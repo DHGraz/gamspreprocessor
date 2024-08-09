@@ -1,0 +1,35 @@
+[project]
+name = "gamspreprocessor"
+version = "0.1.0"
+description = "A utility which helps to preprocess GAMS objects before ingestion."
+authors = [
+    { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" }
+]
+dependencies = [
+    "click>=8.1.7",
+    "uritools>=4.0.3",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[project.scripts]
+preprocess = "gamspreprocessor.cli.main:cli"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "pytest>=8.3.2",
+    "pylint>=3.2.6",
+    "pytest-datadir>=1.5.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gamspreprocessor"]
