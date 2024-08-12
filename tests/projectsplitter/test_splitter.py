@@ -1,21 +1,16 @@
-import os
+"Unit tests for gamspreprocessor.projectsplitter.splitter module."
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from gamspreprocessor.projectsplitter.splitter import (
-#    create_tei_object_dir,
-#    fix_image_url,
-#    get_namespaces,
+    TEIObjectDirectory,
+    extract_pid,
     find_file,
     get_namespaces,
     guess_format,
     rank_path,
-#    uri_to_filename,
     validate_filename,
-    extract_pid,
 )
-
-
 
 
 def test_extract_pid():
@@ -28,14 +23,12 @@ def test_extract_pid():
 def test_validate_filename():
     "Only a few characters are allowed in filenames."
     assert validate_filename(Path("foo.xml")) is None
-    #assert validate_filename(Path("foo1.xml"))
-
-
+    # assert validate_filename(Path("foo1.xml"))
 
 
 def test_get_namespaces(datadir):
     "Test extracting namespaces from an XML file."
-    namespaces = get_namespaces(datadir / "TEI_1.xml")
+    namespaces = get_namespaces(datadir / "projects" / "TEI_1.xml")
     assert namespaces == {
         "": "http://www.tei-c.org/ns/1.0",
         "foo": "https://example.com/foo",
@@ -43,118 +36,106 @@ def test_get_namespaces(datadir):
 
 
 def test_rank_path():
-    "Test the rank path function"
-    assert rank_path(Path('foo'), Path('foox')) == 0
-    assert rank_path(Path('foo'), Path('foo')) == 3
-    assert rank_path(Path('foxo'), Path('foo')) == 1
-    assert rank_path(Path('bar/foo'), Path('foo')) == 3
+    """Test the rank path function.
+
+    In short the rank ist the number of identical chars counted from the end
+    """
+    assert rank_path(Path("foo"), Path("foox")) == 0
+    assert rank_path(Path("foo"), Path("foo")) == 3
+    assert rank_path(Path("foxo"), Path("foo")) == 1
+    assert rank_path(Path("bar/foo"), Path("foo")) == 3
 
 
 def test_find_file(datadir):
     "Test finding a file in a directory."
     root_dir = datadir / "find_file"
 
-    assert find_file('foo.png', root_dir) == root_dir / 'foo.png'
-    assert find_file('foo/foo.png', root_dir) == root_dir / 'foo' / 'foo.png'
-    assert find_file("/bar/foo.png", datadir)  == root_dir / "bar" / "foo.png"
-    # bar/foo.png should win over foo/bar/foo.png
-    assert find_file("bar/foo.png", datadir)  == root_dir / "bar" / "foo.png"
+    assert find_file("foo.png", root_dir) == root_dir / "foo.png"
+    assert find_file("foo/foo.png", root_dir) == root_dir / "foo" / "foo.png"
+    assert find_file("/bar/foo.png", datadir) == root_dir / "bar" / "foo.png"
 
-    assert find_file("file:///bar/foo.png", datadir)  == root_dir / "bar" / "foo.png"
-    assert find_file("http://example.com/bar/foo.png", datadir)  == root_dir / "bar" / "foo.png"
+    # bar/foo.png should win over foo/bar/foo.png
+    assert find_file("bar/foo.png", datadir) == root_dir / "bar" / "foo.png"
+
+    assert find_file("file:///bar/foo.png", datadir) == root_dir / "bar" / "foo.png"
+    assert (
+        find_file("http://example.com/bar/foo.png", datadir)
+        == root_dir / "bar" / "foo.png"
+    )
     assert find_file("foo.jpeg", datadir) is None
 
 
-def _test_uri_to_filename():
-    assert uri_to_filename("http://example.com/image.jpg") == "image.jpg"
-    assert uri_to_filename("https://example.com/image.jpg") == "image.jpg"
-    assert uri_to_filename("file:///path/to/image.jpg") == "image.jpg"
-    assert uri_to_filename("file:///image.jpg") == "image.jpg"
-    assert uri_to_filename("image.jpg") == "image.jpg"
+def test_teiobjectdirectory_init(tmp_path):
+    "Test if TEIObjectDirectory is initialized correctly."
+    tei_dir = tmp_path / "object1"
+    obj = TEIObjectDirectory(tei_dir)
+    assert obj.path == tei_dir
+    assert tei_dir.is_dir()
+
+    # Check what happens if directory ist not empty
+    # At the moment: nothing
+    tei_dir = tmp_path / "object2"
+    tei_dir.mkdir()
+    (tei_dir / "foo.xml").touch()
+    obj = TEIObjectDirectory(tei_dir)
+    assert obj.path == tei_dir
 
 
-def _test_fix_image_url(datadir):
-    # Image in root directory
-    src, target = fix_image_url("file:///image01.jpeg", datadir)
-    assert src == os.path.join(datadir, "image01.jpeg")
-    assert target == "image01.jpeg"
+def test_teiobjectdirectory_split(datadir, tmp_path):
+    "Test the split method of TEIObjectDirectory."
+    project_file = datadir / "projects" / "TEI_1.xml"
+    tei_dir = tmp_path / "object1"
+    objdir = TEIObjectDirectory(tei_dir)
 
-    # image in a subdirectory
-    src, target = fix_image_url("file:///image02.jpeg", datadir)
-    assert src == os.path.join(datadir, "img", "foo", "image02.jpeg")
-    assert target == "image02.jpeg"
+    objdir.split(project_file)
 
+    assert (tei_dir / "TEI_1.xml").exists()
+    assert (tei_dir / "IMG.1.jpeg").exists()
+    assert (tei_dir / "image02.jpeg").exists()
 
-def _test_fix_image_url_with_xmlid(datadir):
-    "If a xmlid is provides, the image name should be changed to the xmlid."
-    src, target = fix_image_url("file:///image02.jpeg", datadir, "IMG.1")
-    assert src == os.path.join(datadir, "img", "foo", "image02.jpeg")
-    assert target == "IMG.1"
-
-
-def _test_fix_image_url_with_http_and_file(datadir):
-    "If schema is html we nevertheless check if the image is a file."
-    src, target = fix_image_url("http://gams.com/foo/bar/image02.jpeg", datadir)
-    assert src == os.path.join(datadir, "img", "foo", "image02.jpeg")
-    assert target == "image02.jpeg"
-
-
-def _test_fix_image_url_with_external_image(datadir):
-    "url is really pointing to an external image"
-    url = "http://gams.com/foo/bar/external.jpeg"
-    src, target = fix_image_url(url, datadir)
-    assert src == url
-    assert target is None
-
-
-def _test_create_tei_object_tei(datadir, tmpdir):
-    target_dir = Path(tmpdir) / "TEI_1"
-    create_tei_object_dir(datadir / "TEI_1.xml", target_dir)
-    expected_file = target_dir / "TEI_1.xml"
-    # Are all files present'
-    assert expected_file.exists()
-    assert (target_dir / "image02.jpeg").exists()
-    assert (target_dir / "IMG.1").exists()
-
-    # Check the generated TEI file
-    tree = ET.parse(expected_file)
+    tree = ET.parse(tei_dir / "TEI_1.xml")
     root = tree.getroot()
     for graphic in root.findall(".//{http://www.tei-c.org/ns/1.0}graphic"):
-        assert graphic.attrib["url"] in {"./image02.jpeg", "./IMG.1"}
+        assert graphic.attrib["url"] in {"./image02.jpeg", "./IMG.1.jpeg"}
 
 
-def _test_tei_dump(datadir, tmpdir):
-    """Make sure that XML generated by ElementTree is the same as the original."""
-    target_dir = Path(tmpdir) / "TEI_1"
-    create_tei_object_dir(datadir / "TEI_1.xml", target_dir)
+def test_teiobjectdirectory_whitespace_handling(datadir, tmp_path):
+    "Make sure that the XML is written correctly."
+    project_file = datadir / "projects" / "bar.xml"
+    tei_dir = tmp_path / "bar"
+    objdir = TEIObjectDirectory(tei_dir)
 
-    with open(target_dir / "TEI_1.xml") as f:
+    objdir.split(project_file)
+    with open(tei_dir / "bar.xml", encoding="utf-8") as f:
         text = f.read()
-        assert "ö" in text  # no entities für special chars
-    # TODO: Whitespace Handling
+    assert (
+        '<p cid="1">Mit den besten <foo>Weihnachtsgrüßen</foo> übersende ich</p>'
+        in text
+    )
+    assert '<p cid="2"> foobar <foo> bar </foo> foo </p>' in text
+    assert (
+        """<p cid="2"> foobar <foo> bar </foo> foo </p> 
+            <p cid="3">ein erster
+            Absatz
+
+            und ein zweiter
+            </p>"""
+        in text
+    )
 
 
 def test_guess_format(datadir):
     "Guess the format of the file from the extension."
-    # we need an unspecifiv xml file
-    foo_xml = datadir / "foo.xml"
-    with open(foo_xml, 'w', encoding='utf-8') as f:
+
+    foo_xml = datadir / "projects" / "foo.xml"
+    with open(foo_xml, "w", encoding="utf-8") as f:
         f.write("<foo></foo>")
-        
-    assert guess_format(datadir / "TEI_1.xml") == "tei"
-    assert guess_format(datadir / "LIDO_1.xml") == "lido"
+
+    assert guess_format(datadir / "projects" / "TEI_1.xml") == "tei"
+    assert guess_format(datadir / "projects" / "LIDO_1.xml") == "lido"
     assert guess_format(str(foo_xml)) == "xml"
-    assert guess_format(datadir / "foo.csv") == "csv"
-    assert guess_format(datadir / "foo.pdf") == "pdf"
-    assert guess_format(datadir / "d1/bar.pdf") == "pdf"
-    assert guess_format('img.jpeg') == 'image'
-    assert guess_format('img.png') == 'image'
-
-
-def _test_register_all_namespaces(datadir):
-    testfile = datadir / "TEI_1.xml"
-    namespaces = get_namespaces(testfile)
-    assert namespaces == {
-        "": "http://www.tei-c.org/ns/1.0",
-        "foo": "https://example.com/foo",
-    }
+    assert guess_format(datadir / "projects" / "foo.csv") == "csv"
+    assert guess_format(datadir / "projects" / "foo.pdf") == "pdf"
+    assert guess_format(datadir / "projects" / "d1/bar.pdf") == "pdf"
+    assert guess_format("img.jpeg") == "image"
+    assert guess_format("img.png") == "image"

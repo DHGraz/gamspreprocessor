@@ -1,10 +1,13 @@
-import click
+"""The main module of the preprocess cli application.
+
+As we expect a bigger number of subcommands in later stages, we decided to 
+keep each subcommand in its own module in the cli package.
+"""
 import logging
 
-from .. import utils
+import click
 
-from .. import NAME, VERSION
-
+from .. import NAME, VERSION, utils
 from . import projectsplitter
 
 logger = logging.getLogger(NAME)
@@ -34,7 +37,7 @@ utils.configure_logging()
 )
 @click.option(
     "--logfile", help="Path to the log file. If not set, no logfile will be created."
-)    
+)
 @click.version_option(version=VERSION, prog_name=NAME)
 def cli(loglevel, logfile=f"{NAME}.log"):
     """preprocessor is the GAMS tool to preprocess GAMS objetcs.
@@ -49,7 +52,6 @@ def cli(loglevel, logfile=f"{NAME}.log"):
     # for file logging we want at least logging.INFO
     filelog_level = logging.INFO if loglevel > logging.INFO else loglevel
     utils.configure_logging(loglevel, logfile, filelog_level)
-
 
 
 cli.add_command(projectsplitter.split_project)

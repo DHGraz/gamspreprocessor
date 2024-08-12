@@ -1,17 +1,32 @@
-from pathlib import Path
+"""Module to split a project into single objects, each in it's own folder.
+
+The main class is ProjectSplitter, which provides a split method to create
+a object folder for the file given as argument.
+The module tries to find all referenced files (based on the object type)
+and copies them to the object folder.
+"""
+
+import logging
+import mimetypes
 import re
 import shutil
-from typing import Dict, Union
 import xml.etree.ElementTree as ET
-import os
-import mimetypes
-from .bookkeeper import BookKeeper
+from pathlib import Path
+from typing import Dict, Set, Tuple, Union
+
 from uritools import urisplit
+
+from .. import NAME
+from .bookkeeper import BookKeeper
+
 # Match Namespaces to formats
 XML_FORMATS = {
     "http://www.tei-c.org/ns/1.0": "tei",
     "http://www.lido-schema.org": "lido",
 }
+
+logger = logging.getLogger(NAME)
+
 
 def guess_format(filename: str) -> str:
     """Guess the format of the file from the extension.
@@ -21,35 +36,41 @@ def guess_format(filename: str) -> str:
     """
     mtype = mimetypes.guess_type(filename)[0]
     file_format = None
-    if mtype == 'application/xml':
+    if mtype == "application/xml":
         file_format = "xml"  # for xml without namespace
+        # search for the document namespace
         for node in ET.iterparse(filename, events=["start-ns"]):
             file_format = XML_FORMATS.get(node[1][1], "xml")
             break
-    elif mtype.startswith('application/'):
-        file_format = mtype.split('/')[1]
-    elif mtype.startswith('text/'):
-        file_format = mtype.split('/')[1]
+    elif mtype.startswith("application/"):
+        file_format = mtype.split("/")[1]
+    elif mtype.startswith("text/"):
+        file_format = mtype.split("/")[1]
     else:
-        file_format = mtype.split('/')[0]
+        file_format = mtype.split("/")[0]
     return file_format.lower()
-    
 
-def validate_filename(path:Path) -> None:
+
+def validate_filename(path: Path) -> None:
     "Raise a ValueError if filename does not match our conventions."
-    allowed_pattern = '^([a-z]:)?[.-_a-z0-9]+$'
+    allowed_pattern = "^([a-z]:)?[.-_a-z0-9]+$"
     filename = path.name
     m = re.match(allowed_pattern, filename)
     if m is None:
-        raise ValueError(f"Filename {filename} does not match the allowed pattern {allowed_pattern}")
+        raise ValueError(
+            f"Filename {filename} does not match the allowed pattern {allowed_pattern}"
+        )
 
-def extract_pid(path:Path) -> str:
+
+def extract_pid(path: Path) -> str:
     "Extract pid from a path."
-    return ".".join(path.name.split('.')[0:-1])
+    return ".".join(path.name.split(".")[0:-1])
+
 
 def get_namespaces(filename: Path) -> Dict[str, str]:
     "Return all namespaces from the XML file a dictionary."
-    return {k:v for (_, (k, v)) in ET.iterparse(filename, events=["start-ns"])}
+    return {k: v for (_, (k, v)) in ET.iterparse(filename, events=["start-ns"])}
+
 
 def register_namespaces(namespaces: dict) -> None:
     "Register all namespaces in the ElementTree module."
@@ -57,7 +78,7 @@ def register_namespaces(namespaces: dict) -> None:
         ET.register_namespace(ns, namespaces[ns])
 
 
-def rank_path(short_path:Path, long_path:Path):
+def rank_path(short_path: Path, long_path: Path):
     "Return how many chars are the same at the end of both paths."
     score = 0
 
@@ -71,33 +92,34 @@ def rank_path(short_path:Path, long_path:Path):
 
 def find_file(referenced_uri: str, source_dir: Path) -> Union[Path, None]:
     """Try to find a file below source_dir with might match the file referenced in uri.
-    
+
     The file will be identified by the best matching path (dir + filename)
     If 2 or more paths are ranked equally, the shortest matching path will be returned.
-    
+
     Return path to the first file which matches or None if no file was found
     """
     uri = urisplit(referenced_uri)
     path = uri.path
-    if path.endswith('/'):
+    if path.endswith("/"):
         path = path[:-1]
-    
+
     ranked_paths = []
-    for file in source_dir.rglob(path.split('/')[-1]):
+    for file in source_dir.rglob(path.split("/")[-1]):
         ranked_paths.append((rank_path(path, file), file))
 
     if ranked_paths:
-        # we sort by 1) rank (desc) and 2) length of the path (asc: *-1) 
-        ranked_paths.sort(key=lambda x: (x[0], len(str(x[1])*-1)), reverse=True)
+        # we sort by 1) rank (desc) and 2) length of the path (asc: *-1)
+        ranked_paths.sort(key=lambda x: (x[0], len(str(x[1]) * -1)), reverse=True)
         return ranked_paths[0][1]
     return None
+
 
 class ObjectDirectory:
     "Class to handle a directory for a generic single object."
 
-    def __init__(self, path:Path):
+    def __init__(self, path: Path):
         """Initialize the object directory.
-        
+
         File will be created, if necessary.
         """
         self.path = path
@@ -108,88 +130,100 @@ class ObjectDirectory:
             self.path.mkdir()
         self.files = []
 
-
-    def split(self, sourcefile:Path):
+    def split(self, sourcefile: Path):
         "Copy the sourcefile to the object directory."
         shutil.copy(sourcefile, self.path)
         self.files.append(sourcefile)
 
+    def __str__(self):
+        return f"ObjectDirectory({self.path})"
+
 
 class TEIObjectDirectory(ObjectDirectory):
-    
-    def split(self, sourcefile: Path):
+    "Class to handle a directory for a TEI object."
+
+    NAMESPACES = {"tei": "http://www.tei-c.org/ns/1.0"}
+
+    def split(self, sourcefile: Path) -> None:
         "Copy the sourcefile and all referenced files to the object directory."
-        referenced_files = set()  # all referenced files must be copied, 
-        
-        #source_dir = sourcefile.parent
+
+        # Keeps all files which must be copied to the object directory
+        referenced_files: Set[Tuple[str, Path]] = set()
+
         shutil.copy(sourcefile, self.path)
         self.files.append(sourcefile)
 
-        
+        # from now on we operate on the copied file
         new_sourcefile = self.path / sourcefile.name
 
         # we want the keep the original prefixes in the namespaces
         register_namespaces(get_namespaces(new_sourcefile))
-        
+
         tree = ET.parse(new_sourcefile)
         root = tree.getroot()
-        self._replace_graphics(root, sourcefile.parent, referenced_files)
-        # TODO: can we make this more generic?
-        # for graphic in root.findall(".//{http://www.tei-c.org/ns/1.0}graphic"): # TODO: tei:?
-        #     src_file, new_image_name = fix_image_url(
-        #         graphic.attrib["url"],
-        #         sourcefile.parent,
-        #         graphic.attrib.get("{http://www.w3.org/XML/1998/namespace}id", ""),
-        #     )
-        #     if new_image_name is not None:
-        #         graphic.set("url", f"./{new_image_name}")
-        # #         ref_files.add((src_file, target_dir / new_image_name))
+        referenced_files.update(self._replace_graphics(root, sourcefile.parent))
 
-        # tree.write(target_dir / source_file.name, encoding="utf-8", xml_declaration=True)
-        # # we copy the images after writing the TEI file (just in case something goes wrong)
-        # for original_url, new_url in ref_files:
-        #     logger.debug("Moving %s to %s", original_url, new_url)
-        #     os.rename(original_url, target_dir / new_url)
+        tree.write(self.path / sourcefile.name, encoding="utf-8", xml_declaration=True)
+        # we copy the images after writing the TEI file (just in case something goes wrong)
+        self.files.append(sourcefile)
+        for filename, sourcepath in referenced_files:
+            target = self.path / filename
+            logger.debug("Moving %s to %s", target, sourcepath)
+            shutil.copy(sourcepath, target)
+            self.files.append(sourcepath)
 
-
-    def _replace_graphics(self, root_node: ET.Element, source_dir:Path, referenced_files:set) -> None:
+    def _replace_graphics(
+        self, root_node: ET.Element, source_dir: Path
+    ) -> Set[Tuple[str, Path]]:
         "Replace the graphic elements in the tree."
+        referenced_files = set()
 
-        for graphic in root_node.findall(".//{http://www.tei-c.org/ns/1.0}graphic"):  # TODO: should also work with tei:
+        for graphic in root_node.findall(".//tei:graphic", namespaces=self.NAMESPACES):
             referenced_uri = graphic.attrib["url"]
-            graphic_id = graphic.attrib.get("{http://www.w3.org/XML/1998/namespace}id", "")
-            referenced_file = find_file(referenced_uri, source_dir)        
+            graphic_id = graphic.attrib.get(
+                "{http://www.w3.org/XML/1998/namespace}id", ""
+            )
+            referenced_file = find_file(referenced_uri, source_dir)
 
             if referenced_file is not None:
                 # if an id is set. we use the id as file name, not the original name
-                new_image_name = f"{graphic_id}.{referenced_file.suffix}"
-                graphic.set("url", f"./{new_image_name}")
-                referenced_files.add(referenced_file)
+                image_name = referenced_file.name
+                if graphic_id:
+                    image_name = f"{graphic_id}{referenced_file.suffix}"
+                graphic.set("url", f"./{image_name}")
+                referenced_files.add((image_name, referenced_file))
+        return referenced_files
 
+    def __str__(self):
+        return f"TEIObjectDirectory({self.path})"
 
-
-            #src_file, new_image_name = fix_image_url(
-            #    graphic.attrib["url"],
-            #    sourcefile.parent,
-            #    graphic.attrib.get("{http://www.w3.org/XML/1998/namespace}id", ""),
-            #)
-            #if new_image_name is not None:
-            #    graphic.set("url", f"./{new_image_name}")
-            #    ref_files.add((src_file, target_dir / new_image_name))
 
 class LIDOObjectDirectory(ObjectDirectory):
-    pass
+    """Class to handle a directory for a LIDO object.
+
+
+    Provides as split method to create a object folder for the file given as argument.
+    """
+
+
+    def __str__(self):
+        return f"LIDOObjectDirectory({self.path})"
 
 
 class ProjectSplitter:
+    """Class to split a project into single objects.
+
+    Provides as split method to create a object folder for the file given as argument.
+    """
 
     def __init__(self, outputdir: Path):
         self.outputdir = outputdir
         if not self.outputdir.exists():
             self.outputdir.mkdir()
-        self._bookkeeper = BookKeeper(self.outputdir)
+        self._bookkeeper = BookKeeper(self.outputdir / BookKeeper.FILENAME)
 
     def split(self, sourcefile: Path, objecttype: str) -> None:
+        "Split a file into an object directory."
         validate_filename(sourcefile)
         pid = extract_pid(sourcefile)
         if objecttype == "auto":
@@ -197,67 +231,17 @@ class ProjectSplitter:
 
         if objecttype == "tei":
             objdir = TEIObjectDirectory(self.outputdir / pid)
-            #self._create_tei_object_dir(sourcefile, pid)
+            # self._create_tei_object_dir(sourcefile, pid)
         elif objecttype == "lido":
             objdir = LIDOObjectDirectory(self.outputdir / pid)
-            #self._create_lido_object_dir(sourcefile, pid)
+            # self._create_lido_object_dir(sourcefile, pid)
         else:
             objdir = ObjectDirectory(self.outputdir / pid)
-            #raise ValueError(f"Unknown object type {objecttype}")
+            # raise ValueError(f"Unknown object type {objecttype}")
         objdir.split(sourcefile)
         for path in objdir.files:
             self._bookkeeper.consumed(path)
 
-#     # TODO: validate file name
-#     pid = os.path.splitext(filename)[0]
-#     if object_type == "auto":
-#         object_type = guess_format(source_file)
-#         if object_type == "TEI":
-#             self._create_tei_object_dir(source_file, target_root / pid)
-#         elif object_type == "LIDO":
-#             self._create_lido_object_dir(source_file, target_root / pid)
-#         else:
-#             # TODO: do we need more formats?
-#             # TODO:: How can generic formats be handled?
-#             raise ValueError(f"Unknown object type {object_type}")
-
-#     # images = extract_images(source_file)
-#     print(source_file, filename, pid)
-# #             sourcefile = Path(sourcefile)
-# #             create_object_dir(sourcefile, target_dir, args.format)
-# #             bookkeeper.consumed(sourcefile)
-# #             object_counter += 1
-# #             unhandled_files = bookkeeper.get_unhandled()
-    
-
     def reset(self) -> None:
         "Reset the bookkeeper."
         self._bookkeeper.reset()
-
-    def _create_tei_object_dir(self, sourcefile: Path, pid: str) -> None:
-        "Copy a TEI file and all referenced images (and other files) to a new directory"
-        target_dir = self.outputdir / pid
-        target_dir.mkdir()
-        ref_files = set()  # all referenced files must be copied, too
-
-        # we want the keep the original prefixes in the namespaces
-        register_namespaces(get_namespaces(sourcefile))
-        
-        tree = ET.parse(sourcefile)
-        root = tree.getroot()
-        # TODO: can we make this more generic?
-        for graphic in root.findall(".//{http://www.tei-c.org/ns/1.0}graphic"): # TODO: tei:?
-            src_file, new_image_name = fix_image_url(
-                graphic.attrib["url"],
-                sourcefile.parent,
-                graphic.attrib.get("{http://www.w3.org/XML/1998/namespace}id", ""),
-            )
-            if new_image_name is not None:
-                graphic.set("url", f"./{new_image_name}")
-                ref_files.add((src_file, target_dir / new_image_name))
-
-        tree.write(target_dir / source_file.name, encoding="utf-8", xml_declaration=True)
-        # we copy the images after writing the TEI file (just in case something goes wrong)
-        for original_url, new_url in ref_files:
-            logger.debug("Moving %s to %s", original_url, new_url)
-            os.rename(original_url, target_dir / new_url)

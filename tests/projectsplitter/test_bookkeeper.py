@@ -11,13 +11,14 @@ def test_init(datadir):
     "Test creating a BookKeeper object without existing data."
 
     bk = BookKeeper(datadir)
-    assert bk.root_dir == str(datadir)
+    assert bk.datafile == datadir / BookKeeper.FILENAME
+    assert len(bk._data) == 4
 
     assert bk._data == {
         os.path.join(datadir, "foo.xml"): False,
         os.path.join(datadir, "foo.pdf"): False,
         os.path.join(datadir, "foo.csv"): False,
-        os.path.join(datadir, "d1/bar.pdf"): False,
+        os.path.join(datadir, "d1", "bar.pdf"): False,
     }
 
 

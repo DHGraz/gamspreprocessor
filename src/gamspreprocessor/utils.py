@@ -1,10 +1,11 @@
-"""Utility function for the gamspreprocessor package.
-"""
+"""Utility function for the gamspreprocessor package."""
+
 import logging
 
 from . import NAME
 
 logger = logging.getLogger(NAME)
+
 
 def configure_logging(
     log_level: int = logging.INFO, logfile: str = None, logfile_level=logging.INFO
@@ -28,4 +29,4 @@ def configure_logging(
         )
         fh.setFormatter(file_formatter)
         fh.setLevel(logfile_level)
-        logger.addHandler(fh)    
+        logger.addHandler(fh)
