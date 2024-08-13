@@ -7,7 +7,7 @@ import logging
 
 import click
 
-from .. import NAME, VERSION, utils
+from .. import NAME, APP_NAME, VERSION, utils
 from . import projectsplitter
 
 logger = logging.getLogger(NAME)
@@ -38,9 +38,9 @@ utils.configure_logging()
 @click.option(
     "--logfile", help="Path to the log file. If not set, no logfile will be created."
 )
-@click.version_option(version=VERSION, prog_name=NAME)
+@click.version_option(version=VERSION, prog_name=APP_NAME)
 def cli(loglevel, logfile=f"{NAME}.log"):
-    """preprocessor is the GAMS tool to preprocess GAMS objetcs.
+    """preprocessor is the GAMS tool to preprocess GAMS objects.
 
     Each object is expected to be in a separate directory.
 
@@ -54,4 +54,4 @@ def cli(loglevel, logfile=f"{NAME}.log"):
     utils.configure_logging(loglevel, logfile, filelog_level)
 
 
-cli.add_command(projectsplitter.split_project)
+cli.add_command(projectsplitter.cli)

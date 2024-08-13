@@ -28,18 +28,19 @@ class BookKeeper:
         self.datafile = project_dir / self.FILENAME
         self._data: Dict[str, str] = {}
 
-        # the file where we keep track of the processed files
-        # self._datafile = str(datafile)
         ## read stored data from disk (if it exists)
         self._load_data()
 
         ## update data with new files
-        self._update_files()
+        #self._update_files()
 
     def dump(self) -> None:
         "Write data to disk"
-        with open(self.datafile, "w", encoding="utf-8") as f:
-            json.dump(self._data, f, ensure_ascii=False)
+        with open('/tmp/x.log', 'w') as f:
+            for file in self._data:
+                f.write(f"{file}, {type(file)}\n")
+        #with open(self.datafile, "w", encoding="utf-8") as f:
+        #    json.dump(self._data, f, ensure_ascii=False)
 
     def consumed(self, file: str) -> None:
         "Mark a file as consumed."
@@ -60,19 +61,9 @@ class BookKeeper:
             with open(self.datafile, encoding="utf-8") as f:
                 self._data = json.load(f)
 
-    # def _collect_files(self, root_dir: str) -> None:
-    #     "Search for (new) files in and below root_dir."
-    #     new_files = []
-    #     for root, _, files in os.walk(root_dir):
-    #         for file in files:
-    #             # skip the bookkeeping file and log files
-    #             if file == self.FILENAME or file.endswith(".log"):
-    #                 continue
-    #             filepath = os.path.join(root, file)
-    #             new_files.append(filepath)
-    #     return new_files
 
-    def _update_files(self):
+    #def _update_files(self):
+    def update(self):
         """Merge already registered files with newly colleced files.
 
         Also remove files which have been deleted since last run.
@@ -93,17 +84,6 @@ class BookKeeper:
         for file in removed_files:
             del self._data[file]
 
-        # # We have to do this in two steps:
-        # # 1) We remove alle Files to avoid modifying the dictionary while iterating over it
-        # # step 1: remove files which have been deleted since last run
-        # new_data = self._collect_files(self.root_dir)
-        # for file in self._data:
-        #     if file not in new_data:
-        #         del self._data[file]
-        # # step 2: add new files
-        # for file in new_data:
-        #     if file not in self._data:
-        #         self._data[file] = False
 
     def __enter__(self):
         return self
