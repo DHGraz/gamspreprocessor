@@ -1,4 +1,4 @@
-"""Keep track of files that have been processed between runs."""
+"""Keep track of files, which have been processed, between runs."""
 
 import json
 import os
@@ -36,11 +36,8 @@ class BookKeeper:
 
     def dump(self) -> None:
         "Write data to disk"
-        with open('/tmp/x.log', 'w') as f:
-            for file in self._data:
-                f.write(f"{file}, {type(file)}\n")
-        #with open(self.datafile, "w", encoding="utf-8") as f:
-        #    json.dump(self._data, f, ensure_ascii=False)
+        with open(self.datafile, "w", encoding="utf-8") as f:
+            json.dump(self._data, f, ensure_ascii=False)
 
     def consumed(self, file: str) -> None:
         "Mark a file as consumed."
