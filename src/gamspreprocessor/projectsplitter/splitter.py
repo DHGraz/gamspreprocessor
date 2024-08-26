@@ -1,7 +1,7 @@
 """Module to split a project into single objects, each in it's own folder.
 
 The main class is ProjectSplitter, which provides a split method to create
-a object folder for the file given as argument.
+an object folder for the file given as argument.
 The module tries to find all referenced files (based on the object type)
 and copies them to the object folder.
 """
@@ -19,36 +19,7 @@ from uritools import urisplit
 from .. import NAME
 from .bookkeeper import BookKeeper
 
-# Match Namespaces to formats
-XML_FORMATS = {
-    "http://www.tei-c.org/ns/1.0": "tei",
-    "http://www.lido-schema.org": "lido",
-}
-
 logger = logging.getLogger(NAME)
-
-
-def guess_format(filename: str) -> str:
-    """Guess the format of the file from the extension.
-
-    It does more than the mimetype guesser, as it also checks the namespaces for xml files.
-    All string returned are lowercase.
-    """
-    mtype = mimetypes.guess_type(filename)[0]
-    file_format = None
-    if mtype == "application/xml":
-        file_format = "xml"  # for xml without namespace
-        # search for the document namespace
-        for node in ET.iterparse(filename, events=["start-ns"]):
-            file_format = XML_FORMATS.get(node[1][1], "xml")
-            break
-    elif mtype.startswith("application/"):
-        file_format = mtype.split("/")[1]
-    elif mtype.startswith("text/"):
-        file_format = mtype.split("/")[1]
-    else:
-        file_format = mtype.split("/")[0]
-    return file_format.lower()
 
 
 def validate_filename(path: Path) -> None:
