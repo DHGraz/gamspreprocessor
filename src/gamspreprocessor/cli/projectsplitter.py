@@ -24,6 +24,7 @@ def cli():
 
 
 @click.command(name="split")
+#@click.command()
 @click.option(
     "-o",
     "--output-dir",
@@ -69,9 +70,9 @@ def split_project(output_dir: str, object_format: str, reset: bool, sourcefiles:
     click.echo(f"Created {object_counter} object dirs, containing {file_counter} files.")
 
 
-@click.command(name="foo")
+@click.command(name="showunhandled")
 @click.argument("project_root", type=click.Path(exists=True))
-def find_unhandled(project_root: str):
+def showunhandled(project_root: str):
     """List all files which have bot been added to an object dir.
 
     This command lists all files from the project dir, which have not been
@@ -79,17 +80,19 @@ def find_unhandled(project_root: str):
     """
     project_root = Path(project_root)
     if not (project_root / BookKeeper.FILENAME).exists():
-       raise click.ClickException(
-           "No bookkeeper file found. Did you run split?"
-       )
+        raise click.ClickException(
+            "No bookkeeper file found. Did you run split?"
+        )
     bookkeeper = BookKeeper(project_root)
     unhandled_files = bookkeeper.get_unhandled()
-    click.echo("foo")
-    #click.echo(f"Found {len(unhandled_files)} unhandled files:\n"
-    #           f"{"\t\n".join(str(f) for f in unhandled_files)}")
-    #for unhandled in unhandled_files():
-    #    click.echo(unhandled)
+    if len(unhandled_files) == 0:
+        click.echo("No unhandled files found.")
+    elif len(unhandled_files) == 1:
+        click.echo(f"Found 1 unhandled file: {unhandled_files[0]}")
+    else:
+        click.echo(f"Found {len(unhandled_files)} unhandled files:\n"
+               f"{"\t\n".join(str(f) for f in unhandled_files)}")
 
 
 cli.add_command(split_project)
-cli.add_command(find_unhandled)
+cli.add_command(showunhandled)
