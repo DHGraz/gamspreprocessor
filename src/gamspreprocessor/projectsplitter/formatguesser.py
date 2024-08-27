@@ -18,6 +18,7 @@ XML_FORMATS = {
     "http://www.lido-schema.org": "lido",
 }
 
+logger = logging.getLogger()
 
 def guess_format(filename: str) -> str:
     """Guess the format of the file from the extension.
@@ -42,5 +43,3 @@ def guess_format(filename: str) -> str:
     else:
         file_format = mtype.split("/")[0]
     return file_format.lower()
-
-
