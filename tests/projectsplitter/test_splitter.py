@@ -2,14 +2,14 @@
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+from gamspreprocessor.projectsplitter.objectdir import find_file, rank_path
 from gamspreprocessor.projectsplitter.splitter import (
-    TEIObjectDirectory,
     extract_pid,
-    find_file,
-    get_namespaces,
-    rank_path,
     validate_filename,
 )
+
+from gamspreprocessor.utils import get_namespaces
+from gamspreprocessor.projectsplitter.teiobjectdir import TEIObjectDirectory
 
 
 def test_extract_pid():
@@ -121,5 +121,3 @@ def test_teiobjectdirectory_whitespace_handling(datadir, tmp_path):
             </p>"""
         in text
     )
-
-

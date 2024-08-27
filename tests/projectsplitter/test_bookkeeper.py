@@ -6,7 +6,9 @@ from pathlib import Path
 
 
 from gamspreprocessor.projectsplitter.bookkeeper import BookKeeper
- 
+
+
+# pylint: disable=protected-access
 
 def test_init_no_data(tmp_path):
     "Test creating a BookKeeper object without existing data."
@@ -36,7 +38,7 @@ def test_init_with_existing_data(tmp_path):
         json.dump(data, f, ensure_ascii=False)
 
     bk = BookKeeper(tmp_path)
-    
+
     assert bk._data == {
         os.path.join(tmp_path, "foo.xml"): True,
         os.path.join(tmp_path, "foo.csv"): True,
@@ -111,7 +113,7 @@ def test_get_unhandled(tmp_path):
     assert Path(file2) in unhandled
     assert Path(file3) in unhandled
 
-    
+
 
 def test_dump(tmp_path):
     "Test writing data to disk."

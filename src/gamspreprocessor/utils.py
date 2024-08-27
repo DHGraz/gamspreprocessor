@@ -1,6 +1,9 @@
 """Utility function for the gamspreprocessor package."""
 
 import logging
+import re
+import xml.etree.ElementTree as ET
+from pathlib import Path
 
 from . import NAME
 
@@ -30,3 +33,30 @@ def configure_logging(
         fh.setFormatter(file_formatter)
         fh.setLevel(logfile_level)
         logger.addHandler(fh)
+
+
+def register_namespaces(namespaces: dict) -> None:
+    "Register all namespaces in the ElementTree module."
+    for ns in namespaces:
+        ET.register_namespace(ns, namespaces[ns])
+
+
+def get_namespaces(filename: Path) -> dict[str, str]:
+    "Return all namespaces from the XML file a dictionary."
+    return {k: v for (_, (k, v)) in ET.iterparse(filename, events=["start-ns"])}
+
+
+def validate_filename(path: Path) -> None:
+    "Raise a ValueError if filename does not match our conventions."
+    allowed_pattern = "^([a-z]:)?[.-_a-z0-9]+$"
+    filename = path.name
+    m = re.match(allowed_pattern, filename)
+    if m is None:
+        raise ValueError(
+            f"Filename {filename} does not match the allowed pattern {allowed_pattern}"
+        )
+
+
+def extract_pid(path: Path) -> str:
+    "Extract pid from a path."
+    return ".".join(path.name.split(".")[0:-1])
