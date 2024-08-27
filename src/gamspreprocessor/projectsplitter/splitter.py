@@ -13,13 +13,12 @@ from pathlib import Path
 from gamspreprocessor.projectsplitter.lidoobjectdir import LIDOObjectDirectory
 from gamspreprocessor.projectsplitter.objectdir import ObjectDirectory
 from gamspreprocessor.projectsplitter.teiobjectdir import TEIObjectDirectory
-from gamspreprocessor.utils import extract_pid, validate_filename
+from gamspreprocessor.utils import validate_filename
 
-from .. import NAME
 from .bookkeeper import BookKeeper
 from .formatguesser import guess_format
 
-logger = logging.getLogger(NAME)
+logger = logging.getLogger()
 
 
 class ProjectSplitter:
@@ -28,15 +27,14 @@ class ProjectSplitter:
     Provides as split method to create a object folder for the file given as argument.
     """
 
-    def __init__(self, outputdir: Path, project_dir: Path) -> list[Path]:
+    def __init__(self, outputdir: Path, project_dir: Path):
         self.outputdir = outputdir
         if not self.outputdir.exists():
             self.outputdir.mkdir()
         self.project_dir = project_dir
-        # self.bookkeeper_file = project_dir / BookKeeper.FILENAME
-        # self._bookkeeper = BookKeeper(self.outputdir / BookKeeper.FILENAME)
+        self.update_bookkeeper()
 
-    def split(self, sourcefile: Path, objecttype: str) -> None:
+    def split(self, sourcefile: Path, objecttype: str = 'auto') -> list[Path]:
         """Split a file into an object directory.
 
         Return a list files (Path objects) which have been copied to the object directory.
@@ -44,7 +42,7 @@ class ProjectSplitter:
         # bk_file = sourcefile.parent / BookKeeper.FILENAME
         with BookKeeper(self.project_dir) as bk:
             validate_filename(sourcefile)
-            pid = extract_pid(sourcefile)
+            pid = self.extract_pid(sourcefile)
             if objecttype == "auto":
                 objecttype = guess_format(sourcefile)
 
@@ -71,3 +69,12 @@ class ProjectSplitter:
 
         with BookKeeper(self.project_dir) as bk:
             bk.reset()
+
+    @classmethod
+    def extract_pid(cls, path: Path) -> str:
+        """Extract the pid from a path.
+
+        This is only useful if path is the main file of an object and contains the pid as filename.
+        """
+        # TODO: Maybe this must be more sophisticated eg. if the object name has to be extracted from content (TEI)
+        return ".".join(path.name.split(".")[0:-1])

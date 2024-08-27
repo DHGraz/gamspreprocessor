@@ -15,21 +15,22 @@ logger = logging.getLogger()
 class TEIObjectDirectory(ObjectDirectory):
     "Class to handle a directory for a TEI object."
 
-    NAMESPACES = {"tei": "http://www.tei-c.org/ns/1.0"}
+    DEFAULT_NAMESPACE = {"tei": "http://www.tei-c.org/ns/1.0"}    
 
     def split(self, sourcefile: Path) -> None:
         "Copy the sourcefile and all referenced files to the object directory."
         # Keeps all files which must be copied to the object directory
         referenced_files: set[tuple[str, Path]] = set()
-
+        
         shutil.copy(sourcefile, self.path)
         self.files.append(sourcefile)
 
         # from now on we operate on the copied file
         new_sourcefile = self.path / sourcefile.name
 
+        namespaces = get_namespaces(sourcefile) 
         # we want the keep the original prefixes in the namespaces
-        register_namespaces(get_namespaces(new_sourcefile))
+        register_namespaces(namespaces)
 
         tree = ET.parse(new_sourcefile)
         root = tree.getroot()
@@ -44,12 +45,12 @@ class TEIObjectDirectory(ObjectDirectory):
             self.files.append(sourcepath)
 
     def _replace_graphics(
-        self, root_node: ET.Element, source_dir: Path
+        self, root_node: ET.Element, source_dir: Path 
     ) -> set[tuple[str, Path]]:
         "Replace the graphic elements in the tree."
         referenced_files = set()
 
-        for graphic in root_node.findall(".//tei:graphic", namespaces=self.NAMESPACES):
+        for graphic in root_node.findall(".//tei:graphic", namespaces=self.DEFAULT_NAMESPACE):
             referenced_uri = graphic.attrib["url"]
             graphic_id = graphic.attrib.get(
                 "{http://www.w3.org/XML/1998/namespace}id", ""

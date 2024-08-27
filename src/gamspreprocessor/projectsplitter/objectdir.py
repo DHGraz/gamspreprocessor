@@ -8,32 +8,6 @@ from pathlib import Path
 
 from uritools import urisplit
 
-
-class ObjectDirectory:
-    "Class to handle a directory for a generic single object."
-
-    def __init__(self, path: Path):
-        """Initialize the object directory.
-
-        File will be created, if necessary.
-        """
-        self.path = path
-        if self.path.is_dir():
-            # TODO: How to react if the directory exists and is not empty?
-            pass
-        else:
-            self.path.mkdir()
-        self.files = []
-
-    def split(self, sourcefile: Path):
-        "Copy the sourcefile to the object directory."
-        shutil.copy(sourcefile, self.path)
-        self.files.append(sourcefile)
-
-    def __str__(self):
-        return f"ObjectDirectory({self.path})"
-
-
 def rank_path(short_path: Path, long_path: Path) -> int:
     "Return how many chars are the same at the end of both paths."
     score = 0
@@ -68,3 +42,34 @@ def find_file(referenced_uri: str, source_dir: Path) -> Path|None:
         ranked_paths.sort(key=lambda x: (x[0], len(str(x[1]) * -1)), reverse=True)
         return ranked_paths[0][1]
     return None
+
+
+class ObjectDirectory:
+    "Class to handle a directory for a generic single object."
+
+    def __init__(self, path: Path, replace: bool = False):
+        """Initialize the object directory.
+
+        If the directory exists and replace is False, a FileExistsError will be raised.
+        So set replace to True if you want to replace the directory.
+        """
+        self.files = []
+        self.path = path
+        if self.path.is_dir():
+            if replace:
+                shutil.rmtree(self.path)
+            else:
+                raise FileExistsError(f"Directory {self.path} already exists")
+        self.path.mkdir()
+        
+
+    def split(self, sourcefile: Path):
+        "Copy the sourcefile to the object directory."
+        shutil.copy(sourcefile, self.path)
+        self.files.append(sourcefile)
+
+    def __str__(self):
+        return f"ObjectDirectory({self.path})"
+
+
+

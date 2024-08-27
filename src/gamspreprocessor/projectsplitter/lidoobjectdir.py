@@ -1,7 +1,16 @@
-"""Module to handle a directory for a LIDO object.
-"""
+"""Module to handle a directory for a LIDO object."""
 
-from .objectdir import ObjectDirectory
+import logging
+import shutil
+from pathlib import Path
+from xml.etree import ElementTree as ET
+
+from gamspreprocessor.utils import get_namespaces, register_namespaces
+
+from .objectdir import ObjectDirectory, find_file
+
+logger = logging.getLogger()
+
 
 class LIDOObjectDirectory(ObjectDirectory):
     """Class to handle a directory for a LIDO object.
@@ -10,6 +19,54 @@ class LIDOObjectDirectory(ObjectDirectory):
     Provides as split method to create a object folder for the file given as argument.
     """
 
+    def split(self, sourcefile: Path) -> None:
+        "Copy the sourcefile and all referenced files to the object directory."
+        # Keeps all files which must be copied to the object directory
+        referenced_files: set[tuple[str, Path]] = set()
+
+        shutil.copy(sourcefile, self.path)
+        self.files.append(sourcefile)
+
+        # from now on we operate on the copied file
+        new_sourcefile = self.path / sourcefile.name
+
+        # we want the keep the original prefixes in the namespaces
+        register_namespaces(get_namespaces(new_sourcefile))
+
+        tree = ET.parse(new_sourcefile)
+        root = tree.getroot()
+        referenced_files.update(self._replace_graphics(root, sourcefile.parent))
+
+        tree.write(self.path / sourcefile.name, encoding="utf-8", xml_declaration=True)
+        # we copy the images after writing the TEI file (just in case something goes wrong)
+        for filename, sourcepath in referenced_files:
+            target = self.path / filename
+            logger.debug("Moving %s to %s", target, sourcepath)
+            shutil.copy(sourcepath, target)
+            self.files.append(sourcepath)
+
+    def _replace_graphics(self, root_node: ET.Element, source_dir: Path) -> set[tuple[str, Path]]:
+        "Replace the graphic elements in the tree."
+        referenced_files = set()
+
+#/lido:lido/lido:administrativeMetadata[1]/lido:resourceWrap[1]/lido:resourceSet[1]/lido:resourceID[1]
+#/lido:lido/lido:administrativeMetadata[1]/lido:resourceWrap[1]/lido:resourceSet[1]/lido:resourceRepresentation[1]/lido:linkResource[1]/@*[namespace-uri()='http://www.lido-schema.org' and local-name()='formatResource']
+
+        for graphic in root_node.findall(".//lido:resourceID", namespaces=self.NAMESPACES):
+            referenced_uri = graphic.attrib["url"]
+            graphic_id = graphic.attrib.get(
+                "{http://www.w3.org/XML/1998/namespace}id", ""
+            )
+            referenced_file = find_file(referenced_uri, source_dir)
+
+            if referenced_file is not None:
+                # if an id is set. we use the id as file name, not the original name
+                image_name = referenced_file.name
+                if graphic_id:
+                    image_name = f"{graphic_id}{referenced_file.suffix}"
+                graphic.set("url", f"./{image_name}")
+                referenced_files.add((image_name, referenced_file))
+        return referenced_files
 
     def __str__(self):
         return f"LIDOObjectDirectory({self.path})"

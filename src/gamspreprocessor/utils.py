@@ -48,7 +48,7 @@ def get_namespaces(filename: Path) -> dict[str, str]:
 
 def validate_filename(path: Path) -> None:
     "Raise a ValueError if filename does not match our conventions."
-    allowed_pattern = "^([a-z]:)?[.-_a-z0-9]+$"
+    allowed_pattern = r"^([a-zA-Z]+:)?[a-zA-Z0-9-._]+$"
     filename = path.name
     m = re.match(allowed_pattern, filename)
     if m is None:
@@ -57,6 +57,3 @@ def validate_filename(path: Path) -> None:
         )
 
 
-def extract_pid(path: Path) -> str:
-    "Extract pid from a path."
-    return ".".join(path.name.split(".")[0:-1])
