@@ -6,7 +6,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from gamspreprocessor.utils import get_namespaces, register_namespaces
-from gamspreprocessor.projectsplitter.objectdir import find_file
+#from gamspreprocessor.projectsplitter.objectdir import find_file
 
 from .objectdir import ObjectDirectory
 
@@ -55,7 +55,7 @@ class TEIObjectDirectory(ObjectDirectory):
             graphic_id = graphic.attrib.get(
                 "{http://www.w3.org/XML/1998/namespace}id", ""
             )
-            referenced_file = find_file(referenced_uri, source_dir)
+            referenced_file = self.find_file(referenced_uri, source_dir)
 
             if referenced_file is not None:
                 # if an id is set. we use the id as file name, not the original name
