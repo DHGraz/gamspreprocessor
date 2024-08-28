@@ -345,13 +345,13 @@
       <lido:resourceSet lido:sortorder="1">
         <lido:resourceID lido:type="IMAGE">IMAGE.1</lido:resourceID>
         <lido:resourceRepresentation>
-          <lido:linkResource lido:formatResource="image/jpeg">http://gams.uni-graz.at/o:ges.a-88/IMAGE.1</lido:linkResource>
+          <lido:linkResource lido:formatResource="image/jpeg">http://gams.uni-graz.at/o:ges.a-88/image01.jpeg</lido:linkResource>
         </lido:resourceRepresentation>
       </lido:resourceSet>
       <lido:resourceSet lido:sortorder="2">
         <lido:resourceID lido:type="IMAGE">IMAGE.2</lido:resourceID>
         <lido:resourceRepresentation>
-          <lido:linkResource lido:formatResource="image/jpeg">http://gams.uni-graz.at/o:ges.a-88/IMAGE.2</lido:linkResource>
+          <lido:linkResource lido:formatResource="image/jpeg">file:///img/image02.jpeg</lido:linkResource>
         </lido:resourceRepresentation>
       </lido:resourceSet>
       <lido:resourceSet lido:sortorder="3">

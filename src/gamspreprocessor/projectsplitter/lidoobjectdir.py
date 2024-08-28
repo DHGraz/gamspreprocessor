@@ -1,15 +1,69 @@
 """Module to handle a directory for a LIDO object."""
 
 import logging
+import mimetypes
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+from uritools import urisplit
+
 from gamspreprocessor.utils import get_namespaces, register_namespaces
 
-from .objectdir import ObjectDirectory, find_file
+from .objectdir import ObjectDirectory
 
 logger = logging.getLogger()
+
+
+@dataclass
+class ResourceSet:
+    "Class to handle a resourceSet element."
+
+    resource_id: str
+    resource_type: str
+    link_format: str
+    link_url: str
+
+    def get_new_url(self) -> str:
+        "Return the new URL for the resource."
+        extension = mimetypes.guess_extension(self.link_format)
+        if extension is None:
+            if "://" in self.link_url:
+                uri = urisplit(self.link_url)
+                suffix = Path(uri.path).suffix
+            else:
+                suffix = Path(self.link_url).suffix
+            if suffix:
+                extension = Path(uri.path).suffix
+            else:
+                extension = ""
+        return f"./{self.resource_id}{extension}"
+
+    @classmethod
+    def from_element(
+        cls, element: ET.Element, namespaces: dict[str, str]
+    ) -> "ResourceSet":
+        "Create a ResourceSet object from a XML element."
+
+        # resourceset_element = element.find("lido:resourceSet", namespaces=namespaces)
+        # if resourceset_element is None:
+        #    resourceid_element = element
+        resourceset_element = element
+        resourceid_element = resourceset_element.find(
+            "lido:resourceID", namespaces=namespaces
+        )
+        resourcelink_element = resourceset_element.find(
+            "lido:resourceRepresentation/lido:linkResource", namespaces=namespaces
+        )
+
+        resource_id = resourceid_element.text
+        resource_type = resourceid_element.attrib[f"{{{namespaces['lido']}}}type"]
+        link_format = resourcelink_element.attrib[
+            f"{{{namespaces['lido']}}}formatResource"
+        ]
+        link_url = resourcelink_element.text
+        return cls(resource_id, resource_type, link_format, link_url)
 
 
 class LIDOObjectDirectory(ObjectDirectory):
@@ -18,6 +72,8 @@ class LIDOObjectDirectory(ObjectDirectory):
 
     Provides as split method to create a object folder for the file given as argument.
     """
+
+    DEFAULT_NAMESPACE = {"lido": "http://www.lido-schema.org"}
 
     def split(self, sourcefile: Path) -> None:
         "Copy the sourcefile and all referenced files to the object directory."
@@ -45,27 +101,25 @@ class LIDOObjectDirectory(ObjectDirectory):
             shutil.copy(sourcepath, target)
             self.files.append(sourcepath)
 
-    def _replace_graphics(self, root_node: ET.Element, source_dir: Path) -> set[tuple[str, Path]]:
+    def _replace_graphics(
+        self, root_node: ET.Element, source_dir: Path
+    ) -> set[tuple[str, Path]]:
         "Replace the graphic elements in the tree."
         referenced_files = set()
 
-#/lido:lido/lido:administrativeMetadata[1]/lido:resourceWrap[1]/lido:resourceSet[1]/lido:resourceID[1]
-#/lido:lido/lido:administrativeMetadata[1]/lido:resourceWrap[1]/lido:resourceSet[1]/lido:resourceRepresentation[1]/lido:linkResource[1]/@*[namespace-uri()='http://www.lido-schema.org' and local-name()='formatResource']
-
-        for graphic in root_node.findall(".//lido:resourceID", namespaces=self.NAMESPACES):
-            referenced_uri = graphic.attrib["url"]
-            graphic_id = graphic.attrib.get(
-                "{http://www.w3.org/XML/1998/namespace}id", ""
+        for resourceset_element in root_node.findall(
+            ".//lido:resourceSet", namespaces=self.DEFAULT_NAMESPACE
+        ):
+            resourceset = ResourceSet.from_element(
+                resourceset_element, self.DEFAULT_NAMESPACE
             )
-            referenced_file = find_file(referenced_uri, source_dir)
-
+            referenced_file = self.find_file(resourceset.link_url, source_dir)
             if referenced_file is not None:
-                # if an id is set. we use the id as file name, not the original name
-                image_name = referenced_file.name
-                if graphic_id:
-                    image_name = f"{graphic_id}{referenced_file.suffix}"
-                graphic.set("url", f"./{image_name}")
-                referenced_files.add((image_name, referenced_file))
+                new_url = resourceset.get_new_url()
+                referenced_files.add((new_url, referenced_file))
+                resourceset_element.find(
+                    ".//lido:linkResource", namespaces=self.DEFAULT_NAMESPACE
+                ).text = new_url
         return referenced_files
 
     def __str__(self):
