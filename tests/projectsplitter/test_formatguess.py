@@ -1,3 +1,4 @@
+"tests for the bookkeeper module."
 from gamspreprocessor.projectsplitter.formatguesser import guess_format
 
 def test_guess_format(datadir):

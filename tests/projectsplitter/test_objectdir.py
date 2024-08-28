@@ -1,3 +1,4 @@
+"Unittests for the object directory class."
 from pathlib import Path
 
 import pytest
@@ -25,7 +26,10 @@ def test_init_dir_exists_no_replace(tmp_path):
 
 
 def test_init_dir_exists_with_replace(tmp_path):
-    "Test the initialization of the object directory if the directory exists an replace is set to True."
+    """Test the initialization of the object directory.
+     
+    We test what happens if the directory exists and replace is set to True.
+    """
 
     # at the moment we ignore the case if the directory exists
     obj_dir = tmp_path / "foo"
@@ -39,7 +43,7 @@ def test_init_dir_exists_with_replace(tmp_path):
     assert obj.path.is_dir()
 
     # directory should be empty
-    assert obj.files == []
+    assert not obj.files
 
 
 def test_split(tmp_path):
