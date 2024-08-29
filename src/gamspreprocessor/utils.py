@@ -55,5 +55,3 @@ def validate_filename(path: Path) -> None:
         raise ValueError(
             f"Filename {filename} does not match the allowed pattern {allowed_pattern}"
         )
-
-
