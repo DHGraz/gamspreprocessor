@@ -8,6 +8,7 @@ and copies them to the object folder.
 
 import logging
 from pathlib import Path
+import shutil
 
 
 from gamspreprocessor.projectsplitter.lidoobjectdir import LIDOObjectDirectory
@@ -27,35 +28,53 @@ class ProjectSplitter:
     Provides as split method to create a object folder for the file given as argument.
     """
 
-    def __init__(self, outputdir: Path, project_dir: Path):
+    def __init__(self, outputdir: Path, project_dir: Path, replace_existing_object_dirs: bool = False):
         self.outputdir = outputdir
+        self.replace_existing_object_dirs = replace_existing_object_dirs
         if not self.outputdir.exists():
             self.outputdir.mkdir()
         self.project_dir = project_dir
         self.update_bookkeeper()
+
+    def make_object_dir(self, pid: str, objecttype: str) -> ObjectDirectory:
+        """An ObjectType factory.
+        
+        Return an ObjectDirectory or a derived class for a given pid depending in objecttype.
+        Will raise a FileExistsError if the directory already exists (ie. the object has already been split).
+        """
+        if objecttype == "tei":
+            objdir = TEIObjectDirectory(self.outputdir / pid)
+        elif objecttype == "lido":
+            objdir = LIDOObjectDirectory(self.outputdir / pid)
+        else:
+            objdir = ObjectDirectory(self.outputdir / pid)
+        return objdir
+
 
     def split(self, sourcefile: Path, objecttype: str = 'auto') -> list[Path]:
         """Split a file into an object directory.
 
         Return a list files (Path objects) which have been copied to the object directory.
         """
-        # bk_file = sourcefile.parent / BookKeeper.FILENAME
         with BookKeeper(self.project_dir) as bk:
             validate_filename(sourcefile)
             pid = self.extract_pid(sourcefile)
             if objecttype == "auto":
                 objecttype = guess_format(sourcefile)
-
-            if objecttype == "tei":
-                objdir = TEIObjectDirectory(self.outputdir / pid)
-            elif objecttype == "lido":
-                objdir = LIDOObjectDirectory(self.outputdir / pid)
-            else:
-                objdir = ObjectDirectory(self.outputdir / pid)
+            try:
+                objdir = self.make_object_dir(pid, objecttype)
+            except FileExistsError as exp:
+                if self.replace_existing_object_dirs:
+                    logger.warning(f"Replacing object directory for {pid}")
+                    bk.remove_pid(pid)
+                    shutil.rmtree(self.outputdir / pid)
+                    objdir = self.make_object_dir(pid, objecttype)
+                else:
+                    logger.error(f"Object {pid} already exists. Skipping.")
+                    raise exp
             objdir.split(sourcefile)
             for path in objdir.files:
-                # self._bookkeeper.consumed(path)
-                bk.consumed(str(path))
+                bk.add_pid(str(path), pid)
         return objdir.files
 
     def update_bookkeeper(self) -> None:

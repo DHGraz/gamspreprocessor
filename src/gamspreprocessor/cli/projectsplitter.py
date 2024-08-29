@@ -38,6 +38,8 @@ def cli():
     default="auto",
     help="The type of files to split. Default is 'auto'.",
 )
+@click.option('-r', '--replace', is_flag=True, default=False,
+              help='Replace existing object directories. Think twice before using this option.')
 @click.option(
     "--reset",
     is_flag=True,
@@ -45,7 +47,7 @@ def cli():
     help="Reset the bookkeeper. Only use this to start all over again.",
 )
 @click.argument("sourcefiles", nargs=-1)
-def split_project(output_dir: str, object_format: str, reset: bool, sourcefiles: Tuple[str]):
+def split_project(output_dir: str, object_format: str, reset: bool, replace:bool, sourcefiles: Tuple[str]):
     """Split project files into objects directories.
 
     Legacy projects kept all objects in a single directory.
@@ -58,8 +60,7 @@ def split_project(output_dir: str, object_format: str, reset: bool, sourcefiles:
     """
     file_counter = 0
     object_counter = 0
-    splitter = ProjectSplitter(Path(output_dir), Path(sourcefiles[0]).parent)
-    #project_dir  = sourcefiles[0].parent
+    splitter = ProjectSplitter(Path(output_dir), Path(sourcefiles[0]).parent, replace)
     if reset:
         splitter.reset()
     # it's enough to update once per run

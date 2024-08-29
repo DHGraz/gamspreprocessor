@@ -13,7 +13,7 @@ def test_init(tmp_path):
     assert obj.path.is_dir()
 
 
-def test_init_dir_exists_no_replace(tmp_path):
+def test_init_dir_exists(tmp_path):
     "Test the initialization of the object directory if the directory exists."
 
     # at the moment we ignore the case if the directory exists
@@ -23,27 +23,6 @@ def test_init_dir_exists_no_replace(tmp_path):
     with pytest.raises(FileExistsError) as excinfo:
         ObjectDirectory(obj_dir)
     assert "already exists" in str(excinfo.value)
-
-
-def test_init_dir_exists_with_replace(tmp_path):
-    """Test the initialization of the object directory.
-     
-    We test what happens if the directory exists and replace is set to True.
-    """
-
-    # at the moment we ignore the case if the directory exists
-    obj_dir = tmp_path / "foo"
-    obj_dir.mkdir()
-
-    # Add a file to make sure that the object is replaced
-    (obj_dir / "foo.txt").write_text("Hello World")
-
-    obj = ObjectDirectory(obj_dir, True)
-    assert obj.path == tmp_path / "foo"
-    assert obj.path.is_dir()
-
-    # directory should be empty
-    assert not obj.files
 
 
 def test_split(tmp_path):

@@ -1,4 +1,5 @@
 "Unit tests for the TEIObjectDirectory class."
+
 from xml.etree import ElementTree as ET
 
 import pytest
@@ -13,18 +14,13 @@ def test_teiobjectdirectory_init(tmp_path):
     assert obj.path == obj_path
     assert obj_path.is_dir()
 
-    # Check what happens if directory ist not empty
-    with pytest.raises(FileExistsError):
-        obj = TEIObjectDirectory(obj_path)
 
-
-def test_teiobjectdirectory_init_dir_with_replace(tmp_path):
-    "Test creating a TEIObjectDirectory with an existing directory and replace=True."
-    obj_path = tmp_path / "object2"
+def test_teiobjectdirectory_init_dir_exists(tmp_path):
+    "Test creating a TEIObjectDirectory with an existing directory."
+    obj_path = tmp_path / "object1"
     obj_path.mkdir()
-    (obj_path / "foo.xml").touch()
-    obj = TEIObjectDirectory(obj_path, True)
-    assert obj.path == obj_path
+    with pytest.raises(FileExistsError):
+        TEIObjectDirectory(obj_path)
 
 
 def test_teiobjectdirectory_split(shared_datadir, tmp_path):

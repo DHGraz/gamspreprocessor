@@ -59,18 +59,16 @@ def test_lidoobjectdirectory_init(tmp_path):
     assert obj.path == obj_path
     assert obj_path.is_dir()
 
-    # Check what happens if directory ist not empty
-    with pytest.raises(FileExistsError):
-        obj = LIDOObjectDirectory(obj_path)
 
 
-def test_lidoobjectdirectory_init_dir_with_replace(tmp_path):
-    "Test creating a LIDOObjectDirectory with an existing directory and replace=True."
+def test_lidoobjectdirectory_init_dir_exists(tmp_path):
+    "Test creating a LIDOObjectDirectory with an existing object directory."
     obj_path = tmp_path / "object2"
     obj_path.mkdir()
-    (obj_path / "foo.xml").touch()
-    obj = LIDOObjectDirectory(obj_path, True)
-    assert obj.path == obj_path
+
+    # Check what happens if directory ist not empty
+    with pytest.raises(FileExistsError):
+        LIDOObjectDirectory(obj_path)
 
 
 def test_lidoobjectdirectory_split(shared_datadir, tmp_path):

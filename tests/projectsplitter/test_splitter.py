@@ -72,7 +72,7 @@ def test_update_bookkeeper(shared_datadir, tmp_path):
     bkfile = source_dir / bookkeeper.BookKeeper.FILENAME
     assert bkfile.is_file()
     bk = bookkeeper.BookKeeper(source_dir)
-    assert bk._data[str(newfile)] is False
+    assert bk._data[str(newfile)] == []
 
 
 def test_reset(shared_datadir, tmp_path):

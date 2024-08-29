@@ -3,17 +3,18 @@
 Each ObjectDirerectory represents a directory that contains all files that
 belong to a single GAMS object.
 """
-
+import logging
 import shutil
 from pathlib import Path
 
 from uritools import urisplit
 
+logger = logging.getLogger(__name__)
 
 class ObjectDirectory:
     "Class to handle a directory for a generic single object."
 
-    def __init__(self, path: Path, replace: bool = False):
+    def __init__(self, path: Path):
         """Initialize the object directory.
 
         If the directory exists and replace is False, a FileExistsError will be raised.
@@ -22,16 +23,15 @@ class ObjectDirectory:
         self.files = []
         self.path = path
         if self.path.is_dir():
-            if replace:
-                shutil.rmtree(self.path)
-            else:
-                raise FileExistsError(f"Directory {self.path} already exists")
+            raise FileExistsError(f"Directory {self.path} already exists")
         self.path.mkdir()
 
     def split(self, sourcefile: Path):
         "Copy the sourcefile to the object directory."
         shutil.copy(sourcefile, self.path)
         self.files.append(sourcefile)
+
+
 
     @classmethod
     def find_file(cls, referenced_uri: str, source_dir: Path) -> Path | None:

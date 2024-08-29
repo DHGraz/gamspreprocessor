@@ -1,9 +1,11 @@
 """Keep track of files, which have been processed, between runs."""
 
 import json
+import logging
 import os
 from pathlib import Path
-from typing import Dict
+
+logger = logging.getLogger(__name__)
 
 
 class BookKeeper:
@@ -26,7 +28,7 @@ class BookKeeper:
 
         self.project_dir = project_dir
         self.datafile = project_dir / self.FILENAME
-        self._data: Dict[str, str] = {}
+        self._data: dict[str, list[str]] = {}
 
         ## read stored data from disk (if it exists)
         self._load_data()
@@ -39,13 +41,30 @@ class BookKeeper:
         with open(self.datafile, "w", encoding="utf-8") as f:
             json.dump(self._data, f, ensure_ascii=False)
 
-    def consumed(self, file: str) -> None:
-        "Mark a file as consumed."
-        self._data[file] = True
+    def add_pid(self, filepath: str, pid:str) -> None:
+        """Mark a file as used for an object with ID pid.
+
+        Files can be used by more than one object, so we need 
+        to keep track of all pids.
+        """
+        if filepath not in self._data:
+            self._data[filepath] = [pid]
+        else:
+            self._data[filepath].append(pid)
+
+    def remove_pid(self, pid:str) -> None:
+        """Remove object ID pid from all entries.
+
+        The is useful if an existing object is replaced by a new one.
+        """
+        for filepath, pids in self._data.items():
+            if pid in pids: 
+                self._data[filepath].remove(pid)
+
 
     def get_unhandled(self) -> list[Path]:
         "Return a list of paths for all files that have not been consumed yet."
-        return [Path(file) for file, consumed in self._data.items() if not consumed]
+        return [Path(file) for file, pids in self._data.items() if not pids]
 
     def reset(self) -> None:
         "Reset the bookkeeper."
@@ -53,13 +72,11 @@ class BookKeeper:
         self.dump()
 
     def _load_data(self) -> dict:
-        "Load data from the json file, if it exists."
+        "Load data from the json file."
         if self.datafile.exists():
             with open(self.datafile, encoding="utf-8") as f:
                 self._data = json.load(f)
-
-
-    #def _update_files(self):
+   
     def update(self):
         """Merge already registered files with newly colleced files.
 
@@ -69,12 +86,13 @@ class BookKeeper:
         for root, _, files in os.walk(str(self.project_dir)):
             for file in files:
                 # skip the bookkeeping file and log files
-                if file == self.datafile.name or file.endswith(".log"):
+                if file == self.datafile.name or file.endswith(".log") or file in ['object.csv', 'datastreams.csv']:
+                    logger.debug(f"skipping {file} while updating bookkeeper")
                     continue
                 filepath = os.path.join(root, file)
                 # add new files as unhandled
                 if filepath not in self._data:
-                    self._data[filepath] = False
+                    self._data[filepath] = []
                 all_files.add(filepath)
         # remove files which have been deleted since last run
         removed_files = set(self._data.keys()) - all_files
