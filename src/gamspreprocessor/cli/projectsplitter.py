@@ -87,8 +87,10 @@ def showunhandled(project_root: str):
     elif len(unhandled_files) == 1:
         click.echo(f"Found 1 unhandled file: {unhandled_files[0]}")
     else:
+        # python < 3.12 does not support backslashes in f-strings
+        files_str ='\n\t'.join(str(f) for f in unhandled_files) 
         click.echo(f"Found {len(unhandled_files)} unhandled files:\n"
-               f"{"\t\n".join(str(f) for f in unhandled_files)}")
+               f"{files_str}")
 
 
 cli.add_command(split_project)
