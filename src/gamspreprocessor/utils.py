@@ -5,25 +5,24 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from . import NAME
-
-logger = logging.getLogger(NAME)
-
 
 def configure_logging(
     log_level: int = logging.INFO, logfile: str = None, logfile_level=logging.INFO
 ) -> None:
-    """Configure the logging module.
+    """Configure the root logger.
 
-    I prefer to use a common logger for all modules in the package. So this function should
-    be called once in the main module of the package.
+    Args:
+        log_level: The log level for the console.
+        logfile: The filename for the log file. If not provided, no log file will be created. 
+        logfile_level: The log level for the log file.
     """
-    logger.setLevel(log_level)
+    logging.basicConfig(level=log_level)
+    root_logger = logging.getLogger()
 
     ch = logging.StreamHandler()
     ch_formatter = logging.Formatter("%(message)s")
     ch.setFormatter(ch_formatter)
-    logger.addHandler(ch)
+    root_logger.addHandler(ch)
 
     if logfile:
         fh = logging.FileHandler(logfile)
@@ -32,17 +31,22 @@ def configure_logging(
         )
         fh.setFormatter(file_formatter)
         fh.setLevel(logfile_level)
-        logger.addHandler(fh)
+        root_logger.addHandler(fh)
 
 
 def register_namespaces(namespaces: dict) -> None:
-    "Register all namespaces in the ElementTree module."
+    """Register all namespaces in dict `namespaces` for the ElementTree module.
+
+    Calling this function will make sure that the namespaces are available 
+    during serialization ti avoid namespace prefixes like `ns0` or `ns1`.
+    """
     for ns in namespaces:
         ET.register_namespace(ns, namespaces[ns])
 
 
 def get_namespaces(filename: Path) -> dict[str, str]:
-    "Return all namespaces from the XML file a dictionary."
+    """Return all namespaces with prefixes from the XML file as dictionary.
+    """
     return {k: v for (_, (k, v)) in ET.iterparse(filename, events=["start-ns"])}
 
 

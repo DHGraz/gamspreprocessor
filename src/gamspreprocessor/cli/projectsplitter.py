@@ -6,13 +6,10 @@ from typing import Tuple
 
 import click
 
-from .. import NAME, utils
 from ..projectsplitter.splitter import ProjectSplitter
 from ..projectsplitter.bookkeeper import BookKeeper
 
-logger = logging.getLogger(NAME)
-utils.configure_logging()
-
+logger = logging.getLogger(__name__)
 
 @click.group(name="splitproject")
 def cli():
@@ -24,7 +21,6 @@ def cli():
 
 
 @click.command(name="split")
-#@click.command()
 @click.option(
     "-o",
     "--output-dir",

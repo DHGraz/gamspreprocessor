@@ -10,7 +10,7 @@ from gamspreprocessor.utils import get_namespaces, register_namespaces
 # from gamspreprocessor.projectsplitter.objectdir import find_file
 from .objectdir import ObjectDirectory
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class TEIObjectDirectory(ObjectDirectory):
@@ -61,7 +61,7 @@ class TEIObjectDirectory(ObjectDirectory):
             referenced_file = self.find_file(referenced_uri, source_dir)
 
             if referenced_file is not None:
-                # if an id is set. we use the id as file name, not the original name
+                # if an id is set, we use the id as file name, not the original name
                 image_name = referenced_file.name
                 if graphic_id:
                     image_name = f"{graphic_id}{referenced_file.suffix}"

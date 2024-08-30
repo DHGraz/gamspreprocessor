@@ -18,7 +18,6 @@ class ObjectDirectory:
         """Initialize the object directory.
 
         If the directory exists and replace is False, a FileExistsError will be raised.
-        So set replace to True if you want to replace the directory.
         """
         self.files = []
         self.path = path

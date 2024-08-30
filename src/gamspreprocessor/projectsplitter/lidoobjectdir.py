@@ -13,12 +13,12 @@ from gamspreprocessor.utils import get_namespaces, register_namespaces
 
 from .objectdir import ObjectDirectory
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 @dataclass
 class ResourceSet:
-    "Class to handle a resourceSet element."
+    "Represents important data from a LIDO resourceSet element."
 
     resource_id: str
     resource_type: str
@@ -38,17 +38,14 @@ class ResourceSet:
                 extension = Path(uri.path).suffix
             else:
                 extension = ""
+        logger.debug("Extension for %s is %s", self.link_url, extension)
         return f"./{self.resource_id}{extension}"
 
     @classmethod
     def from_element(
         cls, element: ET.Element, namespaces: dict[str, str]
     ) -> "ResourceSet":
-        "Create a ResourceSet object from a XML element."
-
-        # resourceset_element = element.find("lido:resourceSet", namespaces=namespaces)
-        # if resourceset_element is None:
-        #    resourceid_element = element
+        "Create a ResourceSet object from a XML resourceSet element."
         resourceset_element = element
         resourceid_element = resourceset_element.find(
             "lido:resourceID", namespaces=namespaces
@@ -91,7 +88,7 @@ class LIDOObjectDirectory(ObjectDirectory):
 
         tree = ET.parse(new_sourcefile)
         root = tree.getroot()
-        referenced_files.update(self._replace_graphics(root, sourcefile.parent))
+        referenced_files.update(self._replace_resource_set(root, sourcefile.parent))
 
         tree.write(self.path / sourcefile.name, encoding="utf-8", xml_declaration=True)
         # we copy the images after writing the TEI file (just in case something goes wrong)
@@ -101,10 +98,10 @@ class LIDOObjectDirectory(ObjectDirectory):
             shutil.copy(sourcepath, target)
             self.files.append(sourcepath)
 
-    def _replace_graphics(
+    def _replace_resource_set(
         self, root_node: ET.Element, source_dir: Path
     ) -> set[tuple[str, Path]]:
-        "Replace the graphic elements in the tree."
+        "Replace the URIs in the resourceSet elements in the tree."
         referenced_files = set()
 
         for resourceset_element in root_node.findall(
