@@ -1,0 +1,21 @@
+variables:
+    RYE_VERSION: "0.38"
+    RYE_IMAGE: "jfxs/rye"
+
+stages:
+  - test
+
+# The Docker image (always latest or use the variables?)
+image: jfxs/rye
+
+# The 'test' stage
+test:
+  stage: test
+  
+  script:
+    - echo "Print the Rye environment versions"
+    - rye --version
+    - echo "Syncing Rye"
+    - rye sync
+    - echo "Running tests with Rye"
+    - rye test
