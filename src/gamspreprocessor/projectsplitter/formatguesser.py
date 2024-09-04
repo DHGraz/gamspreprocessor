@@ -45,7 +45,6 @@ def guess_format(filename: str, explicit_type: str = "auto") -> tuple[str, str]:
     content_type = mimetypes.guess_type(filename)[0]
     # guess_type returns text/xml or application/xml on different platforms?!?
     # At least the github runner returns text/xml while my local system returns application/xml ...
-    print(content_type)
     if content_type == "text/xml": 
         content_type = "application/xml"
     if explicit_type == "auto":

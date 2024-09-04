@@ -1,11 +1,11 @@
 "Unit tests for gamspreprocessor.projectsplitter.splitter module."
 
+import json
 from pathlib import Path
 
 import pytest
 
 # pylint: disable=protected-access
-
 from gamspreprocessor.projectsplitter import bookkeeper
 from gamspreprocessor.projectsplitter.splitter import ProjectSplitter
 
@@ -16,9 +16,9 @@ def test_init(shared_datadir, tmp_path):
     project_dir = shared_datadir / "projects"
 
     splitter = ProjectSplitter(outputdir, project_dir)
-    assert splitter.outputdir == outputdir
+    assert splitter.output_dir == outputdir
     assert splitter.project_dir == project_dir
-    assert splitter.outputdir.is_dir()
+    assert splitter.output_dir.is_dir()
 
 
 def test_split(shared_datadir, tmp_path):
@@ -59,20 +59,25 @@ def test_split_invalid_filename(shared_datadir, tmp_path):
 
 def test_update_bookkeeper(shared_datadir, tmp_path):
     "Test updating the bookkeeper with all files in the project directory."
-    source_dir = shared_datadir / "projects"
-    target_dir = tmp_path / "objects"
+    project_dir = shared_datadir / "projects"
+    object_dir = tmp_path / "objects"
 
     # We create a splitter first and then add a new file to the project directory
-    splitter = ProjectSplitter(target_dir, source_dir)
-    newfile = source_dir / "newfoo.txt"
+    splitter = ProjectSplitter(object_dir, project_dir)
+
+    # Check if an update put all files into the bookkeeper
+    splitter.update_bookkeeper()
+    for path in project_dir.glob("**/*"):
+        if path.is_file():
+            assert str(path) in splitter._bookkeeper._data
+            assert splitter._bookkeeper._data[str(path)] == []
+
+    # add one more file and assert update adds it to the bookkeeper
+    newfile = project_dir / "newfoo.txt"
     newfile.write_text("foo")
     splitter.update_bookkeeper()
-
-    # make sure the Bookkeeper knows about the new file
-    bkfile = source_dir / bookkeeper.BookKeeper.FILENAME
-    assert bkfile.is_file()
-    bk = bookkeeper.BookKeeper(source_dir)
-    assert bk._data[str(newfile)] == []
+    assert str(newfile) in splitter._bookkeeper._data
+    assert splitter._bookkeeper._data[str(newfile)] == []
 
 
 def test_reset(shared_datadir, tmp_path):
@@ -83,17 +88,14 @@ def test_reset(shared_datadir, tmp_path):
     splitter = ProjectSplitter(target_dir, source_dir)
 
     # after creating the splitter, bookkeeping data should exist
-    bk = bookkeeper.BookKeeper(source_dir)
+    bkfile = target_dir / bookkeeper.BookKeeper.FILENAME
+    bk = bookkeeper.BookKeeper(bkfile)
     assert len(bk._data) > 0
 
     splitter.reset()
 
-    # resetting the bookkeeper should be empty
-    bkfile = source_dir / bookkeeper.BookKeeper.FILENAME
-    assert bkfile.is_file()
-
-    bk = bookkeeper.BookKeeper(source_dir)
-    assert len(bk._data) == 0
+    data = json.loads(bkfile.read_text())
+    assert len(data) == 0
 
 
 def test_extract_pid():

@@ -11,10 +11,11 @@ from ..projectsplitter.bookkeeper import BookKeeper
 
 logger = logging.getLogger(__name__)
 
+
 @click.group(name="splitproject")
 def cli():
     """Helpers for creating object directories.
-    
+
     These commands might be useful to convert a GAMS3/4 style project directory
     into a set of object directories like expected in GAMS5.
     """
@@ -24,7 +25,7 @@ def cli():
 @click.option(
     "-o",
     "--output-dir",
-    default=click.Path("./objects"),
+    default="./objects", type=click.Path(exists=True),
     help="The output folder where the object directories will be created. Default: './objects'.",
 )
 @click.option(
@@ -34,8 +35,19 @@ def cli():
     default="auto",
     help="The type of files to split. Default is 'auto'.",
 )
-@click.option('-r', '--replace', is_flag=True, default=False,
-              help='Replace existing object directories. Think twice before using this option.')
+@click.option(
+    "-l",
+    "--file-list",
+    type=click.Path(exists=True),
+    help="A file containing a list of files (with path, if necessary) to be split.",
+)
+@click.option(
+    "-r",
+    "--replace",
+    is_flag=True,
+    default=False,
+    help="Replace existing object directories. Think twice before using this option.",
+)
 @click.option(
     "--reset",
     is_flag=True,
@@ -43,7 +55,14 @@ def cli():
     help="Reset the bookkeeper. Only use this to start all over again.",
 )
 @click.argument("sourcefiles", nargs=-1)
-def split_project(output_dir: str, object_format: str, reset: bool, replace:bool, sourcefiles: Tuple[str]):
+def split_project(
+    output_dir: str,
+    object_format: str,
+    reset: bool,
+    replace: bool,
+    file_list: str,
+    sourcefiles: Tuple[str],
+):
     """Split project files into objects directories.
 
     Legacy projects kept all objects in a single directory.
@@ -56,31 +75,47 @@ def split_project(output_dir: str, object_format: str, reset: bool, replace:bool
     """
     file_counter = 0
     object_counter = 0
+    if file_list and sourcefiles:
+        raise click.ClickException("You cannot use both file-list and sourcefiles.")
+    if file_list:
+        sourcefiles = Path(file_list).read_text().splitlines()
+    if not sourcefiles:
+        raise click.ClickException("No processable source files found.")
+    ## FIXME: We have a problem here, as with file file_list option, we no longer have a
+    ##      single project root. We might need to change the way the projectsplitter works.
     splitter = ProjectSplitter(Path(output_dir), Path(sourcefiles[0]).parent, replace)
     if reset:
         splitter.reset()
     # it's enough to update once per run
     splitter.update_bookkeeper()
     for sourcefile in sourcefiles:
-        object_counter += 1        
-        file_counter += len(splitter.split(Path(sourcefile), object_format))
-    click.echo(f"Created {object_counter} object dirs, containing {file_counter} files.")
+        try:
+            file_counter += len(splitter.split(Path(sourcefile), object_format))
+            object_counter += 1
+            click.echo(f"Split {sourcefile} into object directories.")
+        except FileExistsError:
+            click.echo(f"Object directory for {sourcefile} already  exists. "
+                       "Use '--replace' to overwrite the object directory or delete the directory by hand.")
+    click.echo(
+        f"Created {object_counter} object dirs, containing {file_counter} files."
+    )
 
 
 @click.command(name="showunhandled")
-@click.argument("project_root", type=click.Path(exists=True))
-def showunhandled(project_root: str):
-    """List all files which have bot been added to an object dir.
+@click.argument("output-dir", type=click.Path(exists=True))
+def showunhandled(output_dir: str = './objects'):
+    """List all files which have not been added to an object directory.
 
-    This command lists all files from the project dir, which have not been
+    'output-dir' is the root directory of the object directories, this is the value you used
+    as option '-o' ('--output-dir') for the split command. If not set, the default is './objects'.
+
+    This command lists all files from the project directory, which have not been
     processed by a split command yet.
     """
-    project_root = Path(project_root)
-    if not (project_root / BookKeeper.FILENAME).exists():
-        raise click.ClickException(
-            "No bookkeeper file found. Did you run split?"
-        )
-    bookkeeper = BookKeeper(project_root)
+    objects_dir = Path(output_dir)
+    if not (objects_dir / BookKeeper.FILENAME).exists():
+        raise click.ClickException("No bookkeeper file found. Did you run split?")
+    bookkeeper = BookKeeper(objects_dir / BookKeeper.FILENAME)
     unhandled_files = bookkeeper.get_unhandled()
     if len(unhandled_files) == 0:
         click.echo("No unhandled files found.")
@@ -88,9 +123,8 @@ def showunhandled(project_root: str):
         click.echo(f"Found 1 unhandled file: {unhandled_files[0]}")
     else:
         # python < 3.12 does not support backslashes in f-strings
-        files_str ='\n\t'.join(str(f) for f in unhandled_files) 
-        click.echo(f"Found {len(unhandled_files)} unhandled files:\n"
-               f"{files_str}")
+        files_str = "\n\t".join(str(f) for f in unhandled_files)
+        click.echo(f"Found {len(unhandled_files)} unhandled files:\n" f"{files_str}")
 
 
 cli.add_command(split_project)

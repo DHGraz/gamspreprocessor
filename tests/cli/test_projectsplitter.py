@@ -36,10 +36,10 @@ def test_find_unhandled_no_found(datadir):
     "Test the find-unhandled command with existing bookkeeping file and no unhandled files."
     # create the bookkeeper file
     data = {
-        "image01.jpeg": True,
-        "image02.jpeg": True,
-        "LIDO_1.xml": True,
-        "TEI_1.xml": True,
+        "image01.jpeg": ['foo'],
+        "image02.jpeg": ['foo'],
+        "LIDO_1.xml": ['foo'],
+        "TEI_1.xml": ['bar'],
     }
     bk_file = datadir / BookKeeper.FILENAME
     bk_file.write_text(json.dumps(data))
@@ -54,10 +54,10 @@ def test_find_unhandled_one_found(datadir):
     "Test the find-unhandled command with existing bookkeeping file."
     # create the bookkeeper file
     data = {
-        "image01.jpeg": True,
-        "image02.jpeg": False,
-        "LIDO_1.xml": True,
-        "TEI_1.xml": True,
+        "image01.jpeg": ['foo'],
+        "image02.jpeg": [],
+        "LIDO_1.xml": ['foo'],
+        "TEI_1.xml": ['foo'],
     }
     bk_file = datadir / BookKeeper.FILENAME
     bk_file.write_text(json.dumps(data))
@@ -73,10 +73,10 @@ def test_find_unhandled_multiple_found(datadir):
     "Test the find-unhandled command with existing bookkeeping file and 2 unhandled files."
     # create the bookkeeper file
     data = {
-        "image01.jpeg": True,
-        "image02.jpeg": False,
-        "LIDO_1.xml": False,
-        "TEI_1.xml": True,
+        "image01.jpeg": ['foo'],
+        "image02.jpeg": [],
+        "LIDO_1.xml": [],
+        "TEI_1.xml": ['bar'],
     }
     bk_file = datadir / BookKeeper.FILENAME
     bk_file.write_text(json.dumps(data))

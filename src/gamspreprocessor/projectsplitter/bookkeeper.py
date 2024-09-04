@@ -29,21 +29,27 @@ class BookKeeper:
     # We use pathlib.Path for public interfaces, but strings for paths internally
     # because json does not support Path objects and is does not really make sense
     # to cast values from an to Path objects.
-    def __init__(self, project_dir: Path):
-        "Initialize the BookKeeper object."
+    def __init__(self, data_path: Path) -> None:
+        """Initialize the BookKeeper object.
 
-        self.project_dir = project_dir
-        self.datafile = project_dir / self.FILENAME
+        'data_path' is the path to the file where the bookkeeping data is stored.
+
+        If you plan to run the splitter multiple times for a single project, make sure
+        that the 'data_path' is the same for all runs.
+        """
+        self.data_path = data_path
         self._data: dict[str, list[str]] = {}
 
         ## read stored data from disk (if it exists)
         self._load_data()
 
-    def dump(self) -> None:
-        "Write data to disk"
-        with open(self.datafile, "w", encoding="utf-8") as f:
+    #        self.update()
+
+    def save(self) -> None:
+        "Write data to disk."
+        with open(self.data_path, "w", encoding="utf-8") as f:
             json.dump(self._data, f, ensure_ascii=False)
-        logger.debug("Bookkeeper data written to '%a'", self.datafile)
+        logger.debug("Bookkeeper data written to '%a'", self.data_path)
 
     def add_pid(self, filepath: str, pid: str) -> None:
         """Mark a file as used for an object with ID pid.
@@ -54,7 +60,8 @@ class BookKeeper:
         if filepath not in self._data:
             self._data[filepath] = [pid]
         else:
-            self._data[filepath].append(pid)
+            if pid not in self._data[filepath]:
+                self._data[filepath].append(pid)
         logger.debug("Added object '%s' for '%s' to bookkeeper", pid, filepath)
 
     def remove_pid(self, pid: str) -> None:
@@ -65,7 +72,9 @@ class BookKeeper:
         for filepath, pids in self._data.items():
             if pid in pids:
                 self._data[filepath].remove(pid)
-                logger.debug("Removed object '%s' from '%s' in bookkeeper", pid, filepath)
+                logger.debug(
+                    "Removed object '%s' from '%s' in bookkeeper", pid, filepath
+                )
 
     def get_unhandled(self) -> list[Path]:
         "Return a list of paths for all files that have not been consumed yet."
@@ -74,37 +83,36 @@ class BookKeeper:
     def reset(self) -> None:
         "Reset the bookkeeper."
         self._data = {}
-        self.dump()
+        self.save()
 
     def _load_data(self) -> dict:
         "Load data from the json file."
-        if self.datafile.exists():
-            with open(self.datafile, encoding="utf-8") as f:
+        if self.data_path.exists():
+            with open(self.data_path, encoding="utf-8") as f:
                 self._data = json.load(f)
-            logger.debug("Bookkeeper data loaded from '%s'", self.datafile)
+            logger.debug("Bookkeeper data loaded from '%s'", self.data_path)
         else:
             logger.debug(
-                "Bookkeeper data file '%s' not found, starting with empty data.", self.datafile
+                "Bookkeeper data file '%s' not found, starting with empty data.",
+                self.data_path,
             )
             self._data = {}
 
-    def update(self):
+    def update(self, project_path: Path) -> None:
         """Merge already registered files with newly colleced files.
 
         Also remove files which have been deleted since last run.
+        'project_path' is the root directory of the project files.
         """
+        files_to_ignore = ["object.csv", "datastreams.csv"]
         all_files = set()
-        for root, _, files in os.walk(str(self.project_dir)):
+        for root, _, files in os.walk(str(project_path)):
             for file in files:
                 # skip the bookkeeping file and log files
-                if (
-                    file == self.datafile.name
-                    or file.endswith(".log")
-                    or file in ["object.csv", "datastreams.csv"]
-                ):
+                if file.endswith(".log") or file in files_to_ignore:
                     logger.debug("skipping '%s' while updating bookkeeper", file)
                     continue
-                filepath = os.path.join(root, file)
+                filepath = os.path.abspath(os.path.join(root, file))
                 # add new files as unhandled
                 if filepath not in self._data:
                     self._data[filepath] = []
@@ -115,11 +123,4 @@ class BookKeeper:
         for file in removed_files:
             del self._data[file]
             logger.debug("Removed deleted file '%s' from bookkeeper", file)
-
-    # Make Bookkeper a context manager
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        "Make sure the updated data is written to disk."
-        self.dump()
+        self.save()

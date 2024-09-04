@@ -29,27 +29,30 @@ class ProjectSplitter:
 
     def __init__(
         self,
-        outputdir: Path,
+        output_dir: Path,
         project_dir: Path,
         replace_existing_object_dirs: bool = False,
     ):
-        self.outputdir = outputdir
-        self.replace_existing_object_dirs = replace_existing_object_dirs
-        if not self.outputdir.exists():
-            self.outputdir.mkdir()
+        self.output_dir = output_dir
         self.project_dir = project_dir
+        self.replace_existing_object_dirs = replace_existing_object_dirs
+
+        if not self.output_dir.exists():
+            self.output_dir.mkdir()
+
+        self._bookkeeper = BookKeeper(self.output_dir / BookKeeper.FILENAME)
         self.update_bookkeeper()
         replace_msg = ""
         if self.replace_existing_object_dirs:
             replace_msg = "Existing object directories will be replaced."
         logger.debug(
-            "ProjectSplitter initialized with outputdir %s and project_dir %s. %s",
-            outputdir,
+            "ProjectSplitter initialized with outputdir '%s' and project_dir '%s'. %s",
+            output_dir,
             project_dir,
             replace_msg,
         )
 
-    def make_object_dir(
+    def instantiate_object_directory(
         self, pid: str, mimetype: str, objecttype: str
     ) -> ObjectDirectory:
         """ObjectType factory.
@@ -62,22 +65,24 @@ class ProjectSplitter:
         """
         if mimetype == "application/xml":
             if objecttype == "tei":
-                objdir = TEIObjectDirectory(self.outputdir / pid)
+                objdir = TEIObjectDirectory(self.output_dir / pid)
                 logger.debug("Created TeiObjectDirectory for {pid}")
             elif objecttype == "lido":
-                objdir = LIDOObjectDirectory(self.outputdir / pid)
+                objdir = LIDOObjectDirectory(self.output_dir / pid)
                 logger.debug("Created LidoObjectDirectory for {pid}")
             else:
-                objdir = ObjectDirectory(self.outputdir / pid)
+                objdir = ObjectDirectory(self.output_dir / pid)
                 logger.debug(
                     "Created ObjectDirectory for %s with unspecified XML objecttype %s",
                     pid,
                     objecttype,
                 )
         else:
-            objdir = ObjectDirectory(self.outputdir / pid)
+            objdir = ObjectDirectory(self.output_dir / pid)
             logger.debug(
-                "Created ObjectDirectory for %s. Detected mime type was: %s", pid, mimetype
+                "Created ObjectDirectory for %s. Detected mime type was: %s",
+                pid,
+                mimetype,
             )
         return objdir
 
@@ -86,36 +91,37 @@ class ProjectSplitter:
 
         Return a list files (Path objects) which have been copied to the object directory.
         """
-        with BookKeeper(self.project_dir) as bk:
-            validate_filename(sourcefile)
-            pid = self.extract_pid(sourcefile)
-            mimetype, objecttype = guess_format(sourcefile, objecttype)
-            try:
-                objdir = self.make_object_dir(pid, mimetype, objecttype)
-            except FileExistsError as exp:
-                if self.replace_existing_object_dirs:
-                    logger.warning("Replacing object directory for '%s'", pid)
-                    bk.remove_pid(pid)
-                    shutil.rmtree(self.outputdir / pid)
-                    objdir = self.make_object_dir(pid, mimetype, objecttype)
-                else:
-                    logger.error("Object '%s' already exists. Skipping.", pid)
-                    raise exp
-            objdir.split(sourcefile)
-            for path in objdir.files:
-                bk.add_pid(str(path), pid)
+        # TODO: Unsure if this is the right place to validate the filename
+        validate_filename(sourcefile)
+
+        pid = self.extract_pid(sourcefile)
+        mimetype, objecttype = guess_format(sourcefile, objecttype)
+        try:
+            objdir = self.instantiate_object_directory(pid, mimetype, objecttype)
+        except FileExistsError as exp:
+            if self.replace_existing_object_dirs:
+                logger.warning("Replacing object directory for '%s'", pid)
+                self._bookkeeper.remove_pid(pid)
+                shutil.rmtree(self.output_dir / pid)
+                objdir = self.instantiate_object_directory(pid, mimetype, objecttype)
+            else:
+                logger.error("Object '%s' already exists. Skipping.", pid)
+                raise exp
+        objdir.split(sourcefile)
+        for path in objdir.files:
+            self._bookkeeper.add_pid(str(path), pid)
+        self._bookkeeper.save()
         return objdir.files
 
     def update_bookkeeper(self) -> None:
         "Update the bookkeeper with all files in the project directory."
-        with BookKeeper(self.project_dir) as bk:
-            bk.update()
+        self._bookkeeper.update(self.project_dir)
+        self._bookkeeper.save()
 
     def reset(self) -> None:
         "Reset the bookkeeper."
-
-        with BookKeeper(self.project_dir) as bk:
-            bk.reset()
+        self._bookkeeper.reset()
+        self._bookkeeper.save()
 
     @classmethod
     def extract_pid(cls, path: Path) -> str:
