@@ -1,5 +1,5 @@
 variables:
-    RYE_VERSION: "0.38"
+    RYE_VERSION: "0.39"
     RYE_IMAGE: "jfxs/rye"
 
 stages:
@@ -16,6 +16,7 @@ test-py_3.11:
     - echo "Rye environment version"
     - rye --version
     - echo "Pinning 3.11"
+    - rye pin 3.11
     - rye sync
     - echo "Using python version:"
     - python --version
@@ -28,6 +29,7 @@ test-py_3.12:
     - echo "Rye environment version"
     - rye --version
     - echo "Pinning 3.12"
+    - rye pin 3.12
     - rye sync
     - echo "Using python version:"
     - python --version
