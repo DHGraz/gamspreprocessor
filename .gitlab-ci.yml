@@ -4,18 +4,44 @@ variables:
 
 stages:
   - test
+  - lint
+#  - build
 
 # The Docker image (always latest or use the variables?)
 image: jfxs/rye
 
-# The 'test' stage
-test:
+test-py_3.11:
   stage: test
-  
   script:
-    - echo "Print the Rye environment versions"
+    - echo "Rye environment version"
     - rye --version
-    - echo "Syncing Rye"
+    - echo "Pinning 3.11"
     - rye sync
+    - echo "Using python version:"
+    - python --version
     - echo "Running tests with Rye"
     - rye test
+
+test-py_3.12:
+  stage: test
+  script:
+    - echo "Rye environment version"
+    - rye --version
+    - echo "Pinning 3.12"
+    - rye sync
+    - echo "Using python version:"
+    - python --version
+    - echo "Running tests with Rye"
+    - rye test
+
+lint:
+  stage: lint
+  script:
+    - echo "Rye environment version"
+    - rye --version
+    - echo "Using python version:"
+    - python --version
+    - echo "Running rye lint"
+    - rye lint
+
+
