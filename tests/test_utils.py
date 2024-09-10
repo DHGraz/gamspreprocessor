@@ -1,5 +1,4 @@
 "Tests for the utility functions."
-from pathlib import Path
 
 import pytest
 from gamspreprocessor.utils import get_namespaces, validate_pid
