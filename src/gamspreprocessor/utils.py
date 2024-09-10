@@ -5,6 +5,7 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
 
 def configure_logging(
     log_level: int = logging.INFO, logfile: str = None, logfile_level=logging.INFO
@@ -59,3 +60,6 @@ def validate_filename(path: Path) -> None:
         raise ValueError(
             f"Filename {filename} does not match the allowed pattern {allowed_pattern}"
         )
+    if ':' in filename:
+        logger.warning("Filename %s contains a colon, which is discouraged in the new GAMS.", filename)
+        

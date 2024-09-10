@@ -99,7 +99,7 @@ class ProjectSplitter:
         validate_filename(sourcefile)
 
         mimetype, objecttype = guess_format(sourcefile, objecttype)
-        pid, from_content = self.extract_pid(sourcefile, objecttype, strip_prefix)Filename %s contains a colon. This might cause problems on some systems.
+        pid, from_content = self.extract_pid(sourcefile, objecttype, strip_prefix)
         try:
             objdir = self.instantiate_object_directory(pid, mimetype, objecttype)
         except FileExistsError as exp:
