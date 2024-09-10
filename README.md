@@ -55,21 +55,21 @@ Das sind jeweils die für das Objekt zentralen Dateien. Im Normalfall liefert,
 wenn Wildcards verwendet werden, die Shell eine entsprechende Liste. 
 
 ```
-preprocess splitproject '*TEI*.xml'
+preprocess splitproject split '*TEI*.xml'
 ```
 
 Es können aber auch eine Reihe von Dateien, jeweils durch ein Leerzeichen
 getrennt, angegeben werden. 
 
 ```
-preprocess splitproject TEI_1.xml TEI_2.xml TEI99.xml
+preprocess splitproject split TEI_1.xml TEI_2.xml TEI99.xml
 ```
 
 Eine weitere Möglichkeit, bei der dann kein Argument anzugeben ist, 
 besteht in der Verwendung der ``--file-list`` Option (sieht unten).
 
 ```
-preprocess splitproject --file-list files_to_convert.txt
+preprocess splitproject split --file-list files_to_convert.txt
 ```
 
 ``split`` kennt diese Optionen:
@@ -118,7 +118,7 @@ Der Aufruf erwartet den Pfad zum Wurzelverzeichnis der Objektverzeichnisse
 wurde) als Argument:
 
 ```
-preprocess projectsplitter showunhandled <Pfad>
+preprocess splitproject showunhandled <Pfad>
 ```
 
 Der Befehl kennt keine Optionen außer ``--help``.
