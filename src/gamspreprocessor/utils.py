@@ -51,15 +51,15 @@ def get_namespaces(filename: Path) -> dict[str, str]:
     return {k: v for (_, (k, v)) in ET.iterparse(filename, events=["start-ns"])}
 
 
-def validate_filename(path: Path) -> None:
-    "Raise a ValueError if filename does not match our conventions."
+def validate_pid(pid: str) -> None:
+    "Raise a ValueError if pid does not match our conventions."
     allowed_pattern = r"^([a-zA-Z]+:)?[a-zA-Z0-9-._]+$"
-    filename = path.name
-    m = re.match(allowed_pattern, filename)
+    
+    m = re.match(allowed_pattern, pid)
     if m is None:
         raise ValueError(
-            f"Filename {filename} does not match the allowed pattern {allowed_pattern}"
+            f"PID {pid} does not match the allowed pattern {allowed_pattern}"
         )
-    if ':' in filename:
-        logger.warning("Filename %s contains a colon, which is discouraged in the new GAMS.", filename)
+    if ':' in pid:
+        logger.warning("PID %s contains a colon, which is discouraged in the new GAMS.", pid)
         
