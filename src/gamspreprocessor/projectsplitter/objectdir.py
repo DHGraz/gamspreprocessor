@@ -14,13 +14,13 @@ logger = logging.getLogger(__name__)
 class ObjectDirectory:
     "Class to handle a directory for a generic single object."
 
-    def __init__(self, path: Path):
+    def __init__(self, object_directory_path: Path, new_pid=None):
         """Initialize the object directory.
 
         If the directory exists and replace is False, a FileExistsError will be raised.
         """
         self.files = []
-        self.path = path
+        self.path = Path(str(object_directory_path).replace(':', '%3A'))
         if self.path.is_dir():
             raise FileExistsError(f"Directory {self.path} already exists")
         self.path.mkdir()

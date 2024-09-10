@@ -18,7 +18,7 @@ class TEIObjectDirectory(ObjectDirectory):
 
     DEFAULT_NAMESPACE = {"tei": "http://www.tei-c.org/ns/1.0"}
 
-    def split(self, sourcefile: Path) -> None:
+    def split(self, sourcefile: Path, new_pid=None) -> None:
         "Copy the sourcefile and all referenced files to the object directory."
         # Keeps all files which must be copied to the object directory
         referenced_files: set[tuple[str, Path]] = set()
@@ -35,6 +35,12 @@ class TEIObjectDirectory(ObjectDirectory):
 
         tree = ET.parse(new_sourcefile)
         root = tree.getroot()
+        # if we have a new pid (because we stripped it), we replace the old one
+        if new_pid is not None:
+            root.find(
+                "./tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno",
+                namespaces=self.DEFAULT_NAMESPACE,
+            ).text = new_pid
         referenced_files.update(self._replace_graphics(root, sourcefile.parent))
 
         tree.write(self.path / sourcefile.name, encoding="utf-8", xml_declaration=True)

@@ -41,6 +41,19 @@ def test_teiobjectdirectory_split(shared_datadir, tmp_path):
         assert graphic.attrib["url"] in {"./image02.jpeg", "./IMG.1.jpeg"}
 
 
+def test_teiobjectdirectory_split_with_new_pid(shared_datadir, tmp_path):
+    "Test the split method of TEIObjectDirectory with a new pid."
+    project_file = shared_datadir / "projects" / "TEI_1.xml"
+    obj_path = tmp_path / "object1"
+    objdir = TEIObjectDirectory(obj_path)
+
+    objdir.split(project_file, new_pid="new_pid")
+
+    tree = ET.parse(obj_path / "TEI_1.xml")
+    root = tree.getroot()
+    assert root.find(".//{http://www.tei-c.org/ns/1.0}idno").text == "new_pid"
+
+
 def test_teiobjectdirectory_whitespace_handling(shared_datadir, tmp_path):
     "Make sure that the XML is written correctly."
     project_file = shared_datadir / "projects" / "bar.xml"

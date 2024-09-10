@@ -106,6 +106,17 @@ def test_lidoobjectdirectory_split(shared_datadir, tmp_path):
         == "http://gams.uni-graz.at/o:ges.a-88/IMAGE.3"
     )
 
+def test_lidoobjectdirectory_split_with_new_pid(shared_datadir, tmp_path):
+    "Test the split method of LIDOObjectDirectory with a new pid."
+    project_file = shared_datadir / "projects" / "LIDO_1.xml"
+    obj_path = tmp_path / "object1"
+    objdir = LIDOObjectDirectory(obj_path)
+
+    objdir.split(project_file, new_pid="new_pid")
+
+    tree = ET.parse(obj_path / "LIDO_1.xml")
+    root = tree.getroot()
+    assert root.find(".//{http://www.lido-schema.org}lidoRecID").text == "new_pid"
 
 def test_teiobjectdirectory_whitespace_handling(shared_datadir, tmp_path):
     "Make sure that the XML is written correctly."

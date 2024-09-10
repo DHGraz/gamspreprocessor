@@ -54,6 +54,9 @@ def cli():
     default=False,
     help="Reset the bookkeeper. Only use this to start all over again.",
 )
+
+@click.option("--strip-prefix", is_flag=True, default=False, 
+            help="Strip the prefix (e.g. o:)")
 @click.argument("sourcefiles", nargs=-1)
 def split_project(
     output_dir: str,
@@ -61,6 +64,7 @@ def split_project(
     reset: bool,
     replace: bool,
     file_list: str,
+    strip_prefix: bool,
     sourcefiles: Tuple[str],
 ):
     """Split project files into objects directories.
@@ -81,8 +85,6 @@ def split_project(
         sourcefiles = Path(file_list).read_text().splitlines()
     if not sourcefiles:
         raise click.ClickException("No processable source files found.")
-    ## FIXME: We have a problem here, as with file file_list option, we no longer have a
-    ##      single project root. We might need to change the way the projectsplitter works.
     splitter = ProjectSplitter(Path(output_dir), Path(sourcefiles[0]).parent, replace)
     if reset:
         splitter.reset()
@@ -90,7 +92,7 @@ def split_project(
     splitter.update_bookkeeper()
     for sourcefile in sourcefiles:
         try:
-            file_counter += len(splitter.split(Path(sourcefile), object_format))
+            file_counter += len(splitter.split(Path(sourcefile), object_format, strip_prefix))
             object_counter += 1
             click.echo(f"Split {sourcefile} into object directories.")
         except FileExistsError:

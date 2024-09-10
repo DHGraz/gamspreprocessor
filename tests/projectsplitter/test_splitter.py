@@ -98,7 +98,16 @@ def test_reset(shared_datadir, tmp_path):
     assert len(data) == 0
 
 
-def test_extract_pid():
+def test_extract_pid(shared_datadir):
     "Test extracting the pid from a path via _extract_pid."
-    assert ProjectSplitter.extract_pid(Path("foo/bar/TEI_1.xml")) == "TEI_1"
-    assert ProjectSplitter.extract_pid(Path("foo/bar/o:foo.bar.1.jpg")) == "o:foo.bar.1"
+    tei_file = shared_datadir / "projects" / "TEI_1.xml"
+    assert ProjectSplitter.extract_pid(tei_file, 'tei', True) == ("hsa.letter.12137", True)
+    assert ProjectSplitter.extract_pid(tei_file, 'tei', False) == ("o:hsa.letter.12137", True)
+
+    lido_file = shared_datadir / "projects" / "LIDO_1.xml"
+    assert ProjectSplitter.extract_pid(lido_file, 'lido', True) == ("ges.a-88", True)
+    assert ProjectSplitter.extract_pid(lido_file, 'lido', False) == ("o:ges.a-88", True)
+
+    # Not tei nor lido
+    assert ProjectSplitter.extract_pid(Path('foo/bar/foo.txt'), 'csv', True) == ("foo", False)
+    assert ProjectSplitter.extract_pid(Path('foo/bar/foo.txt'), 'csv', False) == ("foo", False)

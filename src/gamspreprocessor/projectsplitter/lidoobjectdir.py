@@ -72,8 +72,11 @@ class LIDOObjectDirectory(ObjectDirectory):
 
     DEFAULT_NAMESPACE = {"lido": "http://www.lido-schema.org"}
 
-    def split(self, sourcefile: Path) -> None:
-        "Copy the sourcefile and all referenced files to the object directory."
+    def split(self, sourcefile: Path, new_pid=None) -> None:
+        """Copy the sourcefile and all referenced files to the object directory.
+
+        If new_pid is given, the old pid will be replaced with the new one in the xml document.
+        """
         # Keeps all files which must be copied to the object directory
         referenced_files: set[tuple[str, Path]] = set()
 
@@ -88,6 +91,9 @@ class LIDOObjectDirectory(ObjectDirectory):
 
         tree = ET.parse(new_sourcefile)
         root = tree.getroot()
+        # if we have a new pid (because we stripped it), we replace the old one
+        if new_pid is not None:
+            root.find('./lido:lidoRecID', namespaces=self.DEFAULT_NAMESPACE).text = new_pid
         referenced_files.update(self._replace_resource_set(root, sourcefile.parent))
 
         tree.write(self.path / sourcefile.name, encoding="utf-8", xml_declaration=True)
