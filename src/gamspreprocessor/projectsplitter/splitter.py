@@ -14,7 +14,7 @@ from xml.etree import ElementTree as ET
 from gamspreprocessor.projectsplitter.lidoobjectdir import LIDOObjectDirectory
 from gamspreprocessor.projectsplitter.objectdir import ObjectDirectory
 from gamspreprocessor.projectsplitter.teiobjectdir import TEIObjectDirectory
-from gamspreprocessor.utils import validate_filename
+from gamspreprocessor.utils import validate_pid
 
 from .bookkeeper import BookKeeper
 from .formatguesser import guess_format
@@ -95,11 +95,12 @@ class ProjectSplitter:
         strip_prefix: If True, the prefix of the pid ('o:') will be removed.
         Return a list files (Path objects) which have been copied to the object directory.
         """
-        # TODO: Unsure if this is the right place to validate the filename?
-        validate_filename(sourcefile)
+        
+        
 
         mimetype, objecttype = guess_format(sourcefile, objecttype)
         pid, from_content = self.extract_pid(sourcefile, objecttype, strip_prefix)
+        validate_pid(pid)
         try:
             objdir = self.instantiate_object_directory(pid, mimetype, objecttype)
         except FileExistsError as exp:
