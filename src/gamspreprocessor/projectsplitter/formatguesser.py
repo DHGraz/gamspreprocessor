@@ -44,9 +44,12 @@ def guess_format(filename: str, explicit_type: str = "auto") -> tuple[str, str]:
     # TODO: Using an external lib like fido or fits might be a good idea.
     content_type = mimetypes.guess_type(filename)[0]
     # guess_type returns text/xml or application/xml on different platforms?!?
-    # At least the github runner returns text/xml while my local system returns application/xml ...
+    # At least the gitlab runner returns text/xml while my local system returns application/xml ...
     if content_type == "text/xml": 
         content_type = "application/xml"
+    # On some systems, the csv mimetype is not recognized as text/csv but as text/x-comma-separated-values
+    if content_type == "text/x-comma-separated-values":
+        content_type = "text/csv"
     if explicit_type == "auto":
         if content_type == "application/xml":
             file_format = _guess_xml_format(filename)
