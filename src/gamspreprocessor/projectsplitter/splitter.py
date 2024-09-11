@@ -95,9 +95,6 @@ class ProjectSplitter:
         strip_prefix: If True, the prefix of the pid ('o:') will be removed.
         Return a list files (Path objects) which have been copied to the object directory.
         """
-        
-        
-
         mimetype, objecttype = guess_format(sourcefile, objecttype)
         pid, from_content = self.extract_pid(sourcefile, objecttype, strip_prefix)
         validate_pid(pid)
