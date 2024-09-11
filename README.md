@@ -2,6 +2,23 @@
 
 ## Überblick
 
+```mermaid
+graph LR
+    subgraph A[Projektverzeichnis]
+    AA[Enthält z.B. TEI, LIDO-Files,
+    mit referenzierten Dateien
+    wie z.B. Bilder usw.]
+    end
+    subgraph B[Objektverzeichnis]
+    BB[Enthält die Dateien, die
+    dann vom Packaging Tool
+    weiterverarbeitet werden,
+    um Bags für den Ingest zu
+    erzeugen]
+    end
+    A --> |splitproject| B[Objektverzeichnis]
+```
+
 Gamspreprocessor ist eine Sammlung von Werkzeugen zur Vorbereitung von
 Gams-Ingests, die zu einem Befehl ('preprocess') zusammengefasst wurden.
 
