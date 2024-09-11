@@ -97,6 +97,7 @@ class ProjectSplitter:
         """
         mimetype, objecttype = guess_format(sourcefile, objecttype)
         pid, from_content = self.extract_pid(sourcefile, objecttype, strip_prefix)
+
         validate_pid(pid)
         try:
             objdir = self.instantiate_object_directory(pid, mimetype, objecttype)

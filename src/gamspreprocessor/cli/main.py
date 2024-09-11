@@ -10,6 +10,7 @@ import click
 
 from .. import utils, VERSION, APP_NAME
 from . import projectsplitter
+from . import transform
 
 
 @click.group()
@@ -59,3 +60,4 @@ def cli(verbose: bool, quiet: bool, logfile: str, filelog_level: str):
 
 
 cli.add_command(projectsplitter.cli)
+cli.add_command(transform.cli)

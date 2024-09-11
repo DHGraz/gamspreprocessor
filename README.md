@@ -52,6 +52,9 @@ Option, die alle Möglichkeiten auflistet.
 
 Aktuell sind diese Unterbefehle implementiert:
 
+  * splitproject
+  * transform
+
 ### splitproject
 
 ``preprocess splitproject`` wird dazu verwendet, bestehende Projektstrukturen
@@ -139,4 +142,62 @@ preprocess splitproject showunhandled <Pfad>
 ```
 
 Der Befehl kennt keine Optionen außer ``--help``.
+
+### transform
+
+In der aktuellen Version unterstützt ``transform`` nur eine Art von Transformation: ``xslt``.
+Dabei wird im Hintergrund ``saxon`` verwendet. Die verwendete Saxon-Version kann mit dem
+Befehl
+
+```
+preprocess transform saxon-version
+```
+
+ermittelt werden.
+
+#### transform xslt
+
+Der ``xslt`` Befehl von Transform wendet eine XSLT Datei auf ein oder mehrere XML Dateien an:
+
+```
+preprocess trannsform xslt -x myxslt.xsl -o DC.xml foo/TEI.xml
+```
+
+wendet ``myxslt.xsl`` auf ``foo/TEI.xml`` an und schreibt die Ausgabe in die Datei
+``foo/DC.xml``
+
+Gibt man mehr als eine XML-Datei an (oder verwendet ein File-Pattern, das die Shell expandiert),
+wird die XSLT-Datei auf alle XML-Dateien angewendet. Die erzeugte Ausgabe wird dabei jeweils
+in das Verzeichnis geschrieben, in dem die originale XML Datei liegt.
+
+```
+preprocess trannsform xslt -x myxslt.xsl -o DC.xml foo/TEI.xml bar/TEI.xml
+```
+
+Erzeugt 2 neue Dateien: ``foo/DC.xml`` und ``bar/DC.XML``.
+
+Alternativ zur Angabe von XML-Datei, können die zu transformierenden XML-Datei (mit Pfad)
+zeilenweise in eine Datei geschrieben werden:
+
+
+```
+foo/TEI.xml
+bar/TEI.xml
+```
+
+Diese Datei kann mit der ``-file-list`` (oder ``-l``) Option bekannt gemacht werden.
+Nehmen wir an, dass die entsprechende Datei als ``xmls_to_process.txt`` abgespeichert
+wurde. Dann kann sie so verwendet werden:
+
+```
+preprocess trannsform xslt -x myxslt.xsl -o DC.xml -l xmls_to_process.txt
+```
+
+#### Idee
+
+Das Transformationen wie TEI2DC fast immer benötigt werden, könnte man das
+als eigenen Befehl (z.B. tei2dc) implementieren. Das entsprechende XSLT 
+könnte dann aus der Projektkonfiguration gelesen werden oder einen 
+festgelegten Pfad (z.B. im Wurzelverzeichnis des Projekts) haben.
+
 
