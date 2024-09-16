@@ -55,7 +55,7 @@ def cli():
     help="Reset the bookkeeper. Only use this to start all over again.",
 )
 
-@click.option("--strip-prefix", is_flag=True, default=False, 
+@click.option("--strip-prefix", is_flag=True, default=True, 
             help="Strip the prefix (e.g. o:)")
 @click.argument("sourcefiles", nargs=-1)
 def split_project(
