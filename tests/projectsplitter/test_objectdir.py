@@ -1,4 +1,5 @@
 "Unittests for the object directory class."
+
 from pathlib import Path
 
 import pytest
@@ -59,6 +60,7 @@ def test_find_file(shared_datadir):
     root_dir = shared_datadir / "find_file"
 
     assert ObjectDirectory.find_file("foo.png", root_dir) == root_dir / "foo.png"
+
     assert (
         ObjectDirectory.find_file("foo/foo.png", root_dir)
         == root_dir / "foo" / "foo.png"
@@ -83,3 +85,11 @@ def test_find_file(shared_datadir):
         == root_dir / "bar" / "foo.png"
     )
     assert ObjectDirectory.find_file("foo.jpeg", shared_datadir) is None
+
+
+def test_str(tmp_path):
+    "Test the string representation of the object directory."
+
+    obj_path = tmp_path / "foo"
+    obj = ObjectDirectory(obj_path)
+    assert str(obj) == f"ObjectDirectory('{str(obj_path)}')"

@@ -14,3 +14,22 @@ def test_guess_format(datadir):
     assert guess_format(datadir / "d1/bar.pdf") == ("application/pdf", "")
     assert guess_format("img.jpeg") == ("image/jpeg", "")
     assert guess_format("img.png") == ("image/png", "")
+
+
+def test_guess_format_special_cases(datadir, monkeypatch):
+    """Some mimetypes have to be unified."""
+    monkeypatch.setattr("mimetypes.guess_type", lambda x: ("text/xml", None))
+    assert guess_format(datadir / "TEI_1.xml") == ("application/xml", "tei")
+
+    monkeypatch.setattr(
+        "mimetypes.guess_type", lambda x: ("text/x-comma-separated-values", None)
+    )
+    assert guess_format(datadir / "foo.csv") == ("text/csv", "")
+
+    monkeypatch.setattr(
+        "mimetypes.guess_type", lambda x: ("text/x-comma-separated-values", None)
+    )
+    assert guess_format(datadir / "foo.csv", "text/csv") == ("text/csv", "text/csv")
+
+    monkeypatch.setattr("mimetypes.guess_type", lambda x: ("text/xml", None))
+    assert guess_format(datadir / "TEI_1.xml", "tei") == ("application/xml", "tei")

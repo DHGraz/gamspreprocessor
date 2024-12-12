@@ -95,18 +95,18 @@ class ProjectSplitter:
         strip_prefix: If True, the prefix of the pid ('o:') will be removed.
         Return a list files (Path objects) which have been copied to the object directory.
         """
-        mimetype, objecttype = guess_format(sourcefile, objecttype)
-        pid, from_content = self.extract_pid(sourcefile, objecttype, strip_prefix)
+        mimetype, obj_type = guess_format(sourcefile, objecttype)
+        pid, from_content = self.extract_pid(sourcefile, obj_type, strip_prefix)
 
         validate_pid(pid)
         try:
-            objdir = self.instantiate_object_directory(pid, mimetype, objecttype)
+            objdir = self.instantiate_object_directory(pid, mimetype, obj_type)
         except FileExistsError as exp:
             if self.replace_existing_object_dirs:
                 logger.warning("Replacing object directory for '%s'", pid)
                 self._bookkeeper.remove_pid(pid)
                 shutil.rmtree(self.output_dir / pid)
-                objdir = self.instantiate_object_directory(pid, mimetype, objecttype)
+                objdir = self.instantiate_object_directory(pid, mimetype, obj_type)
             else:
                 logger.error("Object '%s' already exists. Skipping.", pid)
                 raise exp
@@ -135,14 +135,16 @@ class ProjectSplitter:
     ) -> tuple[str, bool]:
         """Extract the pid from a path.
 
-        If the PID was extracted from the content (eg. TEI or LIDO file), the second return value is True.
-        This is important, because this means that we might have to update the value in the file.
+        If the PID was extracted from the content (eg. TEI or LIDO file), the
+        second return value is True. This is important, because this means that
+        we might have to update the value in the file.
 
         If object_type is 'tei' or 'lido', we try to extract the PID from the file.
         If strip_prefix is True, we remove the prefix (eg.: 'o:') from the pid.
         If this fails or object_type is not known, we use the filename without extension.
         """
         from_content = False
+        pid = None
         if object_type == "tei":
             root = ET.parse(file_path).getroot()
             element = root.find(

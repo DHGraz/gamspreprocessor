@@ -180,18 +180,27 @@ def test_save(tmp_path):
 
 def test_update_with_ignores(datadir, tmp_path):
     "Test that the BookKeeper update method ignores unwanted files."
-    to_be_ignored = ["foo.log", "object.csv", "datastreams.csv"]
-    files_to_be_ignored = []  # absolute paths
-    # add some files to the project directory
-    for filename in to_be_ignored:
-        f_path = datadir.joinpath(filename)
-        f_path.touch()
-        files_to_be_ignored.append(str(f_path))
+    project_path = datadir / "project"
+    obj_csv = project_path / "object.csv"
+    ds_csv = project_path / "datastreams.csv"
+    logfile = project_path / "foo.log"
+    obj_csv.touch()
+    ds_csv.touch()
+    logfile.touch()
 
-    bk_file = tmp_path / BookKeeper.FILENAME
+    bk_file = datadir / BookKeeper.FILENAME
 
+    # create a BookKeeper object, run update and check if all files registered with the BookKeeper
     bk = BookKeeper(bk_file)
-    for file in bk._data:
-        assert (
-            os.path.basename(file) not in to_be_ignored
-        ), f"File {file} should have been ignored."
+    bk.update(project_path)
+    assert len(bk._data) == 4
+
+    filenames = [os.path.basename(file) for file in bk._data]
+
+    assert "object.csv" not in filenames
+    assert "datastreams.csv" not in filenames
+    assert "foo.log" not in filenames
+    assert "foo.xml" in filenames
+    assert "foo.csv" in filenames
+    assert "bar.pdf" in filenames
+    assert "foo.pdf" in filenames

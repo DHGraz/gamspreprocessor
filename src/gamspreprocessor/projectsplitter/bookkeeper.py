@@ -10,6 +10,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,7 @@ class BookKeeper:
         self._data = {}
         self.save()
 
-    def _load_data(self) -> dict:
+    def _load_data(self) -> dict[str, Any] | None:
         "Load data from the json file."
         if self.data_path.exists():
             with open(self.data_path, encoding="utf-8") as f:

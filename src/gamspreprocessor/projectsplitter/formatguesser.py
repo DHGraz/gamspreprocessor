@@ -10,6 +10,7 @@ about this: https://github.com/KBNLresearch/omSipCreator/issues/23.
 """
 
 import logging
+from pathlib import Path
 import xml.etree.ElementTree as ET
 import mimetypes
 
@@ -32,7 +33,7 @@ def _guess_xml_format(filename: str) -> str:
     return file_format
 
 
-def guess_format(filename: str, explicit_type: str = "auto") -> tuple[str, str]:
+def guess_format(filename: str | Path, explicit_type: str = "auto") -> tuple[str, str]:
     """Guess the format of the file from the extension.
 
     It does more than the mimetype guesser, as it also checks the namespaces for xml files.
@@ -40,14 +41,17 @@ def guess_format(filename: str, explicit_type: str = "auto") -> tuple[str, str]:
     Retuns a tuple with the mimetype and sub-format (like 'tei' for xml.). The sub-format
     always is lowercase and can be an empty string if no subformat was dedected.
     """
+    if isinstance(filename, Path):
+        filename = str(filename)
     # TODO: Add more formats
     # TODO: Using an external lib like fido or fits might be a good idea.
     content_type = mimetypes.guess_type(filename)[0]
     # guess_type returns text/xml or application/xml on different platforms?!?
     # At least the gitlab runner returns text/xml while my local system returns application/xml ...
-    if content_type == "text/xml": 
+    if content_type == "text/xml":
         content_type = "application/xml"
-    # On some systems, the csv mimetype is not recognized as text/csv but as text/x-comma-separated-values
+    # On some systems, the csv mimetype is not recognized as text/csv but as
+    # text/x-comma-separated-values
     if content_type == "text/x-comma-separated-values":
         content_type = "text/csv"
     if explicit_type == "auto":
@@ -57,4 +61,4 @@ def guess_format(filename: str, explicit_type: str = "auto") -> tuple[str, str]:
             file_format = ""
     else:
         file_format = explicit_type
-    return content_type, file_format.lower()
+    return content_type or "", file_format.lower()

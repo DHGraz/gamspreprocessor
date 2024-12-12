@@ -30,6 +30,39 @@ def test_resourceset_from_element():
     assert resourceset.link_url == "http://example.com/image.jpg"
 
 
+def test_resourceset_from_incomplete_element():
+    "Test the ResourceSet classmethod from_element with missing data."
+
+    xml = """
+        <lido:resourceSet xmlns:lido="http://www.lido-schema.org">
+            
+            <lido:resourceRepresentation>
+                <lido:linkResource lido:formatResource="image/jpeg">http://example.com/image.jpg</lido:linkResource>
+            </lido:resourceRepresentation>
+        </lido:resourceSet>
+    """
+    root = ET.fromstring(xml)
+    ns = {"lido": "http://www.lido-schema.org"}
+    resourceset = ResourceSet.from_element(root, ns)
+    assert resourceset.resource_id == ""
+    assert resourceset.resource_type == ""
+    assert resourceset.link_format == "image/jpeg"
+    assert resourceset.link_url == "http://example.com/image.jpg"
+
+    xml = """
+        <lido:resourceSet xmlns:lido="http://www.lido-schema.org">
+            <lido:resourceID lido:type="IMAGE">123</lido:resourceID>
+        </lido:resourceSet>
+    """
+    root = ET.fromstring(xml)
+    ns = {"lido": "http://www.lido-schema.org"}
+    resourceset = ResourceSet.from_element(root, ns)
+    assert resourceset.resource_id == "123"
+    assert resourceset.resource_type == "IMAGE"
+    assert resourceset.link_format == ""
+    assert resourceset.link_url == ""
+
+
 def test_resourceset_get_new_url():
     """The get_new_url tries to come up with a relativ uri for the resource.
 
@@ -51,6 +84,9 @@ def test_resourceset_get_new_url():
     )
     assert resourceset.get_new_url() == "./IMAGE123"
 
+    resourceset = ResourceSet("IMAGE123", "IMAGE", "application/qwirks", "image")
+    assert resourceset.get_new_url() == "./IMAGE123"
+
 
 def test_lidoobjectdirectory_init(tmp_path):
     "Test if LIDOObjectDirectory is initialized correctly."
@@ -58,7 +94,6 @@ def test_lidoobjectdirectory_init(tmp_path):
     obj = LIDOObjectDirectory(obj_path)
     assert obj.path == obj_path
     assert obj_path.is_dir()
-
 
 
 def test_lidoobjectdirectory_init_dir_exists(tmp_path):
@@ -106,6 +141,7 @@ def test_lidoobjectdirectory_split(shared_datadir, tmp_path):
         == "http://gams.uni-graz.at/o:ges.a-88/IMAGE.3"
     )
 
+
 def test_lidoobjectdirectory_split_with_new_pid(shared_datadir, tmp_path):
     "Test the split method of LIDOObjectDirectory with a new pid."
     project_file = shared_datadir / "projects" / "LIDO_1.xml"
@@ -117,6 +153,7 @@ def test_lidoobjectdirectory_split_with_new_pid(shared_datadir, tmp_path):
     tree = ET.parse(obj_path / "LIDO_1.xml")
     root = tree.getroot()
     assert root.find(".//{http://www.lido-schema.org}lidoRecID").text == "new_pid"
+
 
 def test_teiobjectdirectory_whitespace_handling(shared_datadir, tmp_path):
     "Make sure that the XML is written correctly."
@@ -136,3 +173,11 @@ def test_teiobjectdirectory_whitespace_handling(shared_datadir, tmp_path):
         re.MULTILINE,
     )
     assert re.search(r"\s+Geräte</lido:term>", text, re.MULTILINE)
+
+
+def test_str(tmp_path):
+    "Test the string representation of the object directory."
+
+    obj_path = tmp_path / "foo"
+    obj = LIDOObjectDirectory(obj_path)
+    assert str(obj) == f"LIDOObjectDirectory('{str(obj_path)}')"

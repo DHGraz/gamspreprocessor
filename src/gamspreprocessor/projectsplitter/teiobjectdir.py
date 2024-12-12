@@ -37,10 +37,12 @@ class TEIObjectDirectory(ObjectDirectory):
         root = tree.getroot()
         # if we have a new pid (because we stripped it), we replace the old one
         if new_pid is not None:
-            root.find(
+            idno = root.find(
                 "./tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno",
                 namespaces=self.DEFAULT_NAMESPACE,
-            ).text = new_pid
+            )
+            if idno is not None:
+                idno.text = new_pid
         referenced_files.update(self._replace_graphics(root, sourcefile.parent))
 
         tree.write(self.path / sourcefile.name, encoding="utf-8", xml_declaration=True)
@@ -76,4 +78,4 @@ class TEIObjectDirectory(ObjectDirectory):
         return referenced_files
 
     def __str__(self):
-        return f"TEIObjectDirectory({self.path})"
+        return f"TEIObjectDirectory('{self.path}')"

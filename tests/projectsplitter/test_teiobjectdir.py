@@ -76,3 +76,10 @@ def test_teiobjectdirectory_whitespace_handling(shared_datadir, tmp_path):
             </p>"""
         in text
     )
+
+
+def test_str(tmp_path):
+    "Test the __str__ method."
+    obj_path = tmp_path / "object1"
+    obj = TEIObjectDirectory(obj_path)
+    assert str(obj) == f"TEIObjectDirectory('{str(obj_path)}')"
