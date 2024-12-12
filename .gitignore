@@ -14,3 +14,4 @@ requirements-dev.lock
 requirements.lock
 x.py
 objects/
+.coverage

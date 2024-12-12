@@ -1,4 +1,5 @@
 "Tests for the 'transform' group."
+
 from click.testing import CliRunner
 
 from gamspreprocessor.cli.transform import cli

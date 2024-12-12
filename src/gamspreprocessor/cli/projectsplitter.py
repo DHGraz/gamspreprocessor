@@ -6,10 +6,12 @@ from typing import Tuple
 
 import click
 
-from ..projectsplitter.splitter import ProjectSplitter
 from ..projectsplitter.bookkeeper import BookKeeper
+from ..projectsplitter.splitter import ProjectSplitter
 
 logger = logging.getLogger(__name__)
+
+# pylint: disable=too-many-arguments
 
 
 @click.group(name="splitproject")
@@ -25,7 +27,8 @@ def cli():
 @click.option(
     "-o",
     "--output-dir",
-    default="./objects", type=click.Path(exists=True),
+    default="./objects",
+    type=click.Path(exists=True),
     help="The output folder where the object directories will be created. Default: './objects'.",
 )
 @click.option(
@@ -54,9 +57,9 @@ def cli():
     default=False,
     help="Reset the bookkeeper. Only use this to start all over again.",
 )
-
-@click.option("--strip-prefix", is_flag=True, default=True, 
-            help="Strip the prefix (e.g. o:)")
+@click.option(
+    "--strip-prefix", is_flag=True, default=False, help="Strip the prefix (e.g. o:)"
+)
 @click.argument("sourcefiles", nargs=-1)
 def split_project(
     output_dir: str,
@@ -80,24 +83,33 @@ def split_project(
     file_counter = 0
     object_counter = 0
     if file_list and sourcefiles:
-        raise click.ClickException("You cannot use both file-list and sourcefiles.")
+        raise click.ClickException(
+            "You cannot use both '--file-list' and 'sourcefiles'."
+        )
     if file_list:
-        sourcefiles = Path(file_list).read_text().splitlines()
-    if not sourcefiles:
+        with open(file_list, "r", encoding="utf-8", newline="") as f:
+            src_files = f.read().splitlines()
+    else:
+        src_files = sourcefiles
+    if len(src_files) == 0:
         raise click.ClickException("No processable source files found.")
-    splitter = ProjectSplitter(Path(output_dir), Path(sourcefiles[0]).parent, replace)
+    splitter = ProjectSplitter(Path(output_dir), Path(src_files[0]).parent, replace)
     if reset:
         splitter.reset()
     # it's enough to update once per run
     splitter.update_bookkeeper()
-    for sourcefile in sourcefiles:
+    for sourcefile in src_files:
         try:
-            file_counter += len(splitter.split(Path(sourcefile), object_format, strip_prefix))
+            file_counter += len(
+                splitter.split(Path(sourcefile), object_format, strip_prefix)
+            )
             object_counter += 1
             click.echo(f"Split {sourcefile} into object directories.")
         except FileExistsError:
-            click.echo(f"Object directory for {sourcefile} already  exists. "
-                       "Use '--replace' to overwrite the object directory or delete the directory by hand.")
+            raise click.ClickException(
+                f"Object directory for {sourcefile} already  exists. "
+                "Use '--replace' to overwrite the object directory or delete the directory by hand."
+            )
     click.echo(
         f"Created {object_counter} object dirs, containing {file_counter} files."
     )
@@ -105,7 +117,7 @@ def split_project(
 
 @click.command(name="showunhandled")
 @click.argument("output-dir", type=click.Path(exists=True))
-def showunhandled(output_dir: str = './objects'):
+def showunhandled(output_dir: str = "./objects"):
     """List all files which have not been added to an object directory.
 
     'output-dir' is the root directory of the object directories, this is the value you used

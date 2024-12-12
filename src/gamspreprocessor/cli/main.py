@@ -9,6 +9,8 @@ import logging
 import click
 
 from .. import utils, VERSION, APP_NAME
+from . import objectcsv
+from . import project
 from . import projectsplitter
 from . import transform
 
@@ -55,9 +57,11 @@ def cli(verbose: bool, quiet: bool, logfile: str, filelog_level: str):
         loglevel = logging.DEBUG
     else:
         loglevel = logging.INFO
-    filelog_level = logging.getLevelNamesMapping()[filelog_level.upper()]
-    utils.configure_logging(loglevel, logfile, filelog_level)
+    filelog_level_int = logging.getLevelNamesMapping()[filelog_level.upper()]
+    utils.configure_logging(loglevel, logfile, filelog_level_int)
 
 
+cli.add_command(objectcsv.cli)
+cli.add_command(project.cli)
 cli.add_command(projectsplitter.cli)
 cli.add_command(transform.cli)
