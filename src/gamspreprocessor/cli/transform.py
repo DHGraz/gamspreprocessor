@@ -1,3 +1,7 @@
+"""CLI subcommand for transforming a single file.
+
+The 'multitransform' might be a useful alternative to the 'transform' command.
+"""
 import logging
 from pathlib import Path
 import click
@@ -18,38 +22,15 @@ def cli():
 
 @click.command(name="xslt")
 @click.option("--xslt-file", "-x", type=click.Path(exists=True))
-@click.option(
-    "-o",
-    "--output-file",
-    help=(
-        "The output file name. This file will be created in the same folder "
-        "as the input file."
-    ),
-)
-@click.option(
-    "-l",
-    "--file-list",
-    type=click.Path(exists=True),
-    help="A file containing a list of files (with path, if necessary) to be transformed.",
-)
-@click.argument("xmlfiles", type=click.Path(exists=True), nargs=-1)
-def transform_xslt(
-    output_file: str, xslt_file: str, file_list: str, xmlfiles: list[str]
-):
-    "Apply a xslt on one or more xml files."
-    if xmlfiles and file_list:
-        raise click.ClickException(
-            "'--file-list' and 'xmlfiles' are mutually exclusive."
-        )
-    if file_list:
-        xmlfiles = Path(file_list).read_text().splitlines()
-    for xmlfile in xmlfiles:
-        output_file_path = Path(xmlfile).parent / output_file
-        try:
-            transform(Path(xmlfile), Path(xslt_file), output_file_path)
-        except TransformationError as exp:
-            logger.error("Error transforming %s: %s", xmlfile, exp)
-            raise click.ClickException(f"Error transforming {xmlfile}: {exp}") from exp
+@click.argument("xml-file", type=click.Path(exists=True))
+@click.argument("output-file", type=click.Path())
+def transform_xslt(xslt_file: str, xml_file: str, output_file: str):
+    "Apply a xslt on a single xml file."
+    try:
+        transform(Path(xml_file), Path(xslt_file), Path(output_file))
+    except TransformationError as exp:
+        logger.error("Error transforming %s: %s", xml_file, exp)
+        raise click.ClickException(f"Error transforming {xml_file}: {exp}") from exp
 
 
 @click.command(name="saxon-version")

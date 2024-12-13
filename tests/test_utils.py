@@ -1,9 +1,11 @@
 "Tests for the utility functions."
 
 import logging
+from pathlib import Path
 import pytest
 from gamspreprocessor.utils import get_namespaces, validate_pid
 from gamspreprocessor.utils import configure_logging
+from gamspreprocessor.utils import find_multiple_files_per_dir
 
 
 def test_validate_pid():
@@ -12,7 +14,8 @@ def test_validate_pid():
     assert validate_pid("foo.123") is None
     assert validate_pid("foo.1.2.3") is None
     assert validate_pid("foo-bar_1") is None
-    assert validate_pid("o:foo.123") is None
+    with pytest.warns(UserWarning):
+        assert validate_pid("o:foo.123") is None
     with pytest.raises(ValueError):
         validate_pid("foo/bar")
 
@@ -24,6 +27,30 @@ def test_get_namespaces(datadir):
         "": "http://www.tei-c.org/ns/1.0",
         "foo": "https://example.com/foo",
     }
+
+
+def test_find_mutliple_files_per_dir():
+    "Test finding multiple files in each directory."
+    input_paths = [
+        Path("foo/bar1/file1.xml"),
+        Path("foo/bar2/file1.xml"),
+        Path("foo/bar3/file1.xml"),
+        Path("foo/bar3/file2.xml"),
+        Path("bar/bar1/file2.xml"),
+        Path("bar/bar1/file1.xml"),
+    ]
+    result = find_multiple_files_per_dir(input_paths)
+    assert len(result) == 2
+
+    # check sorting of directories
+    assert result[0][0] == Path("bar/bar1")
+    assert result[1][0] == Path("foo/bar3")
+
+    # check sorting of files
+    assert result[0][1][0] == Path("bar/bar1/file1.xml")
+    assert result[0][1][1] == Path("bar/bar1/file2.xml")
+    assert result[1][1][0] == Path("foo/bar3/file1.xml")
+    assert result[1][1][1] == Path("foo/bar3/file2.xml")
 
 
 def test_configure_logging(tmp_path):

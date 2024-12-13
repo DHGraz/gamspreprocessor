@@ -9,6 +9,7 @@ and copies them to the object folder.
 import logging
 import shutil
 from pathlib import Path
+import warnings
 from xml.etree import ElementTree as ET
 
 from gamspreprocessor.projectsplitter.lidoobjectdir import LIDOObjectDirectory
@@ -103,7 +104,7 @@ class ProjectSplitter:
             objdir = self.instantiate_object_directory(pid, mimetype, obj_type)
         except FileExistsError as exp:
             if self.replace_existing_object_dirs:
-                logger.warning("Replacing object directory for '%s'", pid)
+                warnings.warn(f"Replacing object directory for '{pid}'")
                 self._bookkeeper.remove_pid(pid)
                 shutil.rmtree(self.output_dir / pid)
                 objdir = self.instantiate_object_directory(pid, mimetype, obj_type)

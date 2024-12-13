@@ -2,6 +2,7 @@
 
 import logging
 import re
+import warnings
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -65,6 +66,32 @@ def validate_pid(pid: str) -> None:
             f"PID {pid} does not match the allowed pattern {allowed_pattern}"
         )
     if ":" in pid:
-        logger.warning(
-            "PID %s contains a colon, which is discouraged in the new GAMS.", pid
+        warnings.warn(
+            f"PID {pid} contains a colon, which is discouraged in the new GAMS.",
+            UserWarning,
         )
+
+
+def find_multiple_files_per_dir(paths: list[Path]) -> list[tuple[Path, list[Path]]]:
+    """Find multiple files in each directory matching a pattern.
+
+    Args:
+        paths: A list of files.
+    Returns:
+        A list of tuples (dirname, files) for all directories containing multiple files.
+    """
+    multi_file_dirs: dict[str, dict[str, Path]] = {}
+    # collect parent dirs
+    for path in paths:
+        containing_dir: str = str(path.parent)
+        path_files = multi_file_dirs.get(containing_dir, [])
+        path_files.append(path)
+        multi_file_dirs[containing_dir] = path_files
+
+    prolematic_dirs = []
+    for dir, files in multi_file_dirs.items():
+        if len(files) > 1:
+            files.sort()
+            prolematic_dirs.append((Path(dir), files))
+    prolematic_dirs.sort(key=lambda x: x[0])
+    return prolematic_dirs

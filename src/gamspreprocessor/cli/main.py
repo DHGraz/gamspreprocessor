@@ -13,6 +13,7 @@ from . import objectcsv
 from . import project
 from . import projectsplitter
 from . import transform
+from . import multitransform
 
 
 @click.group()
@@ -65,3 +66,4 @@ cli.add_command(objectcsv.cli)
 cli.add_command(project.cli)
 cli.add_command(projectsplitter.cli)
 cli.add_command(transform.cli)
+cli.add_command(multitransform.cli)

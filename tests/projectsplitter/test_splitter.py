@@ -54,7 +54,8 @@ def test_split_tei(shared_datadir, tmp_path):
     testfile = source_dir / "TEI_1.xml"
 
     splitter = ProjectSplitter(target_dir, source_dir)
-    result = splitter.split(testfile, "tei")
+    with pytest.warns(UserWarning, match=r"colon"):
+        result = splitter.split(testfile, "tei")
     assert len(result) == 3
     assert all(f.is_file() for f in result)
 
@@ -72,7 +73,8 @@ def test_split_lido(shared_datadir, tmp_path):
     testfile = source_dir / "LIDO_1.xml"
 
     splitter = ProjectSplitter(target_dir, source_dir)
-    result = splitter.split(testfile, "lido")
+    with pytest.warns(UserWarning, match=r"colon"):
+        result = splitter.split(testfile, "lido")
     assert len(result) == 3
     assert all(f.is_file() for f in result)
 
@@ -111,9 +113,10 @@ def test_split_existing_object_dir(shared_datadir, tmp_path):
         splitter.split(testfile)
 
     # Splitting the same file with replace_existing_object_dirs=True
-    # should not raise an error
+    # should not raise an error, but still give a warning
     splitter.replace_existing_object_dirs = True
-    result = splitter.split(testfile)
+    with pytest.warns(UserWarning, match=r"Replacing object directory"):
+        result = splitter.split(testfile)
     assert len(result) == 1
     assert all(f.is_file() for f in result)
 
