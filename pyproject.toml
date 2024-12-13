@@ -9,6 +9,9 @@ dependencies = [
     "click>=8.1.7",
     "uritools>=4.0.3",
     "saxonche>=12.5.0",
+    "gamslib>=0.3.0",
+    
+    
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -28,6 +31,8 @@ dev-dependencies = [
     "pylint>=3.2.6",
     "pytest-datadir>=1.5.0",
     "grip>=4.6.2",
+    "pyright>=1.1.390",
+    "pytest-cov>=6.0.0",
 ]
 
 [tool.hatch.metadata]
