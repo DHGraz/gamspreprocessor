@@ -14,3 +14,7 @@ requirements-dev.lock
 requirements.lock
 x.py
 .coverage
+
+# other
+objects/
+project.toml
