@@ -88,8 +88,9 @@ def collectcsv(projectroot: str, output_dir: str | None = None, to_csv: bool = F
     obj_csv = gamslib.objectcsv.collect_csv_data(
         Path(projectroot), all_objects_file, all_ds_file
     )
+    # ToDo: add folder {obj_csv.object_dir.name} to avoid problems with linter/tests
     if to_csv:
-        click.echo(f"Created csv files {all_objects_file} and {all_ds_file}.")
+        click.echo(f"Created csv files {all_objects_file} and {all_ds_file} for data in folder {obj_csv.object_dir.name}.")
     else:
         xlsx_file = output_path / "all_objects.xlsx"
         gamslib.objectcsv.csv_to_xlsx(all_objects_file, all_ds_file, xlsx_file)

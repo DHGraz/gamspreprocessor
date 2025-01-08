@@ -1,4 +1,3 @@
-from gamslib import projectconfiguration, objectcsv
 from click.testing import CliRunner
 from gamspreprocessor.cli.main import cli
 
@@ -6,7 +5,7 @@ from gamspreprocessor.cli.main import cli
 def test_create_csv(datadir):
     "Test the csv create command."
     runner = CliRunner()
-    cfgfile = str(datadir / "objects" / "project.toml")
+    #cfgfile = str(datadir / "objects" / "project.toml")
     result = runner.invoke(cli, ["csv", "create", str(datadir / "objects")])
     assert result.exit_code == 0
     assert "Created csv files for 2 objects (3 content files)" in result.output

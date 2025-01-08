@@ -1,7 +1,12 @@
 # Gamspreprocessor
 
 ## Überblick
+- kann mit Hilfe von `splitproject` versuchen aus vorhanden Verzeichnissen Objekt-Ordner zu erzeugen
+- erzeugt mit entsprechenden XSLTs fehlende DC.xml für jedes Objekt
+- erzeugt Excel- bzw. CSV-Dateien (`object.csv`, `datastreams.csv`)
 
+
+### Optional: splitproject
 ```mermaid
 graph LR
     subgraph A[Projektverzeichnis]
@@ -10,14 +15,37 @@ graph LR
     wie z.B. Bilder usw.]
     end
     subgraph B[Objektverzeichnis]
-    BB[Enthält die Dateien, die
-    dann vom Packaging Tool
+    BB[Enthält Dateien, die
+    beim Preprocessing
     weiterverarbeitet werden,
     um Bags für den Ingest zu
     erzeugen]
     end
     A --> |splitproject| B[Objektverzeichnis]
 ```
+
+### Dublin Core und CSV
+```mermaid
+graph LR
+    subgraph A[Projektverzeichnis]
+    AA[Pro Objekt ein Verzeichnit mit 
+    z.B. TEI, LIDO-Files,
+    mit referenzierten Dateien
+    wie z.B. Bilder usw.]
+    end
+    subgraph B[Dublin Core]
+    BB[erzeugt pro Objektverzeichnis
+    ein DC.xml]
+    end
+    subgraph C[Objektverzeichnis]
+    CC[erzeugt CSV bzw. Excel-Dateien
+    für object.csv und
+    datastreams.csv]
+    end
+    A --> |transform| B[Objektverzeichnis]
+    B --> |csv create| C[Objektverzeichnis]
+```
+
 
 Gamspreprocessor ist eine Sammlung von Werkzeugen zur Vorbereitung von
 Gams-Ingests, die zu einem Befehl ('preprocess') zusammengefasst wurden.
@@ -54,6 +82,8 @@ Aktuell sind diese Unterbefehle implementiert:
 
   * splitproject
   * transform
+  * multitransform
+  * csv create
 
 ### splitproject
 
@@ -74,21 +104,21 @@ beim Aufsplitten von Objekten verloren gehen.
 Das sind jeweils die für das Objekt zentralen Dateien. Im Normalfall liefert,
 wenn Wildcards verwendet werden, die Shell eine entsprechende Liste. 
 
-```
+```sh
 preprocess splitproject split '*TEI*.xml'
 ```
 
 Es können aber auch eine Reihe von Dateien, jeweils durch ein Leerzeichen
 getrennt, angegeben werden. 
 
-```
+```sh
 preprocess splitproject split TEI_1.xml TEI_2.xml TEI99.xml
 ```
 
 Eine weitere Möglichkeit, bei der dann kein Argument anzugeben ist, 
 besteht in der Verwendung der ``--file-list`` Option (sieht unten).
 
-```
+```sh
 preprocess splitproject split --file-list files_to_convert.txt
 ```
 
@@ -137,7 +167,7 @@ Der Aufruf erwartet den Pfad zum Wurzelverzeichnis der Objektverzeichnisse
 (das ist der Pfad, der als Option ``--output-dir`` bei ``split`` verwendet
 wurde) als Argument:
 
-```
+```sh
 preprocess splitproject showunhandled <Pfad>
 ```
 
@@ -149,18 +179,18 @@ In der aktuellen Version unterstützt ``transform`` nur eine Art von Transformat
 Dabei wird im Hintergrund ``saxon`` verwendet. Die verwendete Saxon-Version kann mit dem
 Befehl
 
-```
+```sh
 preprocess transform saxon-version
 ```
 
 ermittelt werden.
 
-#### transform xslt
+#### transform xslt: erzeugen von DC.xml
 
-Der ``xslt`` Befehl von Transform wendet eine XSLT Datei auf ein oder mehrere XML Dateien an:
+Der ``xslt`` Befehl von Transform wendet eine XSLT Datei auf eine oder mehrere XML Dateien an:
 
-```
-preprocess trannsform xslt -x myxslt.xsl -o DC.xml foo/TEI.xml
+```sh
+preprocess transform xslt -x myxslt.xsl -o DC.xml foo/TEI.xml
 ```
 
 wendet ``myxslt.xsl`` auf ``foo/TEI.xml`` an und schreibt die Ausgabe in die Datei
@@ -170,8 +200,8 @@ Gibt man mehr als eine XML-Datei an (oder verwendet ein File-Pattern, das die Sh
 wird die XSLT-Datei auf alle XML-Dateien angewendet. Die erzeugte Ausgabe wird dabei jeweils
 in das Verzeichnis geschrieben, in dem die originale XML Datei liegt.
 
-```
-preprocess trannsform xslt -x myxslt.xsl -o DC.xml foo/TEI.xml bar/TEI.xml
+```sh
+preprocess transform xslt -x myxslt.xsl -o DC.xml foo/TEI.xml bar/TEI.xml
 ```
 
 Erzeugt 2 neue Dateien: ``foo/DC.xml`` und ``bar/DC.XML``.
@@ -180,7 +210,7 @@ Alternativ zur Angabe von XML-Datei, können die zu transformierenden XML-Datei 
 zeilenweise in eine Datei geschrieben werden:
 
 
-```
+```sh
 foo/TEI.xml
 bar/TEI.xml
 ```
@@ -189,8 +219,8 @@ Diese Datei kann mit der ``-file-list`` (oder ``-l``) Option bekannt gemacht wer
 Nehmen wir an, dass die entsprechende Datei als ``xmls_to_process.txt`` abgespeichert
 wurde. Dann kann sie so verwendet werden:
 
-```
-preprocess trannsform xslt -x myxslt.xsl -o DC.xml -l xmls_to_process.txt
+```sh
+preprocess multitransform xslt -r -x myxslt.xsl -p 'TEI*.xml' -o DC.xml -l objects
 ```
 
 #### Idee
@@ -201,3 +231,7 @@ könnte dann aus der Projektkonfiguration gelesen werden oder einen
 festgelegten Pfad (z.B. im Wurzelverzeichnis des Projekts) haben.
 
 
+## csv create: CSV bzw. Excel-Dateien erzeugen
+```sh
+preprocess csv create <path-to-object-root-folder>
+```

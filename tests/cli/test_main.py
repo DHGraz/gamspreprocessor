@@ -1,9 +1,7 @@
 "Tests for the main CLI entry point."
 
 import logging
-import click
 from click.testing import CliRunner
-import pytest
 from gamspreprocessor.cli.main import cli
 from gamspreprocessor import APP_NAME, VERSION
 
