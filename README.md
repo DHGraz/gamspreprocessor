@@ -6,47 +6,6 @@
 - erzeugt Excel- bzw. CSV-Dateien (`object.csv`, `datastreams.csv`)
 
 
-### Optional: splitproject
-```mermaid
-graph LR
-    subgraph A[Projektverzeichnis]
-    AA[Enthält z.B. TEI, LIDO-Files,
-    mit referenzierten Dateien
-    wie z.B. Bilder usw.]
-    end
-    subgraph B[Objektverzeichnis]
-    BB[Enthält Dateien, die
-    beim Preprocessing
-    weiterverarbeitet werden,
-    um Bags für den Ingest zu
-    erzeugen]
-    end
-    A --> |splitproject| B[Objektverzeichnis]
-```
-
-### Dublin Core und CSV
-```mermaid
-graph LR
-    subgraph A[Projektverzeichnis]
-    AA[Pro Objekt ein Verzeichnit mit 
-    z.B. TEI, LIDO-Files,
-    mit referenzierten Dateien
-    wie z.B. Bilder usw.]
-    end
-    subgraph B[Dublin Core]
-    BB[erzeugt pro Objektverzeichnis
-    ein DC.xml]
-    end
-    subgraph C[Objektverzeichnis]
-    CC[erzeugt CSV bzw. Excel-Dateien
-    für object.csv und
-    datastreams.csv]
-    end
-    A --> |transform| B[Objektverzeichnis]
-    B --> |csv create| C[Objektverzeichnis]
-```
-
-
 Gamspreprocessor ist eine Sammlung von Werkzeugen zur Vorbereitung von
 Gams-Ingests, die zu einem Befehl ('preprocess') zusammengefasst wurden.
 
@@ -86,6 +45,23 @@ Aktuell sind diese Unterbefehle implementiert:
   * csv create
 
 ### splitproject
+
+```mermaid
+graph LR
+    subgraph A[Projektverzeichnis]
+    AA[Enthält z.B. TEI, LIDO-Files,
+    mit referenzierten Dateien
+    wie z.B. Bilder usw.]
+    end
+    subgraph B[Objektverzeichnis]
+    BB[Enthält Dateien, die
+    beim Preprocessing
+    weiterverarbeitet werden,
+    um Bags für den Ingest zu
+    erzeugen]
+    end
+    A --> |splitproject| B[Objektverzeichnis]
+```
 
 ``preprocess splitproject`` wird dazu verwendet, bestehende Projektstrukturen
 (wie in GAMS 3) so umzubauen, dass für jedes Objekt und seine Datenströme
@@ -175,6 +151,28 @@ Der Befehl kennt keine Optionen außer ``--help``.
 
 ### transform
 
+```mermaid
+graph LR
+    subgraph A[Projektverzeichnis]
+    AA[Pro Objekt ein Verzeichnis mit 
+    z.B. TEI, LIDO-Files,
+    mit referenzierten Dateien
+    wie z.B. Bilder usw.]
+    end
+    subgraph B[Dublin Core]
+    BB[erzeugt pro Objektverzeichnis
+    ein DC.xml]
+    end
+    subgraph C[Objektverzeichnis]
+    CC[erzeugt CSV bzw. Excel-Dateien
+    für object.csv und
+    datastreams.csv]
+    end
+    A --> |transform| B[Objektverzeichnis]
+    B --> |csv create| C[Objektverzeichnis]
+```
+
+
 In der aktuellen Version unterstützt ``transform`` nur eine Art von Transformation: ``xslt``.
 Dabei wird im Hintergrund ``saxon`` verwendet. Die verwendete Saxon-Version kann mit dem
 Befehl
@@ -231,7 +229,92 @@ könnte dann aus der Projektkonfiguration gelesen werden oder einen
 festgelegten Pfad (z.B. im Wurzelverzeichnis des Projekts) haben.
 
 
+## project.toml
+
+Um die Metadaten-CSV-Dateien zu erstellen, benötigt der Packager Daten über das Projekt, zu dem die Objekte gehören.
+Diese Infos müssen in einer Konfigurationsdatei mit dem Namen `project.toml` bereitgestellt werden.
+Mit der Option `-c` von `packager create csv`, kann auch ein anderer Dateinamen verwendet werden, 
+wir empfehlen jedoch, `project.toml` zu verwenden.
+
+Die Datei muss den Regeln des TOML-Formats folgen (https://toml.io). Derzeit ist
+die Datei sehr einfach, da sie nur aus 4 Elementen besteht. Hier ist ein Beispiel für das Projekt `hsa`:
+
+```
+[metdata]
+project_id = "hsa"
+creator = "Gams HSA Project"
+publisher = "Gams"
+rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+
+[general]
+desid_keep_extendsion = true
+loglevel = "info"
+```
+
+Eine `project.toml` kann entweder händisch oder mit Hilfe der `gamslib`(https://zimlab.uni-graz.at/gams5/production/gamslib) angelegt werden. Die Toml-Datei muss die o.g. Felder enthalten.
+
+Nur die Einträge im Abschnitt 'metdata', sind für die Metadaten-Extraktion in die CSV-Dateien.
+
+## Dublin Core (DC.xml)
+
+- DC.xml muss vorhanden sein
+- kann z.B. mit Hilfe eines XSLTs auf TEI erzeugt werden (s. gamspreprocessor)
+- muss folgende Felder enthalten:
+  - identifier
+  - title
+  - creator
+  - rights
+- kann zusätzlich weitere Felder enthalten (s. https://zimlab.uni-graz.at/gams/metadata/templates/dc_template.xml) wie bspw.
+  - date (im ISO-Format?)
+  - location 
+  - ...
+
 ## csv create: CSV bzw. Excel-Dateien erzeugen
 ```sh
 preprocess csv create <path-to-object-root-folder>
+
 ```
+
+## CSV erzeugen 
+
+Es werden zwei CSV-Dateien im Projektordner erzeugt:
+
+  * object.csv
+  * datastreams.csv
+
+Die Idee dahinter ist, die vom SIP benötigten und nicht automatisch ermittelbaren Metadaten so weit wie möglich vorzugenerieren.
+Der Curator hat dann die Möglichkeit, diese Daten noch einmal zu überarbeiten und zu ergänzen, ehe sie als Ausgangspunkt
+für die Erzeugung des SIP verwendet werden. Diese beiden Dateien landen nicht im SIP!?
+
+Die Logik bei Generierung der Objektmetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
+Daten ermittelt werden):
+
+| Key         | Beschreibung        |    DC.xml        | toml | Defaultwert | User |
+|-------------|---------------------|------------------|------|-------------|------|
+| recid       | Pid DigObj          | -                | -    | 1 (=PID)    | 3    |
+| title       | Titel DigObj        | 1 (dc:title)     | -    | 2 (=PID)    | 3    |
+| project     | Projektkürzel       | -                | 1    | 2 ("")      | 3    |
+| description | Beschr. DigO (opt.) | 1                | -    | 2 ("")      | 3    |
+| creator     | Projektkürzel?      | -                | 1    | 2 ("")      | 3    |
+| rights      |                     | 2 (dc:rights)    | 1    | 3 CC BY-NC  | 4    |
+| publisher   | Projleiter? GAMS?   | 2 (dc:publisher) | 1    | 3 ("")      | 4    |
+| source      | Quelle              | -                | -    | 1 "local"   | 2    |
+| objectType  |                     | -                | -    | 1 "text"    | 2    |
+| lang        | langs der DS        |                  |      | 1 "text"    | 2    |
+
+
+Die Logik bei Generierung der Datenstrommetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
+Daten ermittelt werden):
+
+
+| Key         | Beschreibung       | auto |object | Defaultwert  | User |
+|-------------|--------------------|------|-------|--------------|------|
+| dsid        | Data Stream ID     |   1  |  -    | -            |  -   |
+| dspath      | Path to data stream|   1  |  -    | -            |  -   |
+| mimetype    | type of DS         |   1  |  -    | -            |  -   |
+| title       |                    |   -  |  -    | 1 ("")       |  2   |
+| description | Optional           |   -  |  -    | 1 ("")       |  2   |
+| creator     |                    |   -  |  -    | 1 ("")       |  2   |
+| rights      | use obj rights?    |   -  |  1    | 2 (CC BY-NC) |  3   |
+| lang        | lang des DS        |   2  |  -    | -            |  3   |
+| tags        | user defined tags  |   -  |  -    | -            |  3   |
