@@ -1,13 +1,15 @@
 # Gamspreprocessor
 
 ## Überblick
-- kann mit Hilfe von `splitproject` versuchen aus vorhanden Verzeichnissen Objekt-Ordner zu erzeugen
-- erzeugt mit entsprechenden XSLTs fehlende DC.xml für jedes Objekt
-- erzeugt Excel- bzw. CSV-Dateien (`object.csv`, `datastreams.csv`)
-
 
 Gamspreprocessor ist eine Sammlung von Werkzeugen zur Vorbereitung von
-Gams-Ingests, die zu einem Befehl ('preprocess') zusammengefasst wurden.
+Gams-Ingests, die zu einem Befehl (`preprocess`) zusammengefasst wurden.
+
+- mit Hilfe von `splitproject` kann versucht werden aus vorhanden Verzeichnissen
+  Objekt-Ordner zu erzeugen
+- erzeugt mit entsprechenden XSLTs fehlende DC.xml für jedes Objekt(verzeichnis)
+- erzeugt Excel- bzw. CSV-Dateien (`object.csv`, `datastreams.csv`)
+
 
 Für ``preprocess`` selbst und für alle Unterbefehle gibt es die '--help' 
 Option, die alle Möglichkeiten auflistet. 
@@ -19,30 +21,31 @@ Option, die alle Möglichkeiten auflistet.
   * ``--filelog-level`` Es ist möglich, für die Logdatei ein anderes
     Loglevel einzustellen. Damit kann z.B. die Debug-Ausgabe in die Datei
     geschrieben werden, während die Ausgabe am Bildschirm weniger Ausgabe
-    generiert. Der Wert dieser Option muss einer der folgenden Werte sein:
+    generiert. Der Wert dieser Option muss einer der folgenden Werte sein 
+    und überschreibt den Wert im `project.toml`:
 
-    * DEBUG
-    * INFO
-    * WARNING
-    * ERROR
-    * CRITICAL
+    - DEBUG
+    - INFO
+    - WARNING
+    - ERROR
+    - CRITICAL
   
     Groß- und Kleinschreibung spielt dabei keine Rolle.
 
-  * ``--verbose`` (``-v``) Die Option setzte die Ausgabe auf DEBUG. Sie kann
+  - ``--verbose`` (``-v``) Die Option setzte die Ausgabe auf DEBUG. Sie kann
     nicht zusammen mit ``--quiet`` verwedendet werden.  
-  * ``--quiet``(``-q``) Diese Option minimiert die Ausgage auf 
+  - ``--quiet``(``-q``) Diese Option minimiert die Ausgage auf 
     Fehlermeldungen. Sie kann nicht zusammen mit ``--verbose`` verwendet 
     werden. 
-  * ``--version`` Gibt die Version von ``preprocess`` aus.
-  * ``--help`` Gibt den Hilfetext für ``preprocess`` aus.
+  - ``--version`` Gibt die Version von ``preprocess`` aus.
+  - ``--help`` Gibt den Hilfetext für ``preprocess`` aus.
 
 Aktuell sind diese Unterbefehle implementiert:
 
-  * splitproject
-  * transform
-  * multitransform
-  * csv create
+  - splitproject
+  - transform
+  - multitransform
+  - csv create
 
 ### splitproject
 
@@ -69,16 +72,17 @@ ein eigenes Verzeichnis angelegt wird. Aktuell werden basale TEI und LIDO
 Objekte unterstützt. 
 
 ``splitproject`` kann nicht direkt verwendet werden sondern erwartet einen
-weiteren Unterbefehl: ``split`` erzeugt die Objektverzeichnisse, 
-``showunhandled`` zeigt alle Dateien, die im Ursprungsverzeichnis vorhanden,
-aber noch in keinem Objektverzeichnis verwendet werden. Diese Subbefehl
+weiteren Unterbefehl: 
+- ``split`` erzeugt die Objektverzeichnisse, 
+- ``showunhandled`` zeigt alle Dateien, die im Ursprungsverzeichnis vorhanden sind,
+aber noch in keinem Objektverzeichnis verwendet werden. Dieser Subbefehl
 ist somit ein wichtiges Werkzeug, mit dem verhindert werden kann, dass Dateien
 beim Aufsplitten von Objekten verloren gehen.
 
 #### split
 ``split`` erwartet als Argument eine Liste von umzuwandelnden Dateien.
-Das sind jeweils die für das Objekt zentralen Dateien. Im Normalfall liefert,
-wenn Wildcards verwendet werden, die Shell eine entsprechende Liste. 
+Das sind jeweils die für das Objekt zentralen Dateien. Im Normalfall liefert -
+sofern Wildcards verwendet werden - die Shell eine entsprechende Liste. 
 
 ```sh
 preprocess splitproject split '*TEI*.xml'
@@ -100,16 +104,16 @@ preprocess splitproject split --file-list files_to_convert.txt
 
 ``split`` kennt diese Optionen:
 
-  * ``--output-dir`` Über diese Option kann das Verzeichnis festgelegt werden,
+  - ``--output-dir`` Über diese Option kann das Verzeichnis festgelegt werden,
     in dem die Objekt-Verzeichnisse erzeugt werden. Wird die Option nicht
     verwendet, nimmt der Splitter ein Verzeichnis ``objects``direkt
     unterhalb des aktuellen Verzeichnisses an. Das angegebenen Verzeichnis muss
     bereits existieren, wird also nicht automatisch angelegt.
-  * ``object-format`` Erlaubt zur Zeit einen dieser Werte: ``auto`` (default),
+  - ``object-format`` Erlaubt zur Zeit einen dieser Werte: ``auto`` (default),
     ``lido`` oder  ``tei``. Die explizite Festlegung des Typs sollte so gut wie
     nie nötig sein. *Ich überlege deshalb, diese Option wieder zu entfernen oder
     als Filter für Dateitypen zu verwenden.*
-  * ``--file-list`` erwartet als Wert den Pfad zu einer Datei, in der
+  - ``--file-list`` erwartet als Wert den Pfad zu einer Datei, in der
     die "Hauptdateien" gespeichert sind, nach denen gesplittet werden
     soll. Die Verwendung dieser Option ist eine Alternative zur 
     Auflistung der zu verarbeitenden Dateien auf der Kommandozeile
@@ -118,17 +122,17 @@ preprocess splitproject split --file-list files_to_convert.txt
     ``find``) und diese Liste (eine Datei pro Zeile) an den Splitter
     übergeben. Die Option kann nicht zusammen dem Argument ``SOURCEFILES``
     verwendet werden.
-  * ``--replace`` ``split`` überschreibt keine existierenden 
+  - ``--replace`` ``split`` überschreibt keine existierenden 
     Objektverzeichnisse. Durch das Setzen der ``--replace`` Option wird
     dieses Verhalten so verändert, dass bereits existierende 
     Objektverzeichnisse gelöscht und neu angelegt werden.
-  * ``--reset`` Dieser Flag stellt den BookKeeper auf den Ausgangszustand zurück. 
+  - ``--reset`` Dieser Flag stellt den BookKeeper auf den Ausgangszustand zurück. 
     Diese Option sollte nur dann eingesetzt werden, wenn man alle Ordner
     unterhalb von ``--output-dir`` gelöscht hat und das Aufsplitten  in
     Projekte von vorne beginnen möchte. Diese Option setzt nur den
     BookKeeper zurück, löscht aber keine bereits erzeugten #
     Objektverzeichnisse.
-  * ``--help`` zeigt die vom Unterbefehl bereitgestellten Argumente und Optionen
+  - ``--help`` zeigt die vom Unterbefehl bereitgestellten Argumente und Optionen
 
 
 
@@ -149,7 +153,7 @@ preprocess splitproject showunhandled <Pfad>
 
 Der Befehl kennt keine Optionen außer ``--help``.
 
-### transform
+### transform und csv create
 
 ```mermaid
 graph LR
@@ -221,17 +225,10 @@ wurde. Dann kann sie so verwendet werden:
 preprocess multitransform xslt -r -x myxslt.xsl -p 'TEI*.xml' -o DC.xml -l objects
 ```
 
-#### Idee
-
-Das Transformationen wie TEI2DC fast immer benötigt werden, könnte man das
-als eigenen Befehl (z.B. tei2dc) implementieren. Das entsprechende XSLT 
-könnte dann aus der Projektkonfiguration gelesen werden oder einen 
-festgelegten Pfad (z.B. im Wurzelverzeichnis des Projekts) haben.
-
-
 ## project.toml
 
-Um die Metadaten-CSV-Dateien zu erstellen, benötigt der Packager Daten über das Projekt, zu dem die Objekte gehören.
+Um die Metadaten-CSV-Dateien zu erstellen, benötigt der Preprocessor Daten über das Projekt, 
+zu dem die Objekte gehören.
 Diese Infos müssen in einer Konfigurationsdatei mit dem Namen `project.toml` bereitgestellt werden.
 Mit der Option `-c` von `packager create csv`, kann auch ein anderer Dateinamen verwendet werden, 
 wir empfehlen jedoch, `project.toml` zu verwenden.
@@ -264,10 +261,10 @@ Nur die Einträge im Abschnitt 'metdata', sind für die Metadaten-Extraktion in 
   - title
   - creator
   - rights
-- kann zusätzlich weitere Felder enthalten (s. https://zimlab.uni-graz.at/gams/metadata/templates/dc_template.xml) wie bspw.
+- kann zusätzlich weitere Felder enthalten wie bspw.
   - date (im ISO-Format?)
   - location 
-  - ...
+  - ... (s. https://zimlab.uni-graz.at/gams/metadata/templates/dc_template.xml)
 
 ## csv create: CSV bzw. Excel-Dateien erzeugen
 ```sh
