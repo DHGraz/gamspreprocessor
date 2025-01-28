@@ -6,8 +6,8 @@ Gamspreprocessor ist eine Sammlung von Werkzeugen zur Vorbereitung von
 Gams-Ingests, die zu einem Befehl (`preprocess`) zusammengefasst wurden.
 
 - mit Hilfe von `splitproject` kann versucht werden aus vorhanden Verzeichnissen
-  Objekt-Ordner zu erzeugen
-- erzeugt mit entsprechenden XSLTs fehlende DC.xml für jedes Objekt(verzeichnis)
+  Objekt-Ordner zu erzeugen (z.B. von `Y:\data\projekte\...`)
+- erzeugt mit entsprechenden XSLTs fehlende `DC.xml` für jedes Objekt(verzeichnis)
 - erzeugt Excel- bzw. CSV-Dateien (`object.csv`, `datastreams.csv`)
 
 
@@ -96,7 +96,7 @@ preprocess splitproject split TEI_1.xml TEI_2.xml TEI99.xml
 ```
 
 Eine weitere Möglichkeit, bei der dann kein Argument anzugeben ist, 
-besteht in der Verwendung der ``--file-list`` Option (sieht unten).
+besteht in der Verwendung der ``--file-list`` Option:
 
 ```sh
 preprocess splitproject split --file-list files_to_convert.txt
@@ -107,8 +107,8 @@ preprocess splitproject split --file-list files_to_convert.txt
   - ``--output-dir`` Über diese Option kann das Verzeichnis festgelegt werden,
     in dem die Objekt-Verzeichnisse erzeugt werden. Wird die Option nicht
     verwendet, nimmt der Splitter ein Verzeichnis ``objects``direkt
-    unterhalb des aktuellen Verzeichnisses an. Das angegebenen Verzeichnis muss
-    bereits existieren, wird also nicht automatisch angelegt.
+    unterhalb des aktuellen Verzeichnisses an. Das angegebene Verzeichnis **muss
+    bereits existieren**, wird also nicht automatisch angelegt.
   - ``object-format`` Erlaubt zur Zeit einen dieser Werte: ``auto`` (default),
     ``lido`` oder  ``tei``. Die explizite Festlegung des Typs sollte so gut wie
     nie nötig sein. *Ich überlege deshalb, diese Option wieder zu entfernen oder
@@ -120,9 +120,9 @@ preprocess splitproject split --file-list files_to_convert.txt
     (``SOURCEFILES``).
     Man kann also eine Liste der "Objektdateien" vorgenerieren (z.B. mit 
     ``find``) und diese Liste (eine Datei pro Zeile) an den Splitter
-    übergeben. Die Option kann nicht zusammen dem Argument ``SOURCEFILES``
+    übergeben. Die Option kann nicht zusammen mit dem Argument ``SOURCEFILES``
     verwendet werden.
-  - ``--replace`` ``split`` überschreibt keine existierenden 
+  - ``--replace`` überschreibt keine existierenden 
     Objektverzeichnisse. Durch das Setzen der ``--replace`` Option wird
     dieses Verhalten so verändert, dass bereits existierende 
     Objektverzeichnisse gelöscht und neu angelegt werden.
@@ -140,7 +140,7 @@ preprocess splitproject split --file-list files_to_convert.txt
 
 Dieser Unterbefehl zeigt alle Dateien, die zwar im oder unterhalb des
 Ausgangsverzeichnisse vorhanden sind, jedoch in keinem Objektverzeichnis
-verwendet werden. Er ist also ein wichtige Werkzeug, um sicherzustellen,
+verwendet werden. Er ist also ein wichtiges Werkzeug, um sicherzustellen,
 dass der Splitter alle vorhandenen Dateien verarbeitet hat.
 
 Der Aufruf erwartet den Pfad zum Wurzelverzeichnis der Objektverzeichnisse
@@ -206,7 +206,7 @@ in das Verzeichnis geschrieben, in dem die originale XML Datei liegt.
 preprocess transform xslt -x myxslt.xsl -o DC.xml foo/TEI.xml bar/TEI.xml
 ```
 
-Erzeugt 2 neue Dateien: ``foo/DC.xml`` und ``bar/DC.XML``.
+Erzeugt zwei neue Dateien: ``foo/DC.xml`` und ``bar/DC.XML``.
 
 Alternativ zur Angabe von XML-Datei, können die zu transformierenden XML-Datei (mit Pfad)
 zeilenweise in eine Datei geschrieben werden:
@@ -234,7 +234,7 @@ Mit der Option `-c` von `packager create csv`, kann auch ein anderer Dateinamen 
 wir empfehlen jedoch, `project.toml` zu verwenden.
 
 Die Datei muss den Regeln des TOML-Formats folgen (https://toml.io). Derzeit ist
-die Datei sehr einfach, da sie nur aus 4 Elementen besteht. Hier ist ein Beispiel für das Projekt `hsa`:
+die Datei sehr einfach, da sie nur aus wenigen Elementen besteht. Hier ist ein Beispiel für das Projekt `hsa`:
 
 ```
 [metdata]
@@ -248,13 +248,14 @@ desid_keep_extendsion = true
 loglevel = "info"
 ```
 
-Eine `project.toml` kann entweder händisch oder mit Hilfe der `gamslib`(https://zimlab.uni-graz.at/gams5/production/gamslib) angelegt werden. Die Toml-Datei muss die o.g. Felder enthalten.
+Eine `project.toml` kann entweder händisch oder mit Hilfe der [`gamslib`](https://zimlab.uni-graz.at/gams5/production/gamslib) angelegt werden.
+Die Toml-Datei **muss** die o.g. Felder enthalten.
 
-Nur die Einträge im Abschnitt 'metdata', sind für die Metadaten-Extraktion in die CSV-Dateien.
+Nur die Einträge im Abschnitt 'metdata', werden für die Metadaten-Extraktion in die CSV-Dateien verwendet.
 
 ## Dublin Core (DC.xml)
 
-- DC.xml muss vorhanden sein
+- DC.xml **muss** vorhanden sein
 - kann z.B. mit Hilfe eines XSLTs auf TEI erzeugt werden (s. gamspreprocessor)
 - muss folgende Felder enthalten:
   - identifier
@@ -264,7 +265,7 @@ Nur die Einträge im Abschnitt 'metdata', sind für die Metadaten-Extraktion in 
 - kann zusätzlich weitere Felder enthalten wie bspw.
   - date (im ISO-Format?)
   - location 
-  - ... (s. https://zimlab.uni-graz.at/gams/metadata/templates/dc_template.xml)
+  - ... (s. [DC Template](https://zimlab.uni-graz.at/gams/metadata/templates/dc_template.xml))
 
 ## csv create: CSV bzw. Excel-Dateien erzeugen
 ```sh
@@ -281,7 +282,8 @@ Es werden zwei CSV-Dateien im Projektordner erzeugt:
 
 Die Idee dahinter ist, die vom SIP benötigten und nicht automatisch ermittelbaren Metadaten so weit wie möglich vorzugenerieren.
 Der Curator hat dann die Möglichkeit, diese Daten noch einmal zu überarbeiten und zu ergänzen, ehe sie als Ausgangspunkt
-für die Erzeugung des SIP verwendet werden. Diese beiden Dateien landen nicht im SIP!?
+für die Erzeugung des SIP verwendet werden. Diese beiden Dateien landen nicht im SIP
+(s.a. [packager](https://zimlab.uni-graz.at/gams5/production/packaging)).
 
 Die Logik bei Generierung der Objektmetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
 Daten ermittelt werden):
@@ -297,7 +299,7 @@ Daten ermittelt werden):
 | publisher   | Projleiter? GAMS?   | 2 (dc:publisher) | 1    | 3 ("")      | 4    |
 | source      | Quelle              | -                | -    | 1 "local"   | 2    |
 | objectType  |                     | -                | -    | 1 "text"    | 2    |
-| lang        | langs der DS        |                  |      | 1 "text"    | 2    |
+| lang        | langs der DS        |                  |      | 1 ""        | 2    |
 
 
 Die Logik bei Generierung der Datenstrommetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
