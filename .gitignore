@@ -5,16 +5,11 @@ build/
 dist/
 wheels/
 *.egg-info
-
-# venv
 .venv
 .python-version
 .vscode/
 requirements-dev.lock
 requirements.lock
-x.py
 .coverage
+uv.lock
 
-# other
-objects/
-project.toml
