@@ -9,9 +9,7 @@ dependencies = [
     "click>=8.1.7",
     "uritools>=4.0.3",
     "saxonche>=12.5.0",
-    "gamslib>=0.3.0",
-    
-    
+    "gamslib>=0.4.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -48,3 +46,6 @@ packages = ["src/gamspreprocessor"]
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
 extension-pkg-allow-list = ["saxonche"]
+
+[tool.uv.sources]
+gamslib = { path = "../gamslib/dist/gamslib-0.4.0.tar.gz" }

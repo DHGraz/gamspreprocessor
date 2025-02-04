@@ -48,7 +48,12 @@ def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = 
 
     Use `packager objectcsv create --help` to see the available options.
     """
-    cfg = gamslib.projectconfiguration.load_configuration(Path(projectroot), configfile)
+    if configfile is None:
+        config_path = gamslib.projectconfiguration.utils.get_config_file_from_env()
+        if config_path is None: # env settings not found
+            config_path = gamslib.projectconfiguration.utils.find_project_toml(Path(projectroot))
+        
+    cfg = gamslib.projectconfiguration.get_configuration(config_path)
     csv_objects = gamslib.objectcsv.create_csv_files(
         Path(projectroot), cfg, force_overwrite
     )
