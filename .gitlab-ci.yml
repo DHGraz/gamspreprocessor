@@ -42,7 +42,7 @@ lint:
     - uv --version
     - echo "Using python version:"
     - python --version
-    - echo "Running uv cgeck with ruff"
+    - echo "Running uv check with ruff"
     - uv run ruff check src
 
 

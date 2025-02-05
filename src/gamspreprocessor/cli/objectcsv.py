@@ -24,9 +24,14 @@ def cli():
     "-c",
     default=None,
     help=(
-        "Path to the project TOML file. If not set, a file called 'project.toml' "
-        "will be searched 1) in rootfolder or a parent folder of rootfolder, "
-        "2) in the current working directory."
+        "Path to the project TOML file. If not set, "
+        "we check, if an environment variable 'GAMSCFG_PROJECT_TOML' is set. "
+        "If not, we check if a '.env' file exists in the current working directory "
+        "and if it contains a line 'project_toml='. If none of these options are set, "
+        "we search for a 'project.toml' in this order: "
+        "1) in the objects folder or a parent folder of the objects folder, "
+        "2) in the current working directory. "
+        "If no project TOML file is found, the command will fail."
     ),
 )
 @click.option(

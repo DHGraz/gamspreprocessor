@@ -84,11 +84,10 @@ def transform_xslt(
     xmlfiles: list[Path] = []
     if file_list:
         xmlfiles = [Path(file) for file in Path(file_list).read_text().splitlines()]
+    elif recursive:
+        xmlfiles = list(Path(start_dir[0]).rglob(pattern))
     else:
-        if recursive:
-            xmlfiles = list(Path(start_dir[0]).rglob(pattern))
-        else:
-            xmlfiles = list(Path(start_dir[0]).glob(pattern))
+        xmlfiles = list(Path(start_dir[0]).glob(pattern))
     # As we have a fixed output file name, we need to make sure that the pattern only
     # matches one file per directory
     suspicious_dirs = utils.find_multiple_files_per_dir(xmlfiles)

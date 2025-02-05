@@ -60,9 +60,8 @@ class BookKeeper:
         """
         if filepath not in self._data:
             self._data[filepath] = [pid]
-        else:
-            if pid not in self._data[filepath]:
-                self._data[filepath].append(pid)
+        elif pid not in self._data[filepath]:
+            self._data[filepath].append(pid)
         logger.debug("Added object '%s' for '%s' to bookkeeper", pid, filepath)
 
     def remove_pid(self, pid: str) -> None:

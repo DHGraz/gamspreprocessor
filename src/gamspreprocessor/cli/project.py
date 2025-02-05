@@ -21,7 +21,7 @@ def cli():
 @click.command(name="init")
 @click.argument("project-root", type=click.Path(exists=True))
 def init_project(project_root: str):
-    """Create a project.toml in the project-root directory."""
+    """Create a basic project structure and project.toml in the project-root directory."""
     initialize_project_dir(Path(project_root))
     logger.info(
         "Created %a/project.toml. Please edit this file to configure your project.",

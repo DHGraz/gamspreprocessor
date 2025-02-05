@@ -169,7 +169,6 @@ class ProjectSplitter:
         if pid is None:
             pid = ".".join(file_path.name.split(".")[0:-1])
             from_content = False
-        else:
-            if strip_prefix:
-                pid = pid.split(":")[-1]
+        elif strip_prefix:
+            pid = pid.split(":")[-1]
         return pid, from_content
