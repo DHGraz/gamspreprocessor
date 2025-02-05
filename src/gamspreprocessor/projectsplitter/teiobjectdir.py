@@ -16,7 +16,13 @@ logger = logging.getLogger(__name__)
 class TEIObjectDirectory(ObjectDirectory):
     "Class to handle a directory for a TEI object."
 
-    DEFAULT_NAMESPACE = {"tei": "http://www.tei-c.org/ns/1.0"}
+    DEFAULT_NAMESPACE = ("tei", "http://www.tei-c.org/ns/1.0")
+
+    @property
+    def default_ns(self) -> dict[str, str]:
+        "Return the default namespace for TEI files."
+        return {self.DEFAULT_NAMESPACE[0]: self.DEFAULT_NAMESPACE[1]}
+    
 
     def split(self, sourcefile: Path, new_pid=None) -> None:
         "Copy the sourcefile and all referenced files to the object directory."
@@ -39,7 +45,7 @@ class TEIObjectDirectory(ObjectDirectory):
         if new_pid is not None:
             idno = root.find(
                 "./tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno",
-                namespaces=self.DEFAULT_NAMESPACE,
+                namespaces=self.default_ns
             )
             if idno is not None:
                 idno.text = new_pid
@@ -60,7 +66,7 @@ class TEIObjectDirectory(ObjectDirectory):
         referenced_files = set()
 
         for graphic in root_node.findall(
-            ".//tei:graphic", namespaces=self.DEFAULT_NAMESPACE
+            ".//tei:graphic", namespaces=self.default_ns
         ):
             referenced_uri = graphic.attrib["url"]
             graphic_id = graphic.attrib.get(

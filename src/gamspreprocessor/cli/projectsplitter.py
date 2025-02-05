@@ -61,7 +61,7 @@ def cli():
     "--strip-prefix", is_flag=True, default=False, help="Strip the prefix (e.g. o:)"
 )
 @click.argument("sourcefiles", nargs=-1)
-def split_project(
+def split_project( # noqa: PLR0913
     output_dir: str,
     object_format: str,
     reset: bool,

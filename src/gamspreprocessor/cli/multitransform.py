@@ -60,7 +60,7 @@ def cli():
     help="A file containing a list of files (with path, if necessary) to be transformed.",
 )
 @click.argument("start-dir", nargs=-1)
-def transform_xslt(
+def transform_xslt( # noqa: PLR0913
     xslt_file: str,
     start_dir: list[str],
     output_filename: str,

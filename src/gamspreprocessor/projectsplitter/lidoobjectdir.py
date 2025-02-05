@@ -34,10 +34,7 @@ class ResourceSet:
                 suffix = Path(uri.path).suffix
             else:  # file
                 suffix = Path(self.link_url).suffix
-            if suffix:
-                extension = suffix
-            else:
-                extension = ""
+            extension = suffix if suffix is not None else ""
         logger.debug("Extension for %s is %s", self.link_url, extension)
         return f"./{self.resource_id}{extension}"
 
@@ -81,7 +78,13 @@ class LIDOObjectDirectory(ObjectDirectory):
     Provides as split method to create a object folder for the file given as argument.
     """
 
-    DEFAULT_NAMESPACE = {"lido": "http://www.lido-schema.org"}
+    DEFAULT_NAMESPACE = ("lido", "http://www.lido-schema.org")
+
+    @property
+    def default_ns(self) -> dict[str, str]:
+        """Return the default namespace for LIDO files."""
+        return {self.DEFAULT_NAMESPACE[0]: self.DEFAULT_NAMESPACE[1]}
+    
 
     def split(self, sourcefile: Path, new_pid=None) -> None:
         """Copy the sourcefile and all referenced files to the object directory.
@@ -104,7 +107,7 @@ class LIDOObjectDirectory(ObjectDirectory):
         root = tree.getroot()
         # if we have a new pid (because we stripped it), we replace the old one
         if new_pid is not None:
-            rec_id = root.find("./lido:lidoRecID", namespaces=self.DEFAULT_NAMESPACE)
+            rec_id = root.find("./lido:lidoRecID", namespaces=self.default_ns)
             if rec_id is not None:
                 rec_id.text = new_pid
         referenced_files.update(self._replace_resource_set(root, sourcefile.parent))
@@ -124,17 +127,17 @@ class LIDOObjectDirectory(ObjectDirectory):
         referenced_files = set()
 
         for resourceset_element in root_node.findall(
-            ".//lido:resourceSet", namespaces=self.DEFAULT_NAMESPACE
+            ".//lido:resourceSet", namespaces=self.default_ns
         ):
             resourceset = ResourceSet.from_element(
-                resourceset_element, self.DEFAULT_NAMESPACE
+                resourceset_element, self.default_ns
             )
             referenced_file = self.find_file(resourceset.link_url, source_dir)
             if referenced_file is not None:
                 new_url = resourceset.get_new_url()
                 referenced_files.add((new_url, referenced_file))
                 link_resource = resourceset_element.find(
-                    ".//lido:linkResource", namespaces=self.DEFAULT_NAMESPACE
+                    ".//lido:linkResource", namespaces=self.default_ns
                 )
                 if link_resource is not None:
                     link_resource.text = new_url

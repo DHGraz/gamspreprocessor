@@ -47,8 +47,8 @@ def register_namespaces(namespaces: dict) -> None:
     Calling this function will make sure that the namespaces are available
     during serialization ti avoid namespace prefixes like `ns0` or `ns1`.
     """
-    for ns in namespaces:
-        ET.register_namespace(ns, namespaces[ns])
+    for ns, uri in namespaces.items():
+        ET.register_namespace(ns, uri)
 
 
 def get_namespaces(filename: Path) -> dict[str, str]:
