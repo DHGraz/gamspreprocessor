@@ -57,7 +57,7 @@ class ProjectSplitter:
     def instantiate_object_directory(
         self, pid: str, mimetype: str, objecttype: str
     ) -> ObjectDirectory:
-        """ObjectType factory.
+        """ObjectDirectory factory.
 
         Return an ObjectDirectory or a derived class for a given pid depending
         in objecttype.
@@ -65,25 +65,27 @@ class ProjectSplitter:
         Will raise a FileExistsError if the directory already exists (ie. the object
         has already been split).
         """
-        if mimetype == "application/xml":
-            if objecttype == "tei":
-                objdir = TEIObjectDirectory(self.output_dir / pid)
-                logger.debug("Created TeiObjectDirectory for {pid}")
-            elif objecttype == "lido":
-                objdir = LIDOObjectDirectory(self.output_dir / pid)
-                logger.debug("Created LidoObjectDirectory for {pid}")
+        clean_pid = pid.replace(":", "%3A")
+        if mimetype.split("/")[1].endswith('xml'):
+            if objecttype == "TEI":
+                obj_path = self.output_dir.absolute() / clean_pid
+                objdir = TEIObjectDirectory(self.output_dir / clean_pid)
+                logger.debug("Created TeiObjectDirectory for {clean_pid}")
+            elif objecttype == "LIDO":
+                objdir = LIDOObjectDirectory(self.output_dir / clean_pid)
+                logger.debug("Created LidoObjectDirectory for {clean_pid}")
             else:
-                objdir = ObjectDirectory(self.output_dir / pid)
+                objdir = ObjectDirectory(self.output_dir / clean_pid)
                 logger.debug(
                     "Created ObjectDirectory for %s with unspecified XML objecttype %s",
-                    pid,
+                    clean_pid,
                     objecttype,
                 )
         else:
-            objdir = ObjectDirectory(self.output_dir / pid)
+            objdir = ObjectDirectory(self.output_dir / clean_pid)
             logger.debug(
                 "Created ObjectDirectory for %s. Detected mime type was: %s",
-                pid,
+                clean_pid,
                 mimetype,
             )
         return objdir

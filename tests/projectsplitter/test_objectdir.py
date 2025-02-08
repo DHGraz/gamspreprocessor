@@ -14,6 +14,12 @@ def test_init(tmp_path):
     assert obj.path.is_dir()
 
 
+def test_init_with_colon(tmp_path):
+    "Test the initialization of the object directory with a colon in the name."
+    obj = ObjectDirectory(tmp_path / "foo:bar")
+    assert obj.path == tmp_path / "foo%3Abar"
+
+
 def test_init_dir_exists(tmp_path):
     "Test the initialization of the object directory if the directory exists."
 
@@ -44,48 +50,52 @@ def test_split(tmp_path):
     assert sourcefile.read_bytes() == (objectdir / "bar.txt").read_bytes()
 
 
-def test_rank_path():
-    """Test the rank path function.
+@pytest.mark.parametrize(
+    "long, short, expected",
+    [
+        ("foo", "foox", ""),
+        ("foo", "foo", "foo"),
+        ("foxo", "foo", "o"),
+        ("bar/foo", "foo", "foo"),
+        ("data/find_file/foo.png", "foo.png", "foo.png"),
+        ("data/find_file/foo.png", "foo/foo.png", "/foo.png"),
+        ("data/find_file/bar/foo.png", "foo/foo.png", "/foo.png"),
+        ("data/find_file/foo/foo.png", "foo/foo.png", "foo/foo.png"),
+        ("data/find_file/foo/bar/foo.png", "foo/foo.png", "/foo.png"),
+    ],
+)
+def test_rank_path(long, short, expected):
+    rank_size = ObjectDirectory.rank_path(Path(short), Path(long))
+    assert rank_size == len(expected), (
+        f"Got {rank_size} instead of: {expected} (short: {short}, long: {long})"
+    )
 
-    In short the rank ist the number of identical chars counted from the end
+
+@pytest.mark.parametrize(
+    "uri, expected",
+    [  # the second value is the file to be found relative to 'shared_datadir / find_file' (root_dir)
+        ("foo.jpeg", None),  # file does not exist
+        ("foo.png", "foo.png"),  # we have a foo.ping in root_dir
+        ("foo/foo.png", "foo/foo.png"), # we have a foo/foo.png in root_dir 
+        ("/bar/foo.png", "bar/foo.png"), # bar/foo.png should win over foo/bar/foo.png
+        ("bar/foo.png", "bar/foo.png"),  # reference is relative
+        # test uri notation
+        ("file:///bar/foo.png", "bar/foo.png"),
+        ("http://example.com/bar/foo.png", "bar/foo.png"),
+    ],
+)
+def test_find_file(shared_datadir, uri, expected):
+    """The the find_file method of the object directory.
+
+    We have an uri (which might also be a string representing a path), which comes from a xml ref.
+    We try to find a matching file in shared_datadir. The third parameter is the file we expect to be found."
     """
-    assert ObjectDirectory.rank_path(Path("foo"), Path("foox")) == 0
-    assert ObjectDirectory.rank_path(Path("foo"), Path("foo")) == 3
-    assert ObjectDirectory.rank_path(Path("foxo"), Path("foo")) == 1
-    assert ObjectDirectory.rank_path(Path("bar/foo"), Path("foo")) == 3
-
-
-def test_find_file(shared_datadir):
-    "Test finding a file in a directory."
+    # the directory, where we start searching
     root_dir = shared_datadir / "find_file"
 
-    assert ObjectDirectory.find_file("foo.png", root_dir) == root_dir / "foo.png"
-
-    assert (
-        ObjectDirectory.find_file("foo/foo.png", root_dir)
-        == root_dir / "foo" / "foo.png"
-    )
-    assert (
-        ObjectDirectory.find_file("/bar/foo.png", shared_datadir)
-        == root_dir / "bar" / "foo.png"
-    )
-
-    # bar/foo.png should win over foo/bar/foo.png
-    assert (
-        ObjectDirectory.find_file("bar/foo.png", shared_datadir)
-        == root_dir / "bar" / "foo.png"
-    )
-
-    assert (
-        ObjectDirectory.find_file("file:///bar/foo.png", shared_datadir)
-        == root_dir / "bar" / "foo.png"
-    )
-    assert (
-        ObjectDirectory.find_file("http://example.com/bar/foo.png", shared_datadir)
-        == root_dir / "bar" / "foo.png"
-    )
-    assert ObjectDirectory.find_file("foo.jpeg", shared_datadir) is None
-
+    result = ObjectDirectory.find_file(uri, root_dir) 
+    expected_path = root_dir / expected if expected else None
+    assert result == expected_path, f"Expected: {expected_path}, got: {result}"
 
 def test_str(tmp_path):
     "Test the string representation of the object directory."

@@ -25,7 +25,9 @@ class TEIObjectDirectory(ObjectDirectory):
     
 
     def split(self, sourcefile: Path, new_pid=None) -> None:
-        "Copy the sourcefile and all referenced files to the object directory."
+        """
+        Copy the sourcefile and all referenced files to the object directory.
+        """
         # Keeps all files which must be copied to the object directory
         referenced_files: set[tuple[str, Path]] = set()
 

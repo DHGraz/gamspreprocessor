@@ -56,7 +56,7 @@ def test_split_tei(shared_datadir, tmp_path):
     splitter = ProjectSplitter(target_dir, source_dir)
     with pytest.warns(UserWarning, match=r"colon"):
         result = splitter.split(testfile, "tei")
-    assert len(result) == 3
+    assert len(result) == 3  # noqa: PLR2004
     assert all(f.is_file() for f in result)
 
     filenames = [f.name for f in result]
@@ -137,7 +137,7 @@ def test_split_with_strip_prefix_and_from_content(
     assert tei_file.is_file()
     with tei_file.open(encoding="utf-8", newline="") as f:
         content = f.read()
-        assert ">obj1</idno>" in content
+    assert ">obj1</idno>" in content
 
 
 def test_update_bookkeeper(shared_datadir, tmp_path):

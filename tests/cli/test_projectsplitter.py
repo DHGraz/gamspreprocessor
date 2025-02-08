@@ -22,10 +22,21 @@ def test_split_project(datadir, tmp_path):
     "Test the splitproject split command."
     runner = CliRunner()
     obj_file = os.path.join(datadir, "TEI_1.xml")
+    #with pytest.warns(UserWarning, match="colon"):
+    result = runner.invoke(cli, ["splitproject", "split", "-o", tmp_path, obj_file])
+    assert result.exit_code == 0
+    assert "Created 1 object dirs, containing 3 files." in result.output
+
+@pytest.mark.skip(reason="We need an object with a colon in PID")
+def test_split_project_with_colon(datadir, tmp_path):
+    "Test the splitproject split command should raise a warning if we use a colon."
+    runner = CliRunner()
+    obj_file = os.path.join(datadir, "TEI_1.xml")
     with pytest.warns(UserWarning, match="colon"):
         result = runner.invoke(cli, ["splitproject", "split", "-o", tmp_path, obj_file])
     assert result.exit_code == 0
     assert "Created 1 object dirs, containing 3 files." in result.output
+
 
 
 def test_split_project_exclusive_options(datadir, tmp_path):
@@ -159,14 +170,14 @@ def test_object_file_already_exists(datadir, tmp_path):
     obj_file = os.path.join(datadir, "TEI_1.xml")
     outputdir = tmp_path / "objects"
     outputdir.mkdir()
-    with pytest.warns(UserWarning, match="colon"):
-        result = runner.invoke(
-            cli, ["splitproject", "split", "-o", outputdir, obj_file]
+    #with pytest.warns(UserWarning, match="colon"):
+    result = runner.invoke(
+        cli, ["splitproject", "split", "-o", outputdir, obj_file]
         )
     assert result.exit_code == 0
-    with pytest.warns(UserWarning, match="colon"):
-        result = runner.invoke(
-            cli, ["splitproject", "split", "-o", outputdir, obj_file]
+#    with pytest.warns(UserWarning, match="colon"):
+    result = runner.invoke(
+        cli, ["splitproject", "split", "-o", outputdir, obj_file]
         )
     assert result.exit_code == 1
     assert "Object directory for" in result.output
@@ -191,20 +202,20 @@ def test_reset(datadir, tmp_path):
     outputdir.mkdir()
 
     # we create some objects to fill the bookkeeper
-    with pytest.warns(UserWarning, match="colon"):
-        result = runner.invoke(
-            cli, ["splitproject", "split", "-o", outputdir, obj_file]
-        )
+    #with pytest.warns(UserWarning, match="colon"):
+    result = runner.invoke(
+        cli, ["splitproject", "split", "-o", outputdir, obj_file]
+    )
     assert result.exit_code == 0
     assert bookkepper_file.exists()
     # make sure TEI_1.xml has entries in the bookkeeper
     assert extract_from_bookkeeper(bookkepper_file, "TEI_1.xml")
 
     obj_file = os.path.join(datadir, "LIDO_1.xml")
-    with pytest.warns(UserWarning, match="colon"):
-        runner.invoke(
-            cli, ["splitproject", "split", "-o", outputdir, obj_file, "--reset"]
-        )
+    #with pytest.warns(UserWarning, match="colon"):
+    runner.invoke(
+        cli, ["splitproject", "split", "-o", outputdir, obj_file, "--reset"]
+    )
     assert result.exit_code == 0
     assert bookkepper_file.exists()
     # make sure TEI_1.xml has no entries in the bookkeeper

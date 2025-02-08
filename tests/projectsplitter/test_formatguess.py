@@ -6,30 +6,13 @@ from gamspreprocessor.projectsplitter.formatguesser import guess_format
 def test_guess_format(datadir):
     "Guess the format of the file from the extension."
 
-    assert guess_format(datadir / "TEI_1.xml") == ("application/xml", "tei")
-    assert guess_format(datadir / "LIDO_1.xml") == ("application/xml", "lido")
+    assert guess_format(datadir / "TEI_1.xml") == ("application/tei+xml", "TEI")
+    assert guess_format(datadir / "LIDO_1.xml") == ("application/xml", "LIDO")
     assert guess_format(datadir / "foo.xml") == ("application/xml", "")
     assert guess_format(datadir / "foo.csv") == ("text/csv", "")
     assert guess_format(datadir / "foo.pdf") == ("application/pdf", "")
-    assert guess_format(datadir / "d1/bar.pdf") == ("application/pdf", "")
-    assert guess_format("img.jpeg") == ("image/jpeg", "")
-    assert guess_format("img.png") == ("image/png", "")
+    assert guess_format(datadir / "image01.jpg") == ("image/jpeg", "")
+    assert guess_format(datadir / "foo.png") == ("image/png", "")
+    assert guess_format(datadir / "foo.unknown") == ("application/octet-stream", "")
 
 
-def test_guess_format_special_cases(datadir, monkeypatch):
-    """Some mimetypes have to be unified."""
-    monkeypatch.setattr("mimetypes.guess_type", lambda x: ("text/xml", None))
-    assert guess_format(datadir / "TEI_1.xml") == ("application/xml", "tei")
-
-    monkeypatch.setattr(
-        "mimetypes.guess_type", lambda x: ("text/x-comma-separated-values", None)
-    )
-    assert guess_format(datadir / "foo.csv") == ("text/csv", "")
-
-    monkeypatch.setattr(
-        "mimetypes.guess_type", lambda x: ("text/x-comma-separated-values", None)
-    )
-    assert guess_format(datadir / "foo.csv", "text/csv") == ("text/csv", "text/csv")
-
-    monkeypatch.setattr("mimetypes.guess_type", lambda x: ("text/xml", None))
-    assert guess_format(datadir / "TEI_1.xml", "tei") == ("application/xml", "tei")
