@@ -299,7 +299,8 @@ Daten ermittelt werden):
 | publisher   | Projleiter? GAMS?   | 2 (dc:publisher) | 1    | 3 ("")      | 4    |
 | source      | Quelle              | -                | -    | 1 "local"   | 2    |
 | objectType  |                     | -                | -    | 1 "text"    | 2    |
-| lang        | langs der DS        |                  |      | 1 ""        | 2    |
+| mainresource| Hauptdatenstrom     | -                | -    | 1 ""        | 4    |
+| funder      | Fördergeber         | -                | 1    | 1 ""        | 2    |
 
 
 Die Logik bei Generierung der Datenstrommetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
