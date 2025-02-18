@@ -8,7 +8,8 @@ def test_pid_with_colon(tmp_path):
     assert src.strip_prefix
     assert src.strip_extension
     assert src.referenced_files == []
-    assert src.pid == "foo"
+    with pytest.warns(UserWarning):
+        assert src.pid == "foo"
 
 
 def test_pid_with_colon_escaped(tmp_path):
@@ -18,7 +19,8 @@ def test_pid_with_colon_escaped(tmp_path):
     assert src.strip_prefix
     assert src.strip_extension
     assert src.referenced_files == []
-    assert src.pid == "foo"
+    with pytest.warns(UserWarning):
+        assert src.pid == "foo"
 
 
 def test_pid_with_colon_keep_prefix(tmp_path):

@@ -3,6 +3,7 @@
 import json
 import logging
 from pathlib import Path
+import shutil
 
 import pytest
 
@@ -114,23 +115,23 @@ def test_split_tei(shared_datadir, tmp_path):
     assert ">hsa.letter.12137</idno>" in content
 
 
-# def test_split_lido(shared_datadir, tmp_path):
-#     "Test splitting a file into an object directory."
-#     source_dir = shared_datadir / "projects"
-#     target_dir = tmp_path / "objects"
-#     testfile = source_dir / "LIDO_1.xml"
+def test_split_lido(shared_datadir, tmp_path):
+    "Test splitting a file into an object directory."
+    source_dir = shared_datadir / "projects"
+    target_dir = tmp_path / "objects"
+    testfile = source_dir / "LIDO_1.xml"
 
-#     splitter = ProjectSplitter(target_dir, source_dir)
-#     with pytest.warns(UserWarning, match=r"colon"):
-#         result = splitter.split(testfile, "lido")
-#     assert len(result) == 3
-#     assert all(f.is_file() for f in result)
+    splitter = ProjectSplitter(target_dir, source_dir)
+    #with pytest.warns(UserWarning, match=r"colon"):
+    result = splitter.split(testfile, "lido")
+    assert len(result) == 3
+    assert all(f.is_file() for f in result)
 
-#     filenames = [f.name for f in result]
+    filenames = [f.name for f in result]
 
-#     assert "LIDO_1.xml" in filenames
-#     assert "image01.jpeg" in filenames
-#     assert "image01.jpeg" in filenames
+    assert "LIDO_1.xml" in filenames
+    assert "IMAGE.1" in filenames  
+    assert "IMAGE.2" in filenames
 
 
 def test_split_invalid_filename(shared_datadir, tmp_path):
@@ -138,6 +139,7 @@ def test_split_invalid_filename(shared_datadir, tmp_path):
     source_dir = shared_datadir / "projects"
     target_dir = tmp_path / "objects"
     testfile = source_dir / "füß.pdf"
+    shutil.copy(source_dir / "foo.pdf", testfile)
 
     splitter = ProjectSplitter(target_dir, source_dir)
     with pytest.raises(ValueError) as excinfo:
@@ -179,8 +181,8 @@ def test_strip_with_no_strip_prefix_and_from_content(
     splitter = ProjectSplitter(target_dir, source_dir)
 
     testfile = source_dir / "TEI_1.xml"
-    # monkeypatch.setattr(splitter, "extract_pid", lambda x, y, z: ("obj1", True))
-    result = splitter.split(testfile, strip_prefix=False)
+    with pytest.warns(UserWarning, match=r"colon"):
+        result = splitter.split(testfile, strip_prefix=False)
     assert len(result) == 3
     assert all(f.is_file() for f in result)
 
@@ -218,10 +220,12 @@ def test_reset(shared_datadir, tmp_path):
     source_dir = shared_datadir / "projects"
     target_dir = tmp_path / "objects"
 
+   
     splitter = ProjectSplitter(target_dir, source_dir)
 
     # after creating the splitter, bookkeeping data should exist
     bkfile = target_dir / bookkeeper.BookKeeper.FILENAME
+    
     bk = bookkeeper.BookKeeper(bkfile)
     assert len(bk._data) > 0
 

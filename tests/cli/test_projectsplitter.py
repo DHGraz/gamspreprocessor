@@ -22,8 +22,8 @@ def test_split_project(datadir, tmp_path):
     "Test the splitproject split command."
     runner = CliRunner()
     obj_file = os.path.join(datadir, "TEI_1.xml")
-    #with pytest.warns(UserWarning, match="colon"):
-    result = runner.invoke(cli, ["splitproject", "split", "-o", tmp_path, obj_file])
+    with pytest.warns(UserWarning, match="colon"):
+        result = runner.invoke(cli, ["splitproject", "split", "-o", tmp_path, obj_file])
     assert result.exit_code == 0
     assert "Created 1 object dirs, containing 3 files." in result.output
 
@@ -211,9 +211,10 @@ def test_reset(datadir, tmp_path):
     
     obj_file = datadir / "TEI_1.xml"
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["splitproject", "split", "-o", outputdir, str(obj_file), "--reset"]
-    )
+    with pytest.warns(UserWarning, match=r"colon"):
+        result = runner.invoke(
+            cli, ["splitproject", "split", "-o", outputdir, str(obj_file), "--reset"]
+        )
     assert result.exit_code == 0
 
     # make sure TEI_1.xml has no entries in the bookkeeper

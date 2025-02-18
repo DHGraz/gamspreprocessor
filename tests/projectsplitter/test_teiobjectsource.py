@@ -34,9 +34,10 @@ def test_pid_from_filename(tmp_path, shared_datadir):
     tei_file = tmp_path / "TEI_1.xml"
     tree.write(tei_file)
 
-
+    
     src = TEIObjectSource(tei_file, strip_prefix=True, strip_extension=False)
-    assert src.pid == "TEI_1.xml"
+    with pytest.warns(UserWarning):
+        assert src.pid == "TEI_1.xml"
 
 def test_save(tmp_path, shared_datadir):
     """Test the save method."""

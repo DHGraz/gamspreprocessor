@@ -87,14 +87,14 @@ class LIDOObjectSource(ObjectSource):
     def rewrite_references(self):
         "Set the pid to a clean value and replace all referenced file references."
         root = self.tree.getroot()
-        # replace the pid in the idno element
+        # replace the pid in the recId element
         rec_id_node = root.find("./lido:lidoRecID", namespaces=self.DEFAULT_NAMESPACES)
         # if there is a colon in pid, it should only be replaced in file names!
         rec_id_node.text = self.pid.replace("%3A", ":", 1)
 
         # replace the references in the graphic elements
         for resourceset in root.findall(
-            "../lido:resourceSet", namespaces=self.DEFAULT_NAMESPACES
+            ".//lido:resourceSet", namespaces=self.DEFAULT_NAMESPACES
         ):
             ref = LIDOResourceSet(resourceset)
             ref.replace_ref(self.source_file.parent, self.strip_extension)
@@ -114,11 +114,11 @@ class LIDOObjectSource(ObjectSource):
         self.rewrite_references()
         object_dir.mkdir(exist_ok=True)
         # Save the main resource file
-        target_file = object_dir / self.source_file.name
-        # save the modified TEI file
-        x = target_file.absolute()
+        if self.strip_extension:
+            target_file = object_dir / self.source_file.stem
+        else:
+            target_file = object_dir / self.source_file.name
         self.tree.write(target_file, encoding="utf-8", xml_declaration=True)
-        
         copied_files.append(target_file)
         # copy the referenced files
         for ref in self.referenced_files:
