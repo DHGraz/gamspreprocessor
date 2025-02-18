@@ -15,7 +15,7 @@ def test_init_no_data(tmp_path):
     bk_file = tmp_path / BookKeeper.FILENAME
     bk = BookKeeper(bk_file)
 
-    assert bk.data_path == bk_file
+    assert bk.storage_path == bk_file
     assert len(bk._data) == 0
     assert bk._data == {}
 
@@ -61,20 +61,24 @@ def test_update(datadir):
     # create a BookKeeper object, run update and check if all files registered with the BookKeeper
     bk = BookKeeper(bk_file)
     bk.update(project_path)
-    assert len(bk._data) == 4
+    assert len(bk._data) == len(['foo.csv', 'foo.xml', 'foo.pdf', 'd1/bar.pdf'])
 
     # add a new file and remove an existing file
-    newfile = project_path / "foo.pdf"
+    new_file = project_path / "foo.pdf"
     deleted_file = project_path / "foo.csv"
-    newfile.touch()
+    new_file.touch()
     deleted_file.unlink()
 
     bk.update(project_path)
 
+    # check if the bookkeeper has been updated correctly
+    posix_deleted_file = deleted_file.absolute().as_posix()
+    posix_new_file = new_file.absolute().as_posix()
+
     # bookkeeper should have updated data
-    assert str(deleted_file) not in bk._data
-    assert str(newfile) in bk._data  # the new one
-    assert bk._data[str(newfile)] == []  # the new one has not been processed yet
+    assert posix_deleted_file not in bk._data
+    assert posix_new_file in bk._data  # the new one
+    assert bk._data[posix_new_file] == []  # the new one has not been processed yet
 
 
 def test_reset(tmp_path):
@@ -101,12 +105,15 @@ def test_add_pid(tmp_path):
     "Test marking a file as consumed."
     bk_file = tmp_path / BookKeeper.FILENAME
 
-    bk = BookKeeper(bk_file)
-    bk.add_pid("foo", "bar")
-    assert bk._data["foo"] == ["bar"]
+    testfile = tmp_path / "foo.xml"
 
-    bk.add_pid("foo", "foo")
-    assert bk._data["foo"] == ["bar", "foo"]
+    bk = BookKeeper(bk_file)
+    bk.add_pid(testfile, "id1")
+    expected_key = testfile.absolute().as_posix()
+    assert bk._data[expected_key] == ["id1"]
+
+    bk.add_pid(testfile, "id2")
+    assert bk._data[expected_key] == ["id1", "id2"]
 
 
 def test_remove_pid(tmp_path):

@@ -29,7 +29,7 @@ def cli():
     "--output-dir",
     default="./objects",
     type=click.Path(exists=True),
-    help="The output folder where the object directories will be created. Default: './objects'.",
+    help="The output folder where the object directories will be created. Default: '<projectroot>/objects'.",
 )
 @click.option(
     "-f",
@@ -100,14 +100,13 @@ def split_project( # noqa: PLR0913
     splitter.update_bookkeeper()
     for sourcefile in src_files:
         try:
-            file_counter += len(
-                splitter.split(Path(sourcefile), object_format, strip_prefix)
-            )
+            copied_files = splitter.split(Path(sourcefile), object_format, strip_prefix)
+            file_counter += len(copied_files)
             object_counter += 1
             click.echo(f"Split {sourcefile} into object directories.")
         except FileExistsError:
             raise click.ClickException(
-                f"Object directory for {sourcefile} already  exists. "
+                f"Object directory for {sourcefile} already exists. "
                 "Use '--replace' to overwrite the object directory or delete the directory by hand."
             )
     click.echo(

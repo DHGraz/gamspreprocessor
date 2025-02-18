@@ -2,3 +2,48 @@
 
 This package contains modules for splitting up project folders into object directories.
 """
+from pathlib import Path
+from .teiobjectsource import TEIObjectSource
+from .lidoobjectsource import LIDOObjectSource
+from .objectsource import ObjectSource
+
+from gamslib.formatdetect import detect_format
+
+def make_object_source(
+    source_file: Path, use_format="auto", strip_prefix=True, strip_extension=False
+) -> ObjectSource:
+    """ObjectSource factory function.
+
+    Arguments:
+    source_file: Path to the source file.
+    use_format: The format to use for the source file. Can be 'auto', 'tei' or 'lido'.
+    strip_prefix: If True, the prefix of the pid ('o:') will be removed.
+
+    Returns an ObjectSource object for the given source_file.
+    """
+    if not source_file.is_file():
+        raise FileNotFoundError(f"File {source_file} not found or not a file.")
+
+    use_format_lower = use_format.lower()
+    if use_format_lower == "auto":
+        format_info = detect_format(source_file)
+        mimetype = format_info.mimetype
+        subtype = format_info.subtype
+    elif use_format_lower == "tei":
+        mimetype = "text/tei+xml"
+        subtype = "TEI"
+    elif use_format_lower == "lido":
+        mimetype = "application/xml"
+        subtype = "LIDO"
+    else:
+        raise ValueError(
+            f"Invalid format type: '{use_format}'. Must be 'auto', 'tei' or 'lido'."
+        )
+
+    if subtype == "TEI":
+        obj_src = TEIObjectSource(source_file, strip_prefix, strip_extension)
+    elif subtype == "LIDO":
+        obj_src = LIDOObjectSource(source_file, strip_prefix, strip_extension)
+    else:
+        obj_src = ObjectSource(source_file, strip_prefix, strip_extension)
+    return obj_src

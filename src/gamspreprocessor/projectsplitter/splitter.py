@@ -11,17 +11,31 @@ import shutil
 from pathlib import Path
 import warnings
 from xml.etree import ElementTree as ET
+from gamslib.formatdetect import detect_format
 
-from gamspreprocessor.projectsplitter.lidoobjectdir import LIDOObjectDirectory
-from gamspreprocessor.projectsplitter.objectdir import ObjectDirectory
-from gamspreprocessor.projectsplitter.teiobjectdir import TEIObjectDirectory
-from gamspreprocessor.utils import validate_pid
+from .objectsource import ObjectSource
+from .teiobjectsource import TEIObjectSource
+from .lidoobjectsource import LIDOObjectSource
 
 from .bookkeeper import BookKeeper
-from .formatguesser import guess_format
+
 
 logger = logging.getLogger(__name__)
 
+
+def guess_format(filename: str | Path, explicit_type: str = "auto") -> tuple[str, str]:
+    """Guess the format of the file from the extension.
+
+    Uses the formatdetector from gamslib to find out the format of the file. This means,
+    that the type of format guesser can be configured via project.toml or
+    environment variables.
+
+    Returns a tuple with the content type and the (sub)format.
+    """
+    filepath = Path(filename) if isinstance(filename, str) else filename
+    format_info = detect_format(filepath)
+    subtype = format_info.subtype if explicit_type == "auto" else explicit_type
+    return format_info.mimetype, subtype
 
 class ProjectSplitter:
     """Class to split a project into single objects.
@@ -35,9 +49,16 @@ class ProjectSplitter:
         project_dir: Path,
         replace_existing_object_dirs: bool = False,
     ):
-        self.output_dir = output_dir
-        self.project_dir = project_dir
-        self.replace_existing_object_dirs = replace_existing_object_dirs
+        """Initialize the ProjectSplitter.  
+
+        Arguments:
+        output_dir: The directory where the object directories will be created.
+        project_dir: The directory containing the original data.
+        replace_existing_object_dirs: If True, existing object directories will be replaced. Default is False.
+        """
+        self.output_dir:Path = output_dir  # this is where the object directories will be created
+        self.project_dir:Path = project_dir # this is the directory containing the original data
+        self.replace_existing_object_dirs:bool = replace_existing_object_dirs
 
         if not self.output_dir.exists():
             self.output_dir.mkdir()
@@ -54,73 +75,67 @@ class ProjectSplitter:
             replace_msg,
         )
 
-    def instantiate_object_directory(
-        self, pid: str, mimetype: str, objecttype: str
-    ) -> ObjectDirectory:
-        """ObjectDirectory factory.
 
-        Return an ObjectDirectory or a derived class for a given pid depending
-        in objecttype.
+    def make_object_source(
+        self, source_file: Path, use_format: str='auto', strip_prefix:bool=True, strip_extension:bool=False) -> ObjectSource:
+        """ObjectSource factory.
 
-        Will raise a FileExistsError if the directory already exists (ie. the object
+        Return an ObjectSource or a subclass of ObjectSource representing the source file.
+        The type of the returned class depends on mimetype and objecttype.
+
+        Raises a FileExistsError if the directory already exists (ie. the object
         has already been split).
         """
-        clean_pid = pid.replace(":", "%3A")
-        if mimetype.split("/")[1].endswith('xml'):
-            if objecttype == "TEI":
-                obj_path = self.output_dir.absolute() / clean_pid
-                objdir = TEIObjectDirectory(self.output_dir / clean_pid)
-                logger.debug("Created TeiObjectDirectory for {clean_pid}")
-            elif objecttype == "LIDO":
-                objdir = LIDOObjectDirectory(self.output_dir / clean_pid)
-                logger.debug("Created LidoObjectDirectory for {clean_pid}")
-            else:
-                objdir = ObjectDirectory(self.output_dir / clean_pid)
-                logger.debug(
-                    "Created ObjectDirectory for %s with unspecified XML objecttype %s",
-                    clean_pid,
-                    objecttype,
-                )
+        if use_format.lower() == "auto":
+            mimetype, objecttype = guess_format(source_file)
         else:
-            objdir = ObjectDirectory(self.output_dir / clean_pid)
-            logger.debug(
-                "Created ObjectDirectory for %s. Detected mime type was: %s",
-                clean_pid,
-                mimetype,
-            )
-        return objdir
+            objecttype = use_format.lower()
+
+        # TODO: The subtype should use an enum value!
+        if objecttype.lower() == "tei":
+            return TEIObjectSource(source_file, strip_prefix, strip_extension)
+        elif objecttype.lower() == "lido":
+            return LIDOObjectSource(source_file, strip_prefix, strip_extension)
+        else:
+            return ObjectSource(source_file, strip_prefix, strip_extension)
+
 
     def split(
-        self, sourcefile: Path, objecttype: str = "auto", strip_prefix=False
+        self, sourcefile: Path, objecttype: str = "auto", strip_prefix=True, strip_extension=False
     ) -> list[Path]:
-        """Split a file into an object directory.
+        """Convert sourcefile into an object directory.
 
+        Arguments:
+        sourcefile: Path to the source file to be processed.
+        objecttype: The format to use for the source file. Can be 'auto', 'tei' or 'lido'.
         strip_prefix: If True, the prefix of the pid ('o:') will be removed.
+
         Return a list files (Path objects) which have been copied to the object directory.
         """
-        mimetype, obj_type = guess_format(sourcefile, objecttype)
-        pid, from_content = self.extract_pid(sourcefile, obj_type, strip_prefix)
+        rv = []
+        obj_src = self.make_object_source(sourcefile, objecttype, strip_prefix, strip_extension)
+        obj_output_dir = self.output_dir / obj_src.pid
+        if obj_output_dir.exists():
+                if self.replace_existing_object_dirs:
+                    warnings.warn(f"Replacing object directory for '{obj_src.pid}'")
+                    self._bookkeeper.remove_pid(obj_src.pid)
+                    shutil.rmtree(obj_output_dir)
+                else:
+                    raise FileExistsError(f"Object directory '{obj_output_dir}' already exists.")
+        for copied_file in obj_src.save(obj_output_dir):
+            self._bookkeeper.add_pid(copied_file, obj_src.pid)
+            rv.append(copied_file)
+        return rv
 
-        validate_pid(pid)
-        try:
-            objdir = self.instantiate_object_directory(pid, mimetype, obj_type)
-        except FileExistsError as exp:
-            if self.replace_existing_object_dirs:
-                warnings.warn(f"Replacing object directory for '{pid}'")
-                self._bookkeeper.remove_pid(pid)
-                shutil.rmtree(self.output_dir / pid)
-                objdir = self.instantiate_object_directory(pid, mimetype, obj_type)
-            else:
-                logger.error("Object '%s' already exists. Skipping.", pid)
-                raise exp
-        if strip_prefix and from_content:
-            objdir.split(sourcefile, pid)
-        else:
-            objdir.split(sourcefile)
-        for path in objdir.files:
-            self._bookkeeper.add_pid(str(path), pid)
-        self._bookkeeper.save()
-        return objdir.files
+        # # TODO: das ist ein Relikt!
+        # if strip_prefix and from_content:
+        #     objdir.split(sourcefile, pid)
+        # else:
+        #     objdir.split(sourcefile)
+        # for path in objdir.files:
+        #     self._bookkeeper.add_pid(str(path), pid)
+        # self._bookkeeper.save()
+        #return objdir.files
 
     def update_bookkeeper(self) -> None:
         "Update the bookkeeper with all files in the project directory."

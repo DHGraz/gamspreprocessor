@@ -27,7 +27,6 @@ def test_split_project(datadir, tmp_path):
     assert result.exit_code == 0
     assert "Created 1 object dirs, containing 3 files." in result.output
 
-@pytest.mark.skip(reason="We need an object with a colon in PID")
 def test_split_project_with_colon(datadir, tmp_path):
     "Test the splitproject split command should raise a warning if we use a colon."
     runner = CliRunner()
@@ -144,7 +143,7 @@ def test_read_from_filelist(datadir, tmp_path):
             "splitproject",
             "split",
             "-o",
-            outputdir,
+            str(outputdir),
             "--strip-prefix",
             "--file-list",
             str(file_list_file),
@@ -170,14 +169,18 @@ def test_object_file_already_exists(datadir, tmp_path):
     obj_file = os.path.join(datadir, "TEI_1.xml")
     outputdir = tmp_path / "objects"
     outputdir.mkdir()
-    #with pytest.warns(UserWarning, match="colon"):
-    result = runner.invoke(
-        cli, ["splitproject", "split", "-o", outputdir, obj_file]
+
+    # create the object directory
+    with pytest.warns(UserWarning, match="colon"):
+        result = runner.invoke(
+            cli, ["splitproject", "split", "-o", outputdir, obj_file]
         )
     assert result.exit_code == 0
-#    with pytest.warns(UserWarning, match="colon"):
-    result = runner.invoke(
-        cli, ["splitproject", "split", "-o", outputdir, obj_file]
+
+    # try to re-create the object directory
+    with pytest.warns(UserWarning, match="colon"):
+        result = runner.invoke(
+            cli, ["splitproject", "split", "-o", outputdir, obj_file]
         )
     assert result.exit_code == 1
     assert "Object directory for" in result.output
@@ -188,35 +191,32 @@ def test_object_file_already_exists(datadir, tmp_path):
 
 def test_reset(datadir, tmp_path):
     "Test the splitproject split command with the --reset option."
+    # FIXME: if we add an object_file, should'nt be this file in the bookkeeper?
 
-    def extract_from_bookkeeper(bookkeeper_file: Path, filename: str):
-        bk_data = json.loads(bookkeeper_file.read_text())
-        for key, value in bk_data.items():
-            if key.endswith(filename):
-                return value
-
-    runner = CliRunner()
-    obj_file = os.path.join(datadir, "TEI_1.xml")
     outputdir = tmp_path / "objects"
-    bookkepper_file = outputdir / BookKeeper.FILENAME
     outputdir.mkdir()
 
-    # we create some objects to fill the bookkeeper
-    #with pytest.warns(UserWarning, match="colon"):
-    result = runner.invoke(
-        cli, ["splitproject", "split", "-o", outputdir, obj_file]
-    )
-    assert result.exit_code == 0
-    assert bookkepper_file.exists()
-    # make sure TEI_1.xml has entries in the bookkeeper
-    assert extract_from_bookkeeper(bookkepper_file, "TEI_1.xml")
+    # we create a json data in the datadir direcory with some entries
+    bookkeeper_file = outputdir / BookKeeper.FILENAME
+    bookkeeper = BookKeeper(bookkeeper_file)
+    bookkeeper.update(datadir)
+    assert len(bookkeeper._data) > 0
+    # we add 2 pids to each entry
+    for key in bookkeeper._data:
+        bookkeeper._data[key] = ["foo", "bar"]
+    bookkeeper.save()
+    
+    assert bookkeeper_file.exists()
 
-    obj_file = os.path.join(datadir, "LIDO_1.xml")
-    #with pytest.warns(UserWarning, match="colon"):
-    runner.invoke(
-        cli, ["splitproject", "split", "-o", outputdir, obj_file, "--reset"]
+    
+    obj_file = datadir / "TEI_1.xml"
+    runner = CliRunner()
+    result = runner.invoke(
+        cli, ["splitproject", "split", "-o", outputdir, str(obj_file), "--reset"]
     )
     assert result.exit_code == 0
-    assert bookkepper_file.exists()
+
     # make sure TEI_1.xml has no entries in the bookkeeper
-    assert not extract_from_bookkeeper(bookkepper_file, "TEI_1.xml")
+    bk_data = json.loads(bookkeeper_file.read_text())
+    for key, value in bk_data.items():
+        assert value == [], f"key: {key}, value: {value} should be empty" 
