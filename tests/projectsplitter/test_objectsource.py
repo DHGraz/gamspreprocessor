@@ -4,12 +4,21 @@ from gamspreprocessor.projectsplitter.objectsource import ObjectSource
 
 def test_pid_with_colon(tmp_path):
     """If strip_prefix is True, the o: should be removed."""
-    src = ObjectSource(tmp_path / "o:foo.xml", strip_prefix=True, strip_extension=True)
-    assert src.source_file == tmp_path / "o:foo.xml"
+    # we cannot have colons in filenames on Windows because Windows treats 
+    # the colon as a drive letter separator. 
+    # We skip this test on windows, because the next test (escaped colon)
+    # should follow the same logic
+    if os.name == "nt":
+        pytest.skip("This test is not relevant on Windows.")  
+    test_file = tmp_path / "o:foo.xml"
+    src = ObjectSource(test_file, strip_prefix=True, strip_extension=True)
+    assert src.source_file == test_file
     assert src.strip_prefix
     assert src.strip_extension
     assert src.referenced_files == []
-    assert src.pid == "foo"
+    with pytest.warns(UserWarning):
+        assert src.pid == "foo"
+    
 
 
 def test_pid_with_colon_escaped(tmp_path):
@@ -29,8 +38,9 @@ def test_pid_with_colon_keep_prefix(tmp_path):
     But: The colon should be escaped and a warning should be issued.
     """
     # we cannot have colons in filenames on Windows because Windows treats 
-    # the colon as a drive letter separator. In the next test, we use an
-    # escaped version of the colon, which should work on Windows.
+    # the colon as a drive letter separator. 
+    # We skip this test on windows, because the next test (escaped colon)
+    # should follow the same logic
     if os.name == "nt":
         pytest.skip("This test is not relevant on Windows.")  
     test_file = tmp_path / "o:foo.pdf"
