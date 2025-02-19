@@ -204,15 +204,17 @@ def test_update_bookkeeper(shared_datadir, tmp_path):
     splitter.update_bookkeeper()
     for path in project_dir.glob("**/*"):
         if path.is_file():
-            assert str(path) in splitter._bookkeeper._data
-            assert splitter._bookkeeper._data[str(path)] == []
+            bk_path = path.resolve().as_posix()
+            assert bk_path in splitter._bookkeeper._data
+            assert splitter._bookkeeper._data[bk_path] == []
+            
 
     # add one more file and assert update adds it to the bookkeeper
     newfile = project_dir / "newfoo.txt"
     newfile.write_text("foo")
     splitter.update_bookkeeper()
-    assert str(newfile) in splitter._bookkeeper._data
-    assert splitter._bookkeeper._data[str(newfile)] == []
+    assert str(newfile.resolve().as_posix()) in splitter._bookkeeper._data
+    assert splitter._bookkeeper._data[newfile.resolve().as_posix()] == []
 
 
 def test_reset(shared_datadir, tmp_path):

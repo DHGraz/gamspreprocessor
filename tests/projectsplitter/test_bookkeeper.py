@@ -121,24 +121,26 @@ def test_remove_pid(tmp_path):
 
     bk_file = tmp_path / BookKeeper.FILENAME
 
-    file1 = os.path.abspath("/bar/foo.xml")
-    file2 = os.path.abspath("/foo/bar.xml")
+    #file1 = os.path.abspath("/bar/foo.xml").as_posix()
+    file1 = tmp_path / "foo.xml"
+    #file2 = os.path.abspath("/foo/bar.xml").as_posix()
+    file2 = tmp_path / "bar.xml"
 
     bk = BookKeeper(bk_file)
     bk.add_pid(file1, "foo")
     bk.add_pid(file1, "bar")
     bk.add_pid(file2, "foo")
 
-    assert bk._data[file1] == ["foo", "bar"]
-    assert bk._data[file2] == ["foo"]
+    assert bk.get_pids_for_file(file1) == ["foo", "bar"]
+    assert bk.get_pids_for_file(file2) == ["foo"]
 
     bk.remove_pid("foo")
-    assert bk._data[file1] == ["bar"]
-    assert bk._data[file2] == []
+    assert bk.get_pids_for_file(file1) == ["bar"]
+    assert bk.get_pids_for_file(file2) == []
 
     bk.remove_pid("bar")
-    assert bk._data[file1] == []
-    assert bk._data[file2] == []
+    assert bk.get_pids_for_file(file1) == []
+    assert bk.get_pids_for_file(file2) == []
 
 
 def test_get_unhandled(tmp_path):

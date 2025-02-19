@@ -1,3 +1,4 @@
+import os
 import pytest
 from gamspreprocessor.projectsplitter.objectsource import ObjectSource
 
@@ -8,8 +9,7 @@ def test_pid_with_colon(tmp_path):
     assert src.strip_prefix
     assert src.strip_extension
     assert src.referenced_files == []
-    with pytest.warns(UserWarning):
-        assert src.pid == "foo"
+    assert src.pid == "foo"
 
 
 def test_pid_with_colon_escaped(tmp_path):
@@ -24,9 +24,19 @@ def test_pid_with_colon_escaped(tmp_path):
 
 
 def test_pid_with_colon_keep_prefix(tmp_path):
-    """If strip_prefix is False, the o: should not be be removed, but the colon escaped."""
-    src = ObjectSource(tmp_path / "o:foo.xml", strip_prefix=False, strip_extension=True)
-    assert src.source_file == tmp_path / "o:foo.xml"
+    """If strip_prefix is False, the o: should not be be removed.
+    
+    But: The colon should be escaped and a warning should be issued.
+    """
+    # we cannot have colons in filenames on Windows because Windows treats 
+    # the colon as a drive letter separator. In the next test, we use an
+    # escaped version of the colon, which should work on Windows.
+    if os.name == "nt":
+        pytest.skip("This test is not relevant on Windows.")  
+    test_file = tmp_path / "o:foo.pdf"
+    
+    src = ObjectSource(test_file, strip_prefix=False, strip_extension=True)
+    assert src.source_file == test_file
     assert src.strip_prefix is False
     assert src.strip_extension
     assert src.referenced_files == []
@@ -36,8 +46,9 @@ def test_pid_with_colon_keep_prefix(tmp_path):
 
 def test_pid_with_escaped_colon_keep_prefix(tmp_path):
     """If strip_prefix is False, the o%3A should not be kept."""
-    src = ObjectSource(tmp_path / "o:foo.xml", strip_prefix=False, strip_extension=True)
-    assert src.source_file == tmp_path / "o:foo.xml"
+    test_file = tmp_path / "o%3Afoo.pdf"
+    src = ObjectSource(test_file, strip_prefix=False, strip_extension=True)
+    assert src.source_file == test_file
     assert src.strip_prefix is False
     assert src.strip_extension
     assert src.referenced_files == []

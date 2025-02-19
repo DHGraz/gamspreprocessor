@@ -60,7 +60,8 @@ class BookKeeper:
         """
         if not isinstance(filepath, Path):
             filepath = Path(filepath)
-        posix_path = filepath.absolute().as_posix()
+
+        posix_path = filepath.resolve().as_posix()
 
         pids_for_file = self._data.get(posix_path, [])
         
@@ -90,6 +91,11 @@ class BookKeeper:
         self._data = {}
         self.save()
 
+    def get_pids_for_file(self, filepath: Path) -> list[str]:
+        "Return a list of object pids for a file."
+        posix_path = filepath.resolve().as_posix()
+        return self._data.get(posix_path, [])
+
     def _load_data(self) -> dict[str, Any] | None:
         "Load data from the json file in self.storage_path."
         if self.storage_path.exists():
@@ -117,7 +123,7 @@ class BookKeeper:
                 if filepath.name in files_to_ignore or filepath.suffix == ".log":
                     logger.debug("skipping '%s' while updating bookkeeper", filepath)
                     continue
-                posix_path = filepath.absolute().as_posix()
+                posix_path = filepath.resolve().as_posix()
                 #relative_path = filepath.relative_to(project_path).as_posix() 
                 if posix_path not in self._data:
                     self._data[posix_path] = []
