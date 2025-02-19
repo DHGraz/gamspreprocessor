@@ -65,7 +65,7 @@ def validate_pid(pid: str) -> None:
         raise ValueError(
             f"PID {pid} does not match the allowed pattern {allowed_pattern}"
         )
-    if ":" in pid:
+    if ":" in pid or '%3A' in pid:
         warnings.warn(
             f"PID {pid} contains a colon, which is discouraged in the new GAMS.",
             UserWarning,

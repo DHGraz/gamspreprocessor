@@ -30,39 +30,45 @@ class BookKeeper:
     # We use pathlib.Path for public interfaces, but strings for paths internally
     # because json does not support Path objects and is does not really make sense
     # to cast values from an to Path objects.
-    def __init__(self, data_path: Path) -> None:
+    def __init__(self, storage_path: Path) -> None:
         """Initialize the BookKeeper object.
 
         'data_path' is the path to the file where the bookkeeping data is stored.
+        
 
         If you plan to run the splitter multiple times for a single project, make sure
         that the 'data_path' is the same for all runs.
         """
-        self.data_path = data_path
+        self.storage_path: Path = storage_path
         self._data: dict[str, list[str]] = {}
 
         ## read stored data from disk (if it exists)
         self._load_data()
 
-    #        self.update()
 
     def save(self) -> None:
         "Write data to disk."
-        with open(self.data_path, "w", encoding="utf-8") as f:
+        with self.storage_path.open("w", encoding="utf-8") as f:
             json.dump(self._data, f, ensure_ascii=False)
-        logger.debug("Bookkeeper data written to '%a'", self.data_path)
+        logger.debug("Bookkeeper data written to '%a'", self.storage_path)
 
-    def add_pid(self, filepath: str, pid: str) -> None:
+    def add_pid(self, filepath: Path|str, pid: str) -> None:
         """Mark a file as used for an object with ID pid.
 
-        Files can be used by more than one object, so we need
-        to keep track of all pids.
+        As a file can be used by more than one object, we keep the
+        objects it is referenced in as list of object pids.
         """
-        if filepath not in self._data:
-            self._data[filepath] = [pid]
-        elif pid not in self._data[filepath]:
-            self._data[filepath].append(pid)
-        logger.debug("Added object '%s' for '%s' to bookkeeper", pid, filepath)
+        if not isinstance(filepath, Path):
+            filepath = Path(filepath)
+
+        posix_path = filepath.resolve().as_posix()
+
+        pids_for_file = self._data.get(posix_path, [])
+        
+        if pid not in pids_for_file:
+            pids_for_file.append(pid)
+            logger.debug("Added object pid '%s' for '%s' to bookkeeper", pid, posix_path)
+        self._data[posix_path] = pids_for_file
 
     def remove_pid(self, pid: str) -> None:
         """Remove object ID pid from all entries.
@@ -85,42 +91,47 @@ class BookKeeper:
         self._data = {}
         self.save()
 
+    def get_pids_for_file(self, filepath: Path) -> list[str]:
+        "Return a list of object pids for a file."
+        posix_path = filepath.resolve().as_posix()
+        return self._data.get(posix_path, [])
+
     def _load_data(self) -> dict[str, Any] | None:
-        "Load data from the json file."
-        if self.data_path.exists():
-            with open(self.data_path, encoding="utf-8") as f:
+        "Load data from the json file in self.storage_path."
+        if self.storage_path.exists():
+            with open(self.storage_path, encoding="utf-8") as f:
                 self._data = json.load(f)
-            logger.debug("Bookkeeper data loaded from '%s'", self.data_path)
+            logger.debug("Bookkeeper data loaded from '%s'", self.storage_path)
         else:
             logger.debug(
                 "Bookkeeper data file '%s' not found, starting with empty data.",
-                self.data_path,
+                self.storage_path,
             )
             self._data = {}
 
     def update(self, project_path: Path) -> None:
-        """Merge already registered files with newly colleced files.
+        """Merge already registered files with newly collected files.
 
         Also remove files which have been deleted since last run.
         'project_path' is the root directory of the project files.
         """
         files_to_ignore = ["object.csv", "datastreams.csv"]
         all_files = set()
-        for root, _, files in os.walk(str(project_path)):
-            for file in files:
-                # skip the bookkeeping file and log files
-                if file.endswith(".log") or file in files_to_ignore:
-                    logger.debug("skipping '%s' while updating bookkeeper", file)
+
+        for filepath in project_path.rglob("*"):
+            if filepath.is_file():
+                if filepath.name in files_to_ignore or filepath.suffix == ".log":
+                    logger.debug("skipping '%s' while updating bookkeeper", filepath)
                     continue
-                filepath = os.path.abspath(os.path.join(root, file))
-                # add new files as unhandled
-                if filepath not in self._data:
-                    self._data[filepath] = []
-                all_files.add(filepath)
-                logger.debug("Added new file %s to bookkeeper", filepath)
-        # remove files which have been deleted since last run
+                posix_path = filepath.resolve().as_posix()
+                #relative_path = filepath.relative_to(project_path).as_posix() 
+                if posix_path not in self._data:
+                    self._data[posix_path] = []
+                all_files.add(posix_path)
+
         removed_files = set(self._data.keys()) - all_files
         for file in removed_files:
-            del self._data[file]
+            self._data.pop(file)
             logger.debug("Removed deleted file '%s' from bookkeeper", file)
         self.save()
+
