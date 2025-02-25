@@ -8,6 +8,7 @@ from .lidoobjectsource import LIDOObjectSource
 from .objectsource import ObjectSource
 
 from gamslib.formatdetect import detect_format
+from gamslib.formatdetect.xmltypes import XMLTypes
 
 def make_object_source(
     source_file: Path, use_format="auto", strip_prefix=True, strip_extension=False
@@ -31,18 +32,18 @@ def make_object_source(
         subtype = format_info.subtype
     elif use_format_lower == "tei":
         mimetype = "text/tei+xml"
-        subtype = "TEI"
+        subtype = XMLTypes.TEI
     elif use_format_lower == "lido":
         mimetype = "application/xml"
-        subtype = "LIDO"
+        subtype = XMLTypes.LIDO
     else:
         raise ValueError(
             f"Invalid format type: '{use_format}'. Must be 'auto', 'tei' or 'lido'."
         )
 
-    if subtype == "TEI":
+    if subtype == XMLTypes.TEI:
         obj_src = TEIObjectSource(source_file, strip_prefix, strip_extension)
-    elif subtype == "LIDO":
+    elif subtype == XMLTypes.LIDO:
         obj_src = LIDOObjectSource(source_file, strip_prefix, strip_extension)
     else:
         obj_src = ObjectSource(source_file, strip_prefix, strip_extension)
