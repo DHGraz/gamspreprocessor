@@ -349,7 +349,7 @@
         </lido:resourceRepresentation>
       </lido:resourceSet>
       <lido:resourceSet lido:sortorder="2">
-        <lido:resourceID lido:type="IMAGE">IMAGE.2</lido:resourceID>
+        <!--<lido:resourceID lido:type="IMAGE">IMAGE.2</lido:resourceID>-->
         <lido:resourceRepresentation>
           <lido:linkResource lido:formatResource="image/jpeg">file:///img/image02.jpeg</lido:linkResource>
         </lido:resourceRepresentation>

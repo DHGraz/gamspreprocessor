@@ -10,7 +10,7 @@ import pytest
 # pylint: disable=protected-access
 from gamspreprocessor.projectsplitter import bookkeeper
 from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource
-from gamspreprocessor.projectsplitter.objectsource import ObjectSource
+from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSource
 from gamspreprocessor.projectsplitter.splitter import ProjectSplitter, guess_format
 from gamspreprocessor.projectsplitter.teiobjectsource import TEIObjectSource
 
@@ -49,7 +49,7 @@ def test_init_with_existing_dir(shared_datadir, tmp_path, caplog):
     [
         ("TEI_1.xml", "tei", TEIObjectSource),
         ("LIDO_1.xml", "lido", LIDOObjectSource),
-        ("foo.txt", "auto", ObjectSource),
+        ("foo.txt", "auto", GenericObjectSource),
     ],
 )
 def test_make_object_source(
@@ -81,7 +81,6 @@ def test_split(shared_datadir, tmp_path):
     target_dir = tmp_path / "objects"
     splitter = ProjectSplitter(target_dir, source_dir)
 
-    # self, sourcefile: Path, objecttype: str = "auto", strip_prefix=False
     testfile = source_dir / "foo.pdf"
     result = splitter.split(testfile)
     assert len(result) == 1
@@ -131,7 +130,7 @@ def test_split_lido(shared_datadir, tmp_path):
 
     assert "LIDO_1.xml" in filenames
     assert "IMAGE.1" in filenames  
-    assert "IMAGE.2" in filenames
+    assert "image02.jpeg" in filenames
 
 
 def test_split_invalid_filename(shared_datadir, tmp_path):

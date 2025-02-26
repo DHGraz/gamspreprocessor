@@ -78,7 +78,7 @@ class FileReference(metaclass=abc.ABCMeta):
         """
         target_file = None
         # it makes no sense to copy a file which does not exist
-        if self.source_file is not None:
+        if self.source_file is not None: # and self.source_file.is_file():
             target_name = self.get_reference()
             target_file = object_dir / target_name
             if not target_file.exists():

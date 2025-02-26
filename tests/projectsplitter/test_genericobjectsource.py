@@ -1,6 +1,6 @@
 import os
 import pytest
-from gamspreprocessor.projectsplitter.objectsource import ObjectSource
+from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSource
 
 def test_pid_with_colon(tmp_path):
     """If strip_prefix is True, the o: should be removed."""
@@ -11,25 +11,29 @@ def test_pid_with_colon(tmp_path):
     if os.name == "nt":
         pytest.skip("This test is not relevant on Windows.")  
     test_file = tmp_path / "o:foo.xml"
-    src = ObjectSource(test_file, strip_prefix=True, strip_extension=True)
+    src = GenericObjectSource(test_file, strip_prefix=True, strip_extension=True)
     assert src.source_file == test_file
     assert src.strip_prefix
     assert src.strip_extension
     assert src.referenced_files == []
-    with pytest.warns(UserWarning):
-        assert src.pid == "foo"
+    # Not changed yet
+    assert src.pid == "o:foo"
+    # rewrite_pid sets the new pid
+    new_pid = src.rewrite_pid()
+    assert new_pid == "foo"
+    assert src.pid == "foo"
     
 
 
 def test_pid_with_colon_escaped(tmp_path):
     "Like test_pid_with_colon, but with a percent-escaped colon."
-    src = ObjectSource(tmp_path / "o%3Afoo.xml", strip_prefix=True, strip_extension=True)
+    src = GenericObjectSource(tmp_path / "o%3Afoo.xml", strip_prefix=True, strip_extension=True)
     assert src.source_file == tmp_path / "o%3Afoo.xml"
     assert src.strip_prefix
     assert src.strip_extension
     assert src.referenced_files == []
     with pytest.warns(UserWarning):
-        assert src.pid == "foo"
+        assert src.safe_pid == "foo"
 
 
 def test_pid_with_colon_keep_prefix(tmp_path):
@@ -45,30 +49,31 @@ def test_pid_with_colon_keep_prefix(tmp_path):
         pytest.skip("This test is not relevant on Windows.")  
     test_file = tmp_path / "o:foo.pdf"
     
-    src = ObjectSource(test_file, strip_prefix=False, strip_extension=True)
+    src = GenericObjectSource(test_file, strip_prefix=False, strip_extension=True)
     assert src.source_file == test_file
     assert src.strip_prefix is False
     assert src.strip_extension
     assert src.referenced_files == []
     with pytest.warns(UserWarning):
-        assert src.pid == "o%3Afoo"
+        assert src.pid == "o:foo"
+        assert src.safe_pid == "o%3Afoo"
         
 
 def test_pid_with_escaped_colon_keep_prefix(tmp_path):
     """If strip_prefix is False, the o%3A should not be kept."""
     test_file = tmp_path / "o%3Afoo.pdf"
-    src = ObjectSource(test_file, strip_prefix=False, strip_extension=True)
+    src = GenericObjectSource(test_file, strip_prefix=False, strip_extension=True)
     assert src.source_file == test_file
     assert src.strip_prefix is False
     assert src.strip_extension
     assert src.referenced_files == []
     with pytest.warns(UserWarning):
-        assert src.pid == "o%3Afoo"
+        assert src.safe_pid == "o%3Afoo"
 
 
 def test_pid_with_keep_extension(tmp_path):
     """If strip_extension is False, the extension should be kept."""
-    src = ObjectSource(tmp_path / "foo.xml", strip_prefix=True, strip_extension=False)
+    src = GenericObjectSource(tmp_path / "foo.xml", strip_prefix=True, strip_extension=False)
     assert src.source_file == tmp_path / "foo.xml"
     assert src.strip_prefix
     assert src.strip_extension is False
@@ -80,7 +85,7 @@ def test_save(tmp_path):
     """Test the save method."""
     src_file = tmp_path / "foo.xml"
     src_file.touch()
-    src = ObjectSource(src_file, strip_prefix=True, strip_extension=False)
+    src = GenericObjectSource(src_file, strip_prefix=True, strip_extension=False)
     
     obj_dir = tmp_path / "object1"
     obj_dir.mkdir()

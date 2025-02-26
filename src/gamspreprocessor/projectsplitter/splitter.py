@@ -13,7 +13,7 @@ import warnings
 from xml.etree import ElementTree as ET
 from gamslib.formatdetect import detect_format
 
-from .objectsource import ObjectSource
+from .genericobjectsource import GenericObjectSource
 from .teiobjectsource import TEIObjectSource
 from .lidoobjectsource import LIDOObjectSource
 
@@ -77,7 +77,7 @@ class ProjectSplitter:
 
 
     def make_object_source(
-        self, source_file: Path, use_format: str='auto', strip_prefix:bool=True, strip_extension:bool=False) -> ObjectSource:
+        self, source_file: Path, use_format: str='auto', strip_prefix:bool=True, strip_extension:bool=False) -> GenericObjectSource:
         """ObjectSource factory.
 
         Return an ObjectSource or a subclass of ObjectSource representing the source file.
@@ -97,7 +97,7 @@ class ProjectSplitter:
         elif objecttype.lower() == "lido":
             return LIDOObjectSource(source_file, strip_prefix, strip_extension)
         else:
-            return ObjectSource(source_file, strip_prefix, strip_extension)
+            return GenericObjectSource(source_file, strip_prefix, strip_extension)
 
 
     def split(
@@ -114,7 +114,9 @@ class ProjectSplitter:
         """
         rv = []
         obj_src = self.make_object_source(sourcefile, objecttype, strip_prefix, strip_extension)
-        obj_output_dir = self.output_dir / obj_src.pid
+        obj_src.rewrite_pid()
+        obj_src.rewrite_references()
+        obj_output_dir = self.output_dir / obj_src.safe_pid
         if obj_output_dir.exists():
                 if self.replace_existing_object_dirs:
                     warnings.warn(f"Replacing object directory for '{obj_src.pid}'")
@@ -126,16 +128,6 @@ class ProjectSplitter:
             self._bookkeeper.add_pid(copied_file, obj_src.pid)
             rv.append(copied_file)
         return rv
-
-        # # TODO: das ist ein Relikt!
-        # if strip_prefix and from_content:
-        #     objdir.split(sourcefile, pid)
-        # else:
-        #     objdir.split(sourcefile)
-        # for path in objdir.files:
-        #     self._bookkeeper.add_pid(str(path), pid)
-        # self._bookkeeper.save()
-        #return objdir.files
 
     def update_bookkeeper(self) -> None:
         "Update the bookkeeper with all files in the project directory."

@@ -5,14 +5,14 @@ This package contains modules for splitting up project folders into object direc
 from pathlib import Path
 from .teiobjectsource import TEIObjectSource
 from .lidoobjectsource import LIDOObjectSource
-from .objectsource import ObjectSource
+from .genericobjectsource import GenericObjectSource
 
 from gamslib.formatdetect import detect_format
 from gamslib.formatdetect.xmltypes import XMLTypes
 
 def make_object_source(
     source_file: Path, use_format="auto", strip_prefix=True, strip_extension=False
-) -> ObjectSource:
+) -> GenericObjectSource:
     """ObjectSource factory function.
 
     Arguments:
@@ -46,5 +46,5 @@ def make_object_source(
     elif subtype == XMLTypes.LIDO:
         obj_src = LIDOObjectSource(source_file, strip_prefix, strip_extension)
     else:
-        obj_src = ObjectSource(source_file, strip_prefix, strip_extension)
+        obj_src = GenericObjectSource(source_file, strip_prefix, strip_extension)
     return obj_src
