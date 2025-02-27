@@ -3,7 +3,7 @@ from pathlib import Path
 
 from gamspreprocessor.projectsplitter.abstractobjectsources import AbstractObjectSource
 
-from .filereference import FileReference
+from .abstractfilereferences import AbstractFileReference
 
 
 class GenericObjectSource(AbstractObjectSource):

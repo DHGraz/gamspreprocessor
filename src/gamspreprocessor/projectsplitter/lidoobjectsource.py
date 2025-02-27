@@ -6,12 +6,11 @@ from lxml import etree as ET
 
 from gamspreprocessor.projectsplitter.abstractobjectsources import XMLObjectSource
 
-from .filereference import FileReference
-
-from .genericobjectsource import GenericObjectSource
+from .abstractfilereferences import AbstractXMLFileReference
 
 
-class LIDOResourceSet(FileReference):
+
+class LIDOResourceSet(AbstractXMLFileReference):
     "A wrapper around a ResourceSet element in a LIDO file."
 
     def get_reference(self) -> str:

@@ -1,11 +1,12 @@
 """The TEI Source of an object."""
 
 from frozendict import frozendict
+
+from .abstractfilereferences import AbstractXMLFileReference
 from .abstractobjectsources import XMLObjectSource
-from .filereference import FileReference
 
 
-class TEIGraphicReference(FileReference):
+class TEIGraphicReference(AbstractXMLFileReference):
     "A wrapper around a graphic element in a TEI file."
 
     def get_reference(self) -> str:
@@ -30,7 +31,6 @@ class TEIGraphicReference(FileReference):
 class TEIObjectSource(XMLObjectSource):
     """Represents a TEI source file for a single GAMS object."""
 
-    
     DEFAULT_NAMESPACES = frozendict({"tei": "http://www.tei-c.org/ns/1.0"})
 
     def rewrite_references(self):

@@ -18,8 +18,8 @@ from frozendict import frozendict
 from lxml import etree as ET
 from uritools import urisplit
 
-from .abstractfilereference import FileReference
-from .filereference import FileReference
+from .abstractfilereferences import AbstractXMLFileReference
+from .abstractfilereferences import AbstractFileReference
 
 
 class AbstractObjectSource(ABC):
@@ -38,7 +38,7 @@ class AbstractObjectSource(ABC):
         self.strip_prefix: bool = strip_prefix
         self.strip_extension: bool = strip_extension
 
-        self.referenced_files: list[FileReference] = []
+        self.referenced_files: list[AbstractFileReference] = []
 
     def rewrite_pid(self) -> str:
         """Replace the existing pid with the new one (eg. without prefix).

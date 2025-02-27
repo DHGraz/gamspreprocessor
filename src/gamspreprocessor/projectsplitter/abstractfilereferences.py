@@ -8,22 +8,13 @@ from lxml import etree as ET
 from uritools import urisplit
 
 
-class FileReference(metaclass=abc.ABCMeta):
-    """An abstract class for handling references in (XML) documents.
-
-    Subclass this class for any XML element which contains a reference, which might be
-    resolvable to a file.
-
-    Normally it will suffice to implement the get_reference, set_reference and get_id methods.
+class AbstractFileReference(metaclass=abc.ABCMeta):
+    """An abstract class for handling references in documents.
     """
 
-    def __init__(self, element: ET.Element) -> None:
+    def __init__(self) -> None:
         """Initialize the FileReference.
-
-        Arguments:
-        element: The XML element which contains the reference.
         """
-        self._element: ET.Element = element
         self.source_file: Path|None = None
 
     @abc.abstractmethod
@@ -78,7 +69,7 @@ class FileReference(metaclass=abc.ABCMeta):
         """
         target_file = None
         # it makes no sense to copy a file which does not exist
-        if self.source_file is not None: # and self.source_file.is_file():
+        if self.source_file is not None: 
             target_name = self.get_reference()
             target_file = object_dir / target_name
             if not target_file.exists():
@@ -127,7 +118,30 @@ class FileReference(metaclass=abc.ABCMeta):
             return hash(f"{self.__class__.__name__!s} {self.source_file.absolute()}")
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self._element!r})"
+        return f"{self.__class__.__name__}({self.source_file!s})"
 
     def __str__(self):
         return f"{self.__class__.__name__!s} for '{self.source_file!s}'"
+
+
+class AbstractXMLFileReference(AbstractFileReference):
+    """An abstract class for handling references in XML documents.
+
+    Subclass this class for any XML element which contains a reference, which might be
+    resolvable to a file.
+
+    For almost all cases implement the `get_reference()`, `set_reference()` and `get_id()`
+    methods should be enough.
+    """
+
+    def __init__(self, element: ET.Element) -> None:
+        """Initialize the FileReference.
+
+        Arguments:
+        element: The XML element which contains the reference.
+        """
+        super().__init__()
+        self._element: ET.Element = element
+        
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self._element!r})"
