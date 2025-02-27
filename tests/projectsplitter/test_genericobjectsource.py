@@ -92,3 +92,18 @@ def test_save(tmp_path):
     retval = src.save(obj_dir)
     assert (obj_dir / "foo.xml").exists()
     assert retval == [obj_dir / "foo.xml"]
+
+
+def test_str(tmp_path):
+    """Test the __str__ method."""
+    src = GenericObjectSource(tmp_path / "foo.xml", strip_prefix=True, strip_extension=False) 
+    assert str(src) == f"GenericObjectSource({tmp_path / 'foo.xml'})"
+
+def test_repr(tmp_path):
+    """Test the __repr__ method."""
+    src = GenericObjectSource(tmp_path / "foo.xml", strip_prefix=True, strip_extension=False) 
+    print('-'*80)
+    print(repr(src))
+    print('-'*80)
+    assert repr(src) == f"GenericObjectSource({tmp_path / 'foo.xml'}, strip_prefix=True, strip_extension=False)"
+    

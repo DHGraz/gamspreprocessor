@@ -108,8 +108,25 @@ def test_add_pid(tmp_path):
     testfile = tmp_path / "foo.xml"
 
     bk = BookKeeper(bk_file)
+
     bk.add_pid(testfile, "id1")
     expected_key = testfile.absolute().as_posix()
+    assert bk._data[expected_key] == ["id1"]
+
+    bk.add_pid(testfile, "id2")
+    assert bk._data[expected_key] == ["id1", "id2"]
+
+def test_add_pid_str(tmp_path):
+    "Test marking a file as consumed by providing a string instead of a Path."
+    bk_file = tmp_path / BookKeeper.FILENAME
+
+    testpath = tmp_path / "foo.xml"
+    testfile = str(testpath)
+
+    bk = BookKeeper(bk_file)
+
+    bk.add_pid(testfile, "id1")
+    expected_key = testpath.absolute().as_posix()
     assert bk._data[expected_key] == ["id1"]
 
     bk.add_pid(testfile, "id2")

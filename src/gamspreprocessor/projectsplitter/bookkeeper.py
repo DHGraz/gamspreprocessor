@@ -58,7 +58,7 @@ class BookKeeper:
         As a file can be used by more than one object, we keep the
         objects it is referenced in as list of object pids.
         """
-        if not isinstance(filepath, Path):
+        if isinstance(filepath, str):
             filepath = Path(filepath)
 
         posix_path = filepath.resolve().as_posix()

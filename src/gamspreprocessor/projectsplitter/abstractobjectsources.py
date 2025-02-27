@@ -114,7 +114,7 @@ class AbstractObjectSource(ABC):
         return self.source_file.stem if self.strip_extension else self.source_file.name
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.source_file}, self.strip_prefix, self.strip_extension)"
+        return f"{self.__class__.__name__}({self.source_file}, strip_prefix={self.strip_prefix!s}, strip_extension={self.strip_extension!s})"
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.source_file})"
@@ -160,9 +160,17 @@ class XMLObjectSource(AbstractObjectSource):
             )
         return pid
 
-    @abstractmethod
     def rewrite_references(self):
-        "Replace all file references in content."
+        "Set the pid to a clean value and replace all referenced file references."
+        root = self.tree.getroot()
+
+        # iterate over all XPath expressions in the reference registry and create a new
+        # Reference Object for each element found in the XML file.
+        for xpath, ref_class in self.REFERENCE_REGISTRY.items():
+            for element in root.findall(xpath, namespaces=self.DEFAULT_NAMESPACES):
+                ref = ref_class(element)
+                ref.replace_ref(self.source_file.parent, self.strip_extension)
+                self.referenced_files.append(ref)
 
     def save(self, object_dir: Path) -> list[Path]:
         """Save the object to the target directory.

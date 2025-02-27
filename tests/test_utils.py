@@ -1,11 +1,18 @@
 "Tests for the utility functions."
 
 import logging
+import xml.etree.ElementTree as ET
 from pathlib import Path
+
 import pytest
-from gamspreprocessor.utils import get_namespaces, validate_pid
-from gamspreprocessor.utils import configure_logging
-from gamspreprocessor.utils import find_multiple_files_per_dir
+
+from gamspreprocessor.utils import (
+    configure_logging,
+    find_multiple_files_per_dir,
+    get_namespaces,
+    register_namespaces,
+    validate_pid,
+)
 
 
 def test_validate_pid():
@@ -74,3 +81,24 @@ def test_configure_logging(tmp_path):
     logger.error("This is an error message")
 
     assert "info message" not in (tmp_path / "test_error.log").read_text()
+
+def test_register_namespaces():
+    "Test registering namespaces for the ElementTree module."
+    namespaces = {
+        "foo": "https://example.com/foo",
+        "bar": "https://example.com/bar",
+    }
+    register_namespaces(namespaces)
+
+    # Create an XML element with the registered namespaces
+    root = ET.Element("{https://example.com/foo}root")
+    child = ET.SubElement(root, "{https://example.com/bar}child")
+
+    # Serialize the XML element to a string
+    xml_str = ET.tostring(root, encoding="unicode")
+
+    # Check if the namespaces are correctly registered and used
+    assert 'xmlns:foo="https://example.com/foo"' in xml_str
+    assert 'xmlns:bar="https://example.com/bar"' in xml_str
+    assert "<foo:root" in xml_str
+    assert "<bar:child" in xml_str

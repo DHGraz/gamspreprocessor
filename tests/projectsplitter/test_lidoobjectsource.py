@@ -1,5 +1,5 @@
 import pytest
-from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource
+from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource, LIDOResourceSet
 from xml.etree import ElementTree as ET
 
 
@@ -74,3 +74,34 @@ def test_save_strip_extension(shared_datadir, tmp_path):
     assert (objects_root / "LIDO_1").is_file()
     assert (objects_root / "IMAGE.1").is_file()
     assert (objects_root / "image02").is_file()
+    
+
+def test_get_reference_valid(shared_datadir):
+    """Test get_reference method with a valid linkResource element."""
+    lido_file = shared_datadir / "projects" / "LIDO_1.xml"
+    src = LIDOObjectSource(lido_file, strip_prefix=False, strip_extension=False)
+    resource_set = src.tree.find(".//lido:resourceSet", namespaces=LIDOObjectSource.DEFAULT_NAMESPACES)
+    lido_resource_set = LIDOResourceSet(resource_set)
+    assert lido_resource_set.get_reference() == "http://gams.uni-graz.at/o:ges.a-88/image01.jpeg"
+
+
+def test_get_reference_missing(shared_datadir):
+    """Test get_reference method when linkResource element is missing."""
+    lido_file = shared_datadir / "projects" / "LIDO_1.xml"
+
+    # Remove the linkResource  element from the first resourceSet
+    tree=ET.parse(lido_file)    
+    root=tree.getroot()
+    parent =  root.find(".//lido:resourceRepresentation", namespaces=LIDOObjectSource.DEFAULT_NAMESPACES)
+    parent.remove(parent.find(".//lido:linkResource", namespaces=LIDOObjectSource.DEFAULT_NAMESPACES))
+    tree.write(lido_file)
+
+    src = LIDOObjectSource(lido_file, strip_prefix=False, strip_extension=False)
+    resource_set = src.tree.find(".//lido:resourceSet", namespaces=LIDOObjectSource.DEFAULT_NAMESPACES)
+    lido_resource_set = LIDOResourceSet(resource_set)
+    with pytest.raises(ValueError, match="No linkResource element found in resourceSet element"):
+        lido_resource_set.get_reference()
+
+
+
+

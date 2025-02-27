@@ -33,17 +33,14 @@ class TEIObjectSource(XMLObjectSource):
 
     DEFAULT_NAMESPACES = frozendict({"tei": "http://www.tei-c.org/ns/1.0"})
 
-    def rewrite_references(self):
-        "Set the pid to a clean value and replace all referenced file references."
-        root = self.tree.getroot()
+    # Registry of XPaths to all references in TEI files which might have to be rewritten.
+    # If you find more elements that need to be rewritten, add the XPath to this dictionary
+    # and create a new class inheriting from AbstractXMLFileReference, which handles the
+    # replacement of the reference.
+    REFERENCE_REGISTRY = frozendict({
+        ".//tei:graphic": TEIGraphicReference,
+    })
 
-        # replace the references in the graphic elements
-        for graphic_element in root.findall(
-            ".//tei:graphic", namespaces=self.DEFAULT_NAMESPACES
-        ):
-            ref = TEIGraphicReference(graphic_element)
-            ref.replace_ref(self.source_file.parent, self.strip_extension)
-            self.referenced_files.append(ref)
 
     def _extract_pid_from_content(self) -> str:
         """Return the pid (object id) of the object.
