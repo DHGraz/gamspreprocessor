@@ -139,45 +139,45 @@ class ProjectSplitter:
         self._bookkeeper.reset()
         self._bookkeeper.save()
 
-    @classmethod
-    def extract_pid(
-        cls, file_path: Path, object_type: str, strip_prefix: bool
-    ) -> tuple[str, bool]:
-        """Extract the pid from a path.
+    #@classmethod
+    # def extract_pid(
+    #     cls, file_path: Path, object_type: str, strip_prefix: bool
+    # ) -> tuple[str, bool]:
+    #     """Extract the pid from a path.
 
-        If the PID was extracted from the content (eg. TEI or LIDO file), the
-        second return value is True. This is important, because this means that
-        we might have to update the value in the file.
+    #     If the PID was extracted from the content (eg. TEI or LIDO file), the
+    #     second return value is True. This is important, because this means that
+    #     we might have to update the value in the file.
 
-        If object_type is 'tei' or 'lido', we try to extract the PID from the file.
-        If strip_prefix is True, we remove the prefix (eg.: 'o:') from the pid.
-        If this fails or object_type is not known, we use the filename without extension.
-        """
-        from_content = False
-        pid = None
-        if object_type == "tei":
-            root = ET.parse(file_path).getroot()
-            element = root.find(
-                "./tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno",
-                namespaces={"tei": "http://www.tei-c.org/ns/1.0"},
-            )
-            if element is not None and element.text:
-                pid = element.text
-                from_content = True
-        elif object_type == "lido":
-            root = ET.parse(file_path).getroot()
-            element = root.find(
-                "./lido:lidoRecID", namespaces={"lido": "http://www.lido-schema.org"}
-            )
-            if element is not None and element.text:
-                pid = element.text
-                from_content = True
-        else:
-            pid = None
+    #     If object_type is 'tei' or 'lido', we try to extract the PID from the file.
+    #     If strip_prefix is True, we remove the prefix (eg.: 'o:') from the pid.
+    #     If this fails or object_type is not known, we use the filename without extension.
+    #     """
+    #     from_content = False
+    #     pid = None
+    #     if object_type == "tei":
+    #         root = ET.parse(file_path).getroot()
+    #         element = root.find(
+    #             "./tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno",
+    #             namespaces={"tei": "http://www.tei-c.org/ns/1.0"},
+    #         )
+    #         if element is not None and element.text:
+    #             pid = element.text
+    #             from_content = True
+    #     elif object_type == "lido":
+    #         root = ET.parse(file_path).getroot()
+    #         element = root.find(
+    #             "./lido:lidoRecID", namespaces={"lido": "http://www.lido-schema.org"}
+    #         )
+    #         if element is not None and element.text:
+    #             pid = element.text
+    #             from_content = True
+    #     else:
+    #         pid = None
 
-        if pid is None:
-            pid = ".".join(file_path.name.split(".")[0:-1])
-            from_content = False
-        elif strip_prefix:
-            pid = pid.split(":")[-1]
-        return pid, from_content
+    #     if pid is None:
+    #         pid = ".".join(file_path.name.split(".")[0:-1])
+    #         from_content = False
+    #     elif strip_prefix:
+    #         pid = pid.split(":")[-1]
+    #     return pid, from_content

@@ -90,7 +90,7 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
         glob_pattern = uri_path.split("/")[-1]
         ranked_paths = []
         for file in file_root.rglob(glob_pattern):
-            ranked_paths.append((cls._rank_path(uri_path, file), file, uri_path))
+            ranked_paths.append((cls._rank_path(Path(uri_path), file), file, uri_path))
         if ranked_paths:
             # we sort by 1) rank (desc) and 2) length of the path (asc: *-1)
             ranked_paths.sort(key=lambda x: (x[0], len(str(x[1]) * -1)), reverse=True)
@@ -101,14 +101,19 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
     def _rank_path(cls, long_path: Path, short_path: Path) -> int:
         "Return how many chars are the same at the end of both paths."
         score = 0
-        long_str = str(long_path).replace("\\", "/")
-        short_str = str(short_path).replace("\\", "/")
-        for short, long in zip(short_str[::-1], long_str[::-1]):
-            if short == long:
+
+        long_str = long_path.as_posix()   
+        short_str = short_path.as_posix()
+
+        # An empty paths as_posix() will return ".". We need to handle this case
+        long_str = "" if long_str == "." else long_str
+        short_str = "" if short_str == "." else short_str
+        for short_char, long_char in zip(short_str[::-1], long_str[::-1]):
+            if short_char == long_char:
                 score += 1
             else:
                 break
-            return score
+        return score
 
     def __hash__(self):
         # the source file is the one we want to distinguish the object

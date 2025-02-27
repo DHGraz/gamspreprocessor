@@ -14,6 +14,7 @@ from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSo
 from gamspreprocessor.projectsplitter.splitter import ProjectSplitter, guess_format
 from gamspreprocessor.projectsplitter.teiobjectsource import TEIObjectSource
 
+from xml.etree import ElementTree as ET
 
 def test_guess_format(shared_datadir):
     """Make sure the usage of the formatdetector lib is correct."""
@@ -234,3 +235,48 @@ def test_reset(shared_datadir, tmp_path):
 
     data = json.loads(bkfile.read_text())
     assert len(data) == 0
+
+
+# def test_extract_pid_lido(shared_datadir):
+#     "Test extracting PID from a LIDO file."
+#     testfile = shared_datadir / "projects" / "LIDO_1.xml"
+#     pid, from_content = ProjectSplitter.extract_pid(testfile, "lido", strip_prefix=True)
+#     assert pid == "ges.a-88"
+#     assert from_content is True
+
+#     pid, from_content = ProjectSplitter.extract_pid(testfile, "lido", strip_prefix=False)
+#     assert pid == "o:ges.a-88"
+#     assert from_content is True
+
+
+# def test_extract_pid_unknown_format(shared_datadir):
+#     "Test extracting PID from a file with unknown format."
+#     testfile = shared_datadir / "projects" / "foo.txt"
+#     pid, from_content = ProjectSplitter.extract_pid(testfile, "unknown", strip_prefix=True)
+#     assert pid == "foo"
+#     assert from_content is False
+
+#     pid, from_content = ProjectSplitter.extract_pid(testfile, "unknown", strip_prefix=False)
+#     assert pid == "foo"
+#     assert from_content is False
+
+
+# def test_extract_pid_no_pid_in_content(shared_datadir):
+#     "Test extracting PID from a file with no PID in content."
+#     testfile = shared_datadir / "projects" / "TEI_1.xml"
+
+#     # we remove the pid from the content
+#     root = ET.parse(testfile).getroot()
+#     for elem in root.iter():
+#         if elem.tag.endswith("idno"):
+#             elem.text = ""
+#     testfile.write_text(ET.tostring(root, encoding="unicode"))
+
+#     pid, from_content = ProjectSplitter.extract_pid(testfile, "tei", strip_prefix=True)
+#     assert pid == "TEI_1"
+#     assert from_content is False
+
+#     pid, from_content = ProjectSplitter.extract_pid(testfile, "tei", strip_prefix=False)
+#     assert pid == "TEI_1"
+#     assert from_content is False
+

@@ -8,7 +8,7 @@ def test_pid_with_colon(tmp_path):
     # the colon as a drive letter separator. 
     # We skip this test on windows, because the next test (escaped colon)
     # should follow the same logic
-    if os.name == "nt":
+    if os.name == "nt":  # pragma: no cover
         pytest.skip("This test is not relevant on Windows.")  
     test_file = tmp_path / "o:foo.xml"
     src = GenericObjectSource(test_file, strip_prefix=True, strip_extension=True)
@@ -45,10 +45,9 @@ def test_pid_with_colon_keep_prefix(tmp_path):
     # the colon as a drive letter separator. 
     # We skip this test on windows, because the next test (escaped colon)
     # should follow the same logic
-    if os.name == "nt":
+    if os.name == "nt":  # pragma: no cover
         pytest.skip("This test is not relevant on Windows.")  
     test_file = tmp_path / "o:foo.pdf"
-    
     src = GenericObjectSource(test_file, strip_prefix=False, strip_extension=True)
     assert src.source_file == test_file
     assert src.strip_prefix is False

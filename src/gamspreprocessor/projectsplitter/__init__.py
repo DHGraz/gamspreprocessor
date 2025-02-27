@@ -6,13 +6,14 @@ from pathlib import Path
 from .teiobjectsource import TEIObjectSource
 from .lidoobjectsource import LIDOObjectSource
 from .genericobjectsource import GenericObjectSource
+from .abstractobjectsources import AbstractObjectSource
 
 from gamslib.formatdetect import detect_format
 from gamslib.formatdetect.xmltypes import XMLTypes
 
 def make_object_source(
     source_file: Path, use_format="auto", strip_prefix=True, strip_extension=False
-) -> GenericObjectSource:
+) -> AbstractObjectSource:
     """ObjectSource factory function.
 
     Arguments:
