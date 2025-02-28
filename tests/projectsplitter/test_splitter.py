@@ -13,6 +13,7 @@ from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource
 from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSource
 from gamspreprocessor.projectsplitter.splitter import ProjectSplitter, guess_format
 from gamspreprocessor.projectsplitter.teiobjectsource import TEIObjectSource
+from gamslib.formatdetect.formatinfo import SubType
 
 from xml.etree import ElementTree as ET
 
@@ -20,7 +21,7 @@ def test_guess_format(shared_datadir):
     """Make sure the usage of the formatdetector lib is correct."""
     mimetype, subtype = guess_format(shared_datadir / "projects" / "TEI_1.xml")
     assert mimetype == "application/tei+xml"
-    assert subtype == "TEI"
+    assert subtype == SubType.TEI
 
 
 def test_init(shared_datadir, tmp_path):
@@ -53,6 +54,8 @@ def test_init_with_existing_dir(shared_datadir, tmp_path, caplog):
         ("foo.txt", "auto", GenericObjectSource),
     ],
 )
+
+
 def test_make_object_source(
     filename, explicit_format, expected_type, shared_datadir, tmp_path
 ):

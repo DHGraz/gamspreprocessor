@@ -4,8 +4,8 @@ from gamspreprocessor import projectsplitter
 from gamspreprocessor.projectsplitter.teiobjectsource import TEIObjectSource
 from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource
 from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSource
-#from gamslib import formatdetect# import detect_format
-from gamslib.formatdetect.xmltypes import XMLTypes
+
+from gamslib.formatdetect.formatinfo import SubType
 from gamslib.formatdetect import FormatInfo
 
 # @pytest.fixture
@@ -22,7 +22,7 @@ def test_make_object_source_auto_tei(monkeypatch, shared_datadir):
     "Test make_object_source with auto format detection for TEI files"
     source_file = shared_datadir / "projects" / "TEI_1.xml"
     # we fake the format detector used by make_object_source
-    monkeypatch.setattr(projectsplitter, 'detect_format', lambda x: FormatInfo('foodector', "application/tei+xml", XMLTypes.TEI ))
+    monkeypatch.setattr(projectsplitter, 'detect_format', lambda x: FormatInfo('foodector', "application/tei+xml", SubType.TEI ))
 
     obj_src = projectsplitter.make_object_source(source_file, use_format="auto")
     assert isinstance(obj_src, TEIObjectSource)
@@ -31,7 +31,7 @@ def test_make_object_source_auto_lido(monkeypatch, shared_datadir):
     "Test make_object_source with auto format detection for LIDO files"
     source_file = shared_datadir / "projects" / "LIDO_1.xml"
     # we fake the format detector used by make_object_source
-    monkeypatch.setattr(projectsplitter, 'detect_format', lambda x: FormatInfo('foodector', "application/xml", XMLTypes.LIDO ))
+    monkeypatch.setattr(projectsplitter, 'detect_format', lambda x: FormatInfo('foodector', "application/xml", SubType.LIDO ))
 
     obj_src = projectsplitter.make_object_source(source_file, use_format="auto")
     assert isinstance(obj_src, LIDOObjectSource)

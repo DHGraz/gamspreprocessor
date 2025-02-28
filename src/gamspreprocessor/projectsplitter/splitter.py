@@ -8,17 +8,17 @@ and copies them to the object folder.
 
 import logging
 import shutil
-from pathlib import Path
 import warnings
+from pathlib import Path
 from xml.etree import ElementTree as ET
-from gamslib.formatdetect import detect_format
 
-from .genericobjectsource import GenericObjectSource
-from .teiobjectsource import TEIObjectSource
-from .lidoobjectsource import LIDOObjectSource
+from gamslib.formatdetect import detect_format
+from gamslib.formatdetect.formatinfo import SubType
 
 from .bookkeeper import BookKeeper
-
+from .genericobjectsource import GenericObjectSource
+from .lidoobjectsource import LIDOObjectSource
+from .teiobjectsource import TEIObjectSource
 
 logger = logging.getLogger(__name__)
 
@@ -86,15 +86,19 @@ class ProjectSplitter:
         Raises a FileExistsError if the directory already exists (ie. the object
         has already been split).
         """
-        if use_format.lower() == "auto":
+        use_format = use_format.lower()
+        if use_format == "auto":
             mimetype, objecttype = guess_format(source_file)
+        elif use_format == 'tei':
+            objecttype = SubType.TEI
+        elif use_format == 'lido':
+            objecttype = SubType.LIDO
         else:
-            objecttype = use_format.lower()
+            raise ValueError(f"Invalid format type: '{use_format}'. Must be 'auto', 'tei' or 'lido'.")
 
-        # TODO: The subtype should use an enum value!
-        if objecttype.lower() == "tei":
+        if objecttype == SubType.TEI:
             return TEIObjectSource(source_file, strip_prefix, strip_extension)
-        elif objecttype.lower() == "lido":
+        elif objecttype == SubType.LIDO:
             return LIDOObjectSource(source_file, strip_prefix, strip_extension)
         else:
             return GenericObjectSource(source_file, strip_prefix, strip_extension)

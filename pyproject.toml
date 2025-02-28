@@ -1,6 +1,6 @@
 [project]
 name = "gamspreprocessor"
-version = "0.1.0"
+version = "0.2.2"
 description = "A utility which helps to preprocess GAMS objects before ingestion."
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" }
@@ -9,7 +9,7 @@ dependencies = [
     "click>=8.1.7",
     "uritools>=4.0.3",
     "saxonche>=12.5.0",
-    "gamslib>=0.4.0",
+    "gamslib>=0.5.0",
     "frozendict>=2.4.6",
 ]
 readme = "README.md"
@@ -51,3 +51,4 @@ extension-pkg-allow-list = ["saxonche"]
 
 [tool.ruff.lint]
 select = ["PL", "RUF", "SIM"]
+
