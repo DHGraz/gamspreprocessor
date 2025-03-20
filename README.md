@@ -299,8 +299,8 @@ Daten ermittelt werden):
 | publisher   | Projleiter? GAMS?   | 2 (dc:publisher) | 1    | 3 ("")      | 4    |
 | source      | Quelle              | -                | -    | 1 "local"   | 2    |
 | objectType  |                     | -                | -    | 1 "text"    | 2    |
-| mainresource| Hauptdatenstrom     | -                | -    | 1 ""        | 4    |
-| funder      | Fördergeber         | -                | 1    | 1 ""        | 2    |
+| mainResource| Hauptdatenstrom     | -                | -    | 1 ("")      | 4    |
+| funder      | Fördergeber         | -                | 1    | 1 ("")      | 2    |
 
 
 Die Logik bei Generierung der Datenstrommetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
@@ -316,5 +316,5 @@ Daten ermittelt werden):
 | description | Optional           |   -  |  -    | 1 ("")       |  2   |
 | creator     |                    |   -  |  -    | 1 ("")       |  2   |
 | rights      | use obj rights?    |   -  |  1    | 2 (CC BY-NC) |  3   |
-| lang        | lang des DS        |   2  |  -    | -            |  3   |
-| tags        | user defined tags  |   -  |  -    | -            |  3   |
+| lang        | lang des DS        |   -  |  -    | -            |  1   |
+| tags        | user defined tags  |   -  |  -    | -            |  1   |
