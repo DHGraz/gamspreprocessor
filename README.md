@@ -299,7 +299,7 @@ Daten ermittelt werden):
 | publisher   | Projleiter? GAMS?   | 2 (dc:publisher) | 1    | 3 ("")      | 4    |
 | source      | Quelle              | -                | -    | 1 "local"   | 2    |
 | objectType  |                     | -                | -    | 1 "text"    | 2    |
-| mainresource| Hauptdatenstrom     | -                | -    | 1 ""        | 4    |
+| mainResource| Hauptdatenstrom     | -                | -    | 1 ""        | 4    |
 | funder      | Fördergeber         | -                | 1    | 1 ""        | 2    |
 
 
