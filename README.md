@@ -5,7 +5,8 @@
 Gamspreprocessor ist eine Sammlung von Werkzeugen zur Vorbereitung von
 Gams-Ingests, die zu einem Befehl (`preprocess`) zusammengefasst wurden.
 
-- mit Hilfe von `splitproject` kann versucht werden aus vorhanden Verzeichnissen
+- mit `project init` kann ein neues Projekt erzeugt werden
+- mit `splitproject` kann versucht werden aus vorhanden Verzeichnissen
   Objekt-Ordner zu erzeugen (z.B. von `Y:\data\projekte\...`)
 - erzeugt mit entsprechenden XSLTs fehlende `DC.xml` für jedes Objekt(verzeichnis)
 - erzeugt Excel- bzw. CSV-Dateien (`object.csv`, `datastreams.csv`)
@@ -42,10 +43,17 @@ Option, die alle Möglichkeiten auflistet.
 
 Aktuell sind diese Unterbefehle implementiert:
 
+  - project
   - splitproject
   - transform
   - multitransform
   - csv create
+
+
+### project init
+
+- `preprocess project init <root-folder>` erzeugt im angegebenen 'root-folder' ein neues Projekt mit
+  [project.toml](#projecttoml) Datei, die dann für das Projekt angepasst werden muss.
 
 ### splitproject
 
@@ -241,6 +249,7 @@ die Datei sehr einfach, da sie nur aus wenigen Elementen besteht. Hier ist ein B
 project_id = "hsa"
 creator = "Gams HSA Project"
 publisher = "Gams"
+funder = "Institut für Sprachwissenschaft, Universität Graz"
 rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
 
 [general]
