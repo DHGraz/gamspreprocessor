@@ -1,34 +1,44 @@
 # PREPROCESSING AND PACKAGING
 
-## Setup von Python und Virtual Environement
+## Setup von Python und Virtual Environement mit Windows
 
-- Python 3.12.x aus dem Windows Store installieren
+- Python 3.12.x aus dem **Windows Store** installieren
   Aktuell wird Version 3.12.x empfohlen
-- in der Powershell die Python-Version prüfen: `python --version`
-- Virtual environment anlegen: `python -m venv .venv`
-- Virtual environment aktivieren: `.\.venv\Scripts\activate`
+- in der **Powershell** die Python-Version prüfen: `python --version`
+- in der Powershell: Virtual environment anlegen: `python -m venv .venv`
+- in der Powershell: Virtual environment aktivieren: `.\.venv\Scripts\activate`
 
 
 ## gamspreprocessor und gamspackager installieren
 - `pip install gamspreprocessor-x.y.z.tar.gz`
 - `pip install gamspackaging-x.y.z.tar.gz`
+- die Pakete gamspreprocessor und gamspackaging werden später über PyPi zur Verfügung gestellt
 
 
 ## Verzeichnis für Projekt anlegen
-- `mkdir <projektkuerzel>`
-- `cd <projektkuerzel>`
+- in der Powershell:
+  - `mkdir <projektkuerzel>`
+  - `cd <projektkuerzel>`
 
 
 ## Projekt initialisieren
-- `preprocess project init`
-- legt an:
-  - `project.toml`
-  - `.gitignore`
-  - `objects` Verzeichnis
-- händisch lokal ein `bags` Verzeichnis anlegen
+- im Verzeichnis `<projektkuerzel>`:
+  - `preprocess project init`
+  - legt an:
+    - `project.toml`
+    - `.gitignore`
+    - `objects` Verzeichnis
+  - händisch lokal ein `bags` Verzeichnis anlegen
+- Verzeichnisse:
+```
+<projektkuerzel>
+├── bags
+├─`─ objects
+└─ project.toml
+```
 
 ## `project.toml` bearbeiten
-- Felder in der Sektion `[metadata]` korrekt ausfüllen
+- Felder in der Sektion `[metadata]` korrekt ausfüllen (mit einem einfachen Editor)
 
 ## `objects` Verzeichnis
 - im Verzeichnis `objects` muss für jedes Digitale Objekt
