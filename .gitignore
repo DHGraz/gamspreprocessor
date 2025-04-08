@@ -12,5 +12,6 @@ requirements-dev.lock
 requirements.lock
 .coverage
 uv.lock
-
+objects/
+bags/
 debug.log
