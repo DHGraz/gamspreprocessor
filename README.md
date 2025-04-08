@@ -238,7 +238,7 @@ preprocess multitransform xslt -r -x myxslt.xsl -p 'TEI*.xml' -o DC.xml -l objec
 Um die Metadaten-CSV-Dateien zu erstellen, benötigt der Preprocessor Daten über das Projekt, 
 zu dem die Objekte gehören.
 Diese Infos müssen in einer Konfigurationsdatei mit dem Namen `project.toml` bereitgestellt werden.
-Mit der Option `-c` von `packager create csv`, kann auch ein anderer Dateinamen verwendet werden, 
+Mit der Option `-c` von `preprocess create csv`, kann auch ein anderer Dateinamen verwendet werden, 
 wir empfehlen jedoch, `project.toml` zu verwenden.
 
 Die Datei muss den Regeln des TOML-Formats folgen (https://toml.io). Derzeit ist

@@ -51,7 +51,7 @@ def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = 
     in or below 'rootfolder'. This means that this command can be run against
     a single object directory or a project directory containing multiple object directories.
 
-    Use `packager objectcsv create --help` to see the available options.
+    Use `preprocess objectcsv create --help` to see the available options.
     """
     if configfile is None:
         config_path = gamslib.projectconfiguration.utils.get_config_file_from_env()
@@ -88,7 +88,7 @@ def collectcsv(projectroot: str, output_dir: str | None = None, to_csv: bool = F
     If no 'output-dir' is set, the new file(s) will be created in the current
     working directory.
 
-    Use 'packager csv collect --help' to see the available options.
+    Use 'preprocess csv collect --help' to see the available options.
     """
     # if output_dir is not None:
     output_path = Path(output_dir) if output_dir else Path.cwd()
@@ -139,7 +139,7 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
 
     If 'input_dir' is not set, all files are expected to be in the current working directory.
 
-    Use 'packager csv update --help' to see the available options.
+    Use 'preprocess csv update --help' to see the available options.
     """
     input_path = Path(input_dir) if isinstance(input_dir, str) else Path.cwd()
 
@@ -179,7 +179,7 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
 def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
     """Convert csv files to xlsx files.
 
-    Use 'packager csv csv2xlsx --help' to see the available options.
+    Use 'preprocess csv csv2xlsx --help' to see the available options.
     """
     object_csv_path = Path(object_csv)
     ds_csv_path = Path(ds_csv)
@@ -213,7 +213,7 @@ def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
 def xlsx2csv(object_csv: str, ds_csv: str, xlsx_file: str):
     """Convert a xlsx metadata file to 2 csv files.
 
-    Use 'packager csv xlsx2csv --help' to see the available options.
+    Use 'preprocess csv xlsx2csv --help' to see the available options.
     """
     xlsx_file_path = Path(xlsx_file)
     if object_csv == "all_object.csv":

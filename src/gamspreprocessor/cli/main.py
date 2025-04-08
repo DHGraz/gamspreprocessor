@@ -48,7 +48,7 @@ def cli(verbose: bool, quiet: bool, logfile: str, filelog_level: str):
 
     Each object is expected to be in a separate directory.
 
-    Run packager --help to see the available commands.
+    Run preprocess --help to see the available commands.
     """
     if quiet and verbose:
         raise click.UsageError("Cannot use --quiet and --verbose together.")
