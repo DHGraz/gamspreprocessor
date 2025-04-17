@@ -4,6 +4,7 @@ from click.testing import CliRunner
 
 from gamspreprocessor.cli.transform import cli
 
+# pylint: disable=duplicate-code
 
 def test_transform():
     "The basic test is that '--help' does not lead to an error."

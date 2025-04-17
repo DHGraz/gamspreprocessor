@@ -2,14 +2,14 @@
 
 import json
 import os
-from pathlib import Path
+
+import pytest
 from click.testing import CliRunner
 
-# from gamspreprocessor.cli.projectsplitter import cli
 from gamspreprocessor.cli.main import cli
 from gamspreprocessor.projectsplitter.bookkeeper import BookKeeper
-import pytest
 
+# pylint: disable=protected-access
 
 def test_projectsplitter():
     "The basic test is that '--help' does not lead to an error."
@@ -27,6 +27,7 @@ def test_split_project(datadir, tmp_path):
     assert result.exit_code == 0
     assert "Created 1 object dirs, containing 3 files." in result.output
 
+
 def test_split_project_with_colon(datadir, tmp_path):
     "Test the splitproject split command should raise a warning if we use a colon."
     runner = CliRunner()
@@ -37,8 +38,7 @@ def test_split_project_with_colon(datadir, tmp_path):
     assert "Created 1 object dirs, containing 3 files." in result.output
 
 
-
-def test_split_project_exclusive_options(datadir, tmp_path):
+def test_split_project_exclusive_options(tmp_path):
     "file-list and sourcefiles are exclusive options."
 
     file_list_file = tmp_path / "file_list.txt"
@@ -153,7 +153,7 @@ def test_read_from_filelist(datadir, tmp_path):
     assert "Created 2 object dirs, containing 4 files." in result.output
 
 
-def test_split_project_no_source_files(datadir, tmp_path):
+def test_split_project_no_source_files(tmp_path):
     "Test the splitproject split command with no source files."
     runner = CliRunner()
     outputdir = tmp_path / "objects"
@@ -191,8 +191,6 @@ def test_object_file_already_exists(datadir, tmp_path):
 
 def test_reset(datadir, tmp_path):
     "Test the splitproject split command with the --reset option."
-    # FIXME: if we add an object_file, should'nt be this file in the bookkeeper?
-
     outputdir = tmp_path / "objects"
     outputdir.mkdir()
 
@@ -205,10 +203,9 @@ def test_reset(datadir, tmp_path):
     for key in bookkeeper._data:
         bookkeeper._data[key] = ["foo", "bar"]
     bookkeeper.save()
-    
+
     assert bookkeeper_file.exists()
 
-    
     obj_file = datadir / "TEI_1.xml"
     runner = CliRunner()
     with pytest.warns(UserWarning, match=r"colon"):
@@ -220,4 +217,4 @@ def test_reset(datadir, tmp_path):
     # make sure TEI_1.xml has no entries in the bookkeeper
     bk_data = json.loads(bookkeeper_file.read_text())
     for key, value in bk_data.items():
-        assert value == [], f"key: {key}, value: {value} should be empty" 
+        assert value == [], f"key: {key}, value: {value} should be empty"

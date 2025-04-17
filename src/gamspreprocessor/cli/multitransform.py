@@ -22,7 +22,7 @@ def cli():
     These commands might be useful to transform GAMS files into other formats.
     """
 
-
+# pylint: disable=too-many-arguments, too-many-positional-arguments
 @click.command(name="xslt")
 @click.option("--xslt-file", "-x", type=click.Path(exists=True), required=True)
 @click.option(
@@ -83,7 +83,7 @@ def transform_xslt( # noqa: PLR0913
     # collect files to be transformed
     xmlfiles: list[Path] = []
     if file_list:
-        xmlfiles = [Path(file) for file in Path(file_list).read_text().splitlines()]
+        xmlfiles = [Path(file) for file in Path(file_list).read_text(encoding="utf-8").splitlines()]
     elif recursive:
         xmlfiles = list(Path(start_dir[0]).rglob(pattern))
     else:

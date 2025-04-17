@@ -1,11 +1,10 @@
 """CLI commands for managing GAMS object CSV files."""
 
 import logging
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 import click
-
 import gamslib.objectcsv
 import gamslib.projectconfiguration
 
@@ -43,36 +42,45 @@ def cli():
         "because all manually changed metadata will get lost"
     ),
 )
-@click.option('--update', '-u', is_flag=True, default=False, help="Update existing csv files.")    
+@click.option(
+    "--update", "-u", is_flag=True, default=False, help="Update existing csv files."
+)
 @click.argument("projectroot", required=True, type=click.Path(exists=True))
-def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = False, update: bool = False):
+def createcsv(
+    projectroot: str,
+    configfile: str | None,
+    force_overwrite: bool = False,
+    update: bool = False,
+):
     """Generate csv files with metadata for object directories.
 
     Generates a 'object.csv' and 'datastreams.csv' file for each object directory
     in or below 'rootfolder'. This means that this command can be run against
     a single object directory or a project directory containing multiple object directories.
 
-    This command will not overwrite existing csv files, unless the '--force-overwrite' flag 
+    This command will not overwrite existing csv files, unless the '--force-overwrite' flag
     or the `--update` flag is set.
 
     Using '--force-overwrite' will overwrite all existing csv files. All existing metadata
     will be lost. This is only useful if you want to start over with the metadata.
 
-    Using the `--update` flag will merge data for some fields from the existing csv files. 
+    Using the `--update` flag will merge data for some fields from the existing csv files.
     This is useful if you want to update some metadata after you have added datastreams or
-    you have changed the project configuration. Updating will not touch fields 
-    like `description`, `tags` or `lang`. But it will replace fields which can be automatically derived
-    from dublin core or the project configuration. So use with care if you have changed fields like 
-    `title`, `creator`, `publisher` or `rights` by hand. If no new value can be derived, the existing field
-    will be kept. 
+    you have changed the project configuration. Updating will not touch fields
+    like `description`, `tags` or `lang`. But it will replace fields which can be automatically
+    derived from dublin core or the project configuration. So use with care if you have changed
+    fields like `title`, `creator`, `publisher` or `rights` by hand. If no new value can be 
+    derived, the existing field will be kept.
 
     Use `packager objectcsv create --help` to see the available options.
     """
     if configfile is None:
         config_path = gamslib.projectconfiguration.utils.get_config_file_from_env()
-        if config_path is None: # env settings not found
-            config_path = gamslib.projectconfiguration.utils.find_project_toml(Path(projectroot))
-        
+        if config_path is None:  # env settings not found
+            config_path = gamslib.projectconfiguration.utils.find_project_toml(
+                Path(projectroot)
+            )
+
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
     if update:
         csv_objects = gamslib.objectcsv.create_csv_files(
@@ -82,7 +90,7 @@ def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = 
             f"Updated csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
-    else:        
+    else:
         csv_objects = gamslib.objectcsv.create_csv_files(
             Path(projectroot), cfg, force_overwrite
         )
@@ -124,9 +132,11 @@ def collectcsv(objects_dir: str, output_dir: str | None = None, to_csv: bool = F
     obj_csv = gamslib.objectcsv.collect_csv_data(
         Path(objects_dir), all_objects_file, all_ds_file
     )
-    # ToDo: add folder {obj_csv.object_dir.name} to avoid problems with linter/tests
     if to_csv:
-        click.echo(f"Created csv files {all_objects_file} and {all_ds_file} for data in folder {obj_csv.object_dir.name}.")
+        click.echo(
+            f"Created csv files {all_objects_file} and {all_ds_file} for data "
+            f"in folder {obj_csv.object_dir.name}."
+        )
     else:
         xlsx_file = output_path / "all_objects.xlsx"
         gamslib.objectcsv.csv_to_xlsx(all_objects_file, all_ds_file, xlsx_file)

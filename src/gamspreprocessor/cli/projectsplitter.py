@@ -22,14 +22,15 @@ def cli():
     into a set of object directories like expected in GAMS5.
     """
 
-
+# pylint: disable=too-many-positional-arguments
 @click.command(name="split")
 @click.option(
     "-o",
     "--output-dir",
     default="./objects",
     type=click.Path(exists=True),
-    help="The output folder where the object directories will be created. Default: '<projectroot>/objects'.",
+    help=("The output folder where the object directories will be created."
+          "Default: '<projectroot>/objects'."),
 )
 @click.option(
     "-f",
@@ -61,7 +62,7 @@ def cli():
     "--strip-prefix", is_flag=True, default=False, help="Strip the prefix (e.g. o:)"
 )
 @click.argument("sourcefiles", nargs=-1)
-def split_project( # noqa: PLR0913
+def split_project(  # noqa: PLR0913
     output_dir: str,
     object_format: str,
     reset: bool,
@@ -104,11 +105,11 @@ def split_project( # noqa: PLR0913
             file_counter += len(copied_files)
             object_counter += 1
             click.echo(f"Split {sourcefile} into object directories.")
-        except FileExistsError:
+        except FileExistsError as exp:
             raise click.ClickException(
                 f"Object directory for {sourcefile} already exists. "
                 "Use '--replace' to overwrite the object directory or delete the directory by hand."
-            )
+            ) from exp
     click.echo(
         f"Created {object_counter} object dirs, containing {file_counter} files."
     )
@@ -137,7 +138,7 @@ def showunhandled(output_dir: str = "./objects"):
     else:
         # python < 3.12 does not support backslashes in f-strings
         files_str = "\n\t".join(str(f) for f in unhandled_files)
-        click.echo(f"Found {len(unhandled_files)} unhandled files:\n" f"{files_str}")
+        click.echo(f"Found {len(unhandled_files)} unhandled files:\n{files_str}")
 
 
 cli.add_command(split_project)

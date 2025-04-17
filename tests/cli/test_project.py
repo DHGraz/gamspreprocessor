@@ -1,3 +1,4 @@
+"Tests for project creation and initialization."
 from click.testing import CliRunner
 
 from gamspreprocessor.cli.main import cli
