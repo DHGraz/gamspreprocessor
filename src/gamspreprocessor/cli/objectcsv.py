@@ -43,15 +43,30 @@ def cli():
         "because all manually changed metadata will get lost"
     ),
 )
+@click.option('--update', '-u', is_flag=True, default=False, help="Update existing csv files.")    
 @click.argument("projectroot", required=True, type=click.Path(exists=True))
-def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = False):
+def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = False, update: bool = False):
     """Generate csv files with metadata for object directories.
 
     Generates a 'object.csv' and 'datastreams.csv' file for each object directory
     in or below 'rootfolder'. This means that this command can be run against
     a single object directory or a project directory containing multiple object directories.
 
-    Use `preprocess objectcsv create --help` to see the available options.
+    This command will not overwrite existing csv files, unless the '--force-overwrite' flag 
+    or the `--update` flag is set.
+
+    Using '--force-overwrite' will overwrite all existing csv files. All existing metadata
+    will be lost. This is only useful if you want to start over with the metadata.
+
+    Using the `--update` flag will merge data for some fields from the existing csv files. 
+    This is useful if you want to update some metadata after you have added datastreams or
+    you have changed the project configuration. Updating will not touch fields 
+    like `description`, `tags` or `lang`. But it will replace fields which can be automatically derived
+    from dublin core or the project configuration. So use with care if you have changed fields like 
+    `title`, `creator`, `publisher` or `rights` by hand. If no new value can be derived, the existing field
+    will be kept. 
+
+    Use `packager objectcsv create --help` to see the available options.
     """
     if configfile is None:
         config_path = gamslib.projectconfiguration.utils.get_config_file_from_env()
@@ -59,13 +74,22 @@ def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = 
             config_path = gamslib.projectconfiguration.utils.find_project_toml(Path(projectroot))
         
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
-    csv_objects = gamslib.objectcsv.create_csv_files(
-        Path(projectroot), cfg, force_overwrite
-    )
-    click.echo(
-        f"Created csv files for {len(csv_objects)} objects "
-        f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
-    )
+    if update:
+        csv_objects = gamslib.objectcsv.create_csv_files(
+            Path(projectroot), cfg, update=True
+        )
+        click.echo(
+            f"Updated csv files for {len(csv_objects)} objects "
+            f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
+        )
+    else:        
+        csv_objects = gamslib.objectcsv.create_csv_files(
+            Path(projectroot), cfg, force_overwrite
+        )
+        click.echo(
+            f"Created csv files for {len(csv_objects)} objects "
+            f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
+        )
 
 
 @click.command(name="collect")
@@ -76,14 +100,16 @@ def createcsv(projectroot: str, configfile: str | None, force_overwrite: bool = 
     help="Path to the output directory. Default is the current working directory.",
 )
 @click.option("--to-csv", "-c", is_flag=True, help="Output csv files instead of xlsx.")
-@click.argument("projectroot", required=True, type=click.Path(exists=True))
-def collectcsv(projectroot: str, output_dir: str | None = None, to_csv: bool = False):
+@click.argument("objects-dir", required=True, type=click.Path(exists=True))
+def collectcsv(objects_dir: str, output_dir: str | None = None, to_csv: bool = False):
     """Collect data from all csv files in all object folders.
 
-    Collect data from all 'object.csv' and all 'datastreams.csv' files below 'rootfolder'
+    Collect data from all 'object.csv' and all 'datastreams.csv' files below 'objects-dir'
     into a 'all_objects.xlsx' file.
-    If the '--to-csv' flag is set, the output will be be no xlsx file, but two csv
+
+    If the '--to-csv' flag is set, the output will not be a single xlsx file, but two csv
     files will be created: 'all_objects.csv' and 'all_datastreams.csv'.
+
 
     If no 'output-dir' is set, the new file(s) will be created in the current
     working directory.
@@ -96,7 +122,7 @@ def collectcsv(projectroot: str, output_dir: str | None = None, to_csv: bool = F
     all_ds_file = output_path / "all_datastreams.csv"
 
     obj_csv = gamslib.objectcsv.collect_csv_data(
-        Path(projectroot), all_objects_file, all_ds_file
+        Path(objects_dir), all_objects_file, all_ds_file
     )
     # ToDo: add folder {obj_csv.object_dir.name} to avoid problems with linter/tests
     if to_csv:
@@ -144,7 +170,7 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
     input_path = Path(input_dir) if isinstance(input_dir, str) else Path.cwd()
 
     if from_csv:
-        num_of_obj, num_of_ds = gamslib.objectcsv.update_csv_files(
+        num_of_obj, num_of_ds = gamslib.objectcsv.split_csv_files(
             Path(projectroot), input_path
         )
 
@@ -156,7 +182,7 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
             obj_file = tmp_path / "all_objects.csv"
             ds_file = tmp_path / "all_datastreams.csv"
             gamslib.objectcsv.xlsx_to_csv(xlsx_file, obj_file, ds_file)
-            num_of_obj, num_of_ds = gamslib.objectcsv.update_csv_files(
+            num_of_obj, num_of_ds = gamslib.objectcsv.split_csv_files(
                 Path(projectroot), tmp_path
             )
     click.echo(
