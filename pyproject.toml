@@ -1,6 +1,6 @@
 [project]
 name = "gamspreprocessor"
-version = "0.2.4"
+version = "0.2.5"
 description = "A utility which helps to preprocess GAMS objects before ingestion."
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" }
@@ -10,9 +10,10 @@ dependencies = [
     "uritools>=4.0.3",
     "saxonche>=12.5.0",
     "frozendict>=2.4.6",
-    "gamslib>=0.5.4",
+    "gamslib>=0.5.5",
 ]
 readme = "README.md"
+# due to a problem with saxonche, 3.13 currently does not work!
 requires-python = ">= 3.11"
 
 [project.scripts]
