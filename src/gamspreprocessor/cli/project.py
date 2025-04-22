@@ -4,7 +4,11 @@ import logging
 from pathlib import Path
 
 import click
-from gamslib.projectconfiguration.utils import initialize_project_dir
+from gamslib.projectconfiguration.utils import (
+    configuration_needs_update,
+    initialize_project_dir,
+    update_configuration,
+)
 
 logger = logging.getLogger()
 
@@ -21,12 +25,32 @@ def cli():
 @click.command(name="init")
 @click.argument("project-root", type=click.Path(exists=True))
 def init_project(project_root: str):
-    """Create a basic project structure and project.toml in the project-root directory."""
+    """Create a basic project structure and project.toml."""
     initialize_project_dir(Path(project_root))
-    logger.info(
-        "Created %a/project.toml. Please edit this file to configure your project.",
-        project_root,
+    click.echo(
+        f"Created {project_root}/project.toml. "
+        "Please edit this file to configure your project."
     )
 
 
+@click.command(name="update")
+@click.argument("config-file", type=click.Path(exists=True))
+def update_project(config_file: str):
+    """Update the project.toml file in the current directory.
+    
+    Run this if the configuration file schema has changed. You can run it as
+    often as you like, it will not overwrite any of your settings.
+    It will only add new settings or remove deprecated ones.
+    """
+    if configuration_needs_update(Path(config_file)):
+        update_configuration(Path(config_file))
+        click.echo(
+            f"Updated {config_file}."
+            "Please edit this file to finish configuring your project."
+        )
+    else:
+        click.echo(f"{config_file} is already up to date. No changes were made.")
+
+
 cli.add_command(init_project)
+cli.add_command(update_project)

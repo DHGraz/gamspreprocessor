@@ -239,6 +239,71 @@ def test_reset(shared_datadir, tmp_path):
     data = json.loads(bkfile.read_text())
     assert len(data) == 0
 
+def test_make_object_source_invalid_format(shared_datadir, tmp_path):
+    """Test that make_object_source raises ValueError for invalid format types."""
+    source_dir = shared_datadir / "projects"
+    target_dir = tmp_path / "objects"
+    
+    splitter = ProjectSplitter(target_dir, source_dir)
+    source_file = source_dir / "foo.pdf"
+    
+    with pytest.raises(ValueError, match=r"Invalid format type"):
+        splitter.make_object_source(source_file, "invalid_format")
+    
+    with pytest.raises(ValueError, match=r"Invalid format type"):
+        splitter.make_object_source(source_file, "xml")
+
+
+def test_make_object_source_strip_parameters(shared_datadir, tmp_path, monkeypatch):
+    """Test that strip_prefix and strip_extension parameters are correctly passed."""
+    source_dir = shared_datadir / "projects"
+    target_dir = tmp_path / "objects"
+    
+    splitter = ProjectSplitter(target_dir, source_dir)
+    tei_file = source_dir / "TEI_1.xml"
+    lido_file = source_dir / "LIDO_1.xml"
+    generic_file = source_dir / "foo.pdf"
+    
+    # Test with different strip combinations
+    tei_source = splitter.make_object_source(tei_file, "tei", strip_prefix=False, strip_extension=True)
+    assert isinstance(tei_source, TEIObjectSource)
+    assert tei_source.strip_prefix is False
+    assert tei_source.strip_extension is True
+    
+    lido_source = splitter.make_object_source(lido_file, "lido", strip_prefix=True, strip_extension=False)
+    assert isinstance(lido_source, LIDOObjectSource)
+    assert lido_source.strip_prefix is True
+    assert lido_source.strip_extension is False
+    
+    generic_source = splitter.make_object_source(generic_file, "auto", strip_prefix=False, strip_extension=False)
+    assert isinstance(generic_source, GenericObjectSource)
+    assert generic_source.strip_prefix is False
+    assert generic_source.strip_extension is False
+
+
+def test_make_object_source_case_insensitive(shared_datadir, tmp_path):
+    """Test that the format parameter is case-insensitive."""
+    source_dir = shared_datadir / "projects"
+    target_dir = tmp_path / "objects"
+    
+    splitter = ProjectSplitter(target_dir, source_dir)
+    tei_file = source_dir / "TEI_1.xml"
+    lido_file = source_dir / "LIDO_1.xml"
+    
+    # Test with uppercase formats
+    tei_source = splitter.make_object_source(tei_file, "TEI")
+    assert isinstance(tei_source, TEIObjectSource)
+    
+    lido_source = splitter.make_object_source(lido_file, "LIDO")
+    assert isinstance(lido_source, LIDOObjectSource)
+    
+    # Test with mixed case formats
+    tei_source = splitter.make_object_source(tei_file, "TeI")
+    assert isinstance(tei_source, TEIObjectSource)
+    
+    lido_source = splitter.make_object_source(lido_file, "LiDo")
+    assert isinstance(lido_source, LIDOObjectSource)
+
 
 # def test_extract_pid_lido(shared_datadir):
 #     "Test extracting PID from a LIDO file."

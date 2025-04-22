@@ -33,12 +33,24 @@
 ```
 <projektkuerzel>
 ├── bags
-├─`─ objects
+├── objects
 └─ project.toml
 ```
 
 ## `project.toml` bearbeiten
 - nur die Felder in der Sektion `[metadata]` müssen korrekt ausgefüllt werden
+
+### `project.toml` aktualisieren
+
+Solange das Format für `project.toml` noch nicht stabil ist, empfiehlt es sich,
+nach dem Installieren einer neuen Version vom Packager diesen Befehl laufen zu lassen:
+
+```
+preprocess project update
+```
+
+Dadurch wir das existierende `project.toml` auf das aktuelle Format umgebaut.
+Existierende, noch benötigte Einträge werden dabei nicht verändert.
 
 ## `objects` Verzeichnis
 - im Verzeichnis `objects` muss für jedes Digitale Objekt
@@ -58,12 +70,63 @@
 
 
 ## CSV bzw. Excel-Dateien erzeugen
-- Felder in der CSV-Datei müssen überprüft u. evtl. korrigiert werden
-- Windows-User sollten entweder einen einfachen Editor verwenden oder
-  die CSV-Datei in Excel und zurück konvertieren. Dann nur die Excel-Datei
-  bearbeiten
-- Konvertierung von CSV nach Excel u. zurück wird noch überarbeitet
-- Grundlegender Befehl: `preprocess csv create <root-folder>`
+
+Der Packager erwartet in jedem Objekt-Verzeichnis zwei Dateien mit
+zusätzlichen Metadaten:
+
+  - object.csv
+  - datastreams.csv
+
+Diese Dateien können im Prinzip händisch geschrieben werden. Der empfohlene
+Weg ist aber, die Dateien teilautomatisiert erzeugen zu lassen:
+
+```
+preprocess csv create <folder>
+```
+
+Dieser Befehl kann selektiv für einzelne Objektfolder ausgeführt werden, im
+Normalfall lässt man ihn gegen alle Objektfolder unter einem Pfad (wie z.B.
+`objects\') laufen:
+
+```
+preprocess csv create objects
+```
+
+Dadurch werden die beiden CSV-Dateien in jedem darunter liegenden Objektverzeichnis erzeugt.
+
+Falls die CSV-Dateien für ein Objektverzeichnis bereits vorhanden sind, werden sie nicht
+verändert. Dieses Verhalten kann durch Optionen verändert werden:
+
+  - `--update` führt bestehende CSV-Daten mit einer veränderten Projektkonfiguration
+     oder nachträglich ergäntzten Datenströmen zusammen. Wenn Sie also Änderungen
+     in `project.toml` gemacht haben oder neue Datenströme in einem Objektverzeichnis
+     angelegt haben, sollten Sie `preprocess csv create --update <folder>` laufen
+     lassen.
+  - `--overwrite`.  Das ist eine gefährliche Operation, die alle bereits bestehenden 
+     CSV-Dateien überschreibt. Sie sollte nur verwendet werden, wenn Sie wieder von
+     ganz vorne beginnen möchten.
+
+Die so generierten Dateien sind jedoch nur so weit automatisch befüllt, wie dies
+z.B. aus der Projektkonfiguration ableitbar ist. Die einzelnen CSV-Dateien müssen also
+händisch nachbarbeitet werden. Damit dies möglichst effizient erfolgen kann,
+empfehlen wir diesen Weg:
+
+  - `preprocess collect <objects-root>` `objects-root` ist dabei der Pfad zu dem Ordner,
+    in dem die Objektverzeichnisse liegen, deren CSV-Dateien eingesammelt werden sollen.
+    Dieser Befehl  generiert eine Datei `all_objects.xlsx`im Excel-Format mit 2 Tabs:
+    einer enthält alle Daten auf allen eingesammelten CSV Dateien, der zweite die
+    Daten aus allen eigensammelten Datenstrom-Dateien.
+    Diese Sheets können nun bearbeitet werden, was wegen der von Excel bereit gestellten
+    Möglichkeiten die Bearbeitung massiv erleichtern sollte:
+      * Hinkopieren von Werten in viele Felder
+      * Umsortieren von Zeilen um z.B. fehlende Werte und 'Ausreisser' einfach zu finden
+      * ...
+  - Wenn die Bearbeitung der beiden Sheets beendet ist, können die Daten wieder
+    in die einzelnen CSV Dateien zurückgespielt werden:
+    `preprocess csv update <objects-root`. Falls `all_objects.csv` nicht gefunden
+    wird, müssen Sie die `--input-dir` Option verwenden, die auf das Verzeichnis verweist,
+    in dem das Excel File liegt: preprocess csv update --input-dir <verzeichis> <objects-root`.
+
 
 
 ## Bags erzeugen

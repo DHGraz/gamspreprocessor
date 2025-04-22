@@ -238,8 +238,14 @@ preprocess multitransform xslt -r -x myxslt.xsl -p 'TEI*.xml' -o DC.xml -l objec
 Um die Metadaten-CSV-Dateien zu erstellen, benötigt der Preprocessor Daten über das Projekt, 
 zu dem die Objekte gehören.
 Diese Infos müssen in einer Konfigurationsdatei mit dem Namen `project.toml` bereitgestellt werden.
-Mit der Option `-c` von `preprocess create csv`, kann auch ein anderer Dateinamen verwendet werden, 
-wir empfehlen jedoch, `project.toml` zu verwenden.
+Diese sollte im Wurzelverzeichnis des jeweiligen Projekt liegen (also dort, wo auch der `objects` Ordner
+liegt).
+Mit der Option `-c` von `preprocess create csv`, kann auch eine andere Konfigurationsdatei 
+angegeben verwendet werden, wir empfehlen jedoch `project.toml` im Projektverzeichnis zu verwenden.
+
+Eine andere Möglichkeit, dauerhaft einen anderen Pfad zur Konfigurationdatei anzugeben, besteht darin,
+eine Umgebungsvariable `GAMSCFG_PROJECT_TOML` zu setzen. Eine weitere Möglichkeit besteht in der
+Verwendung einer `.env` Datei im aktuellen Verzeichnis mit und dem darin definierten Wert `poject_toml`.
 
 Die Datei muss den Regeln des TOML-Formats folgen (https://toml.io). Derzeit ist
 die Datei sehr einfach, da sie nur aus wenigen Elementen besteht. Hier ist ein Beispiel für das Projekt `hsa`:
@@ -255,12 +261,38 @@ rights = "Creative Commons Attribution-NonCommercial 4.0 (https://creativecommon
 [general]
 desid_keep_extendsion = true
 loglevel = "info"
+format_detector = "" # to use an alternative detector 
+format_detector_url = "" # URL of a dector service (currently unused)
 ```
 
-Eine `project.toml` kann entweder händisch oder mit Hilfe der [`gamslib`](https://zimlab.uni-graz.at/gams5/production/gamslib) angelegt werden.
+`format_detector` erwartet zur Zeit einen der beiden Werte: 
+
+  * `magika` (default) ein auf der Google Magika Bibliothek basierenden Detector
+  * `base` ein minimaler Detector, der primär Dateinamen auswertet.
+
 Die Toml-Datei **muss** die o.g. Felder enthalten.
 
 Nur die Einträge im Abschnitt 'metdata', werden für die Metadaten-Extraktion in die CSV-Dateien verwendet.
+
+### Eine Konfiguration erzeugen lassen
+
+Mit dem Befehl 
+```
+preprocess project init
+```
+
+kann man sich eine Beispielskonfiguration erzeugen lassen. Diese muss danach noch an das jeweilige 
+Projekt angepasst werden.
+
+Dieser Befehl legt nicht nur eine neue Konfigurationsdatei an, sondern erzeugt auch ein basales
+`.gitignore` und ein leeres `objects` Verzeichnis.
+
+### Eine bestehende Konfiguration erweitern
+
+Der Befehl `preprocess project update` erweitert eine bestehende Konfiguration um neue Felder. 
+Bestehende Werte werden dabei nicht verändert. Solange das Format von `project.toml` noch nicht stabil ist, sollte diese Befehl ab und zu ausgeführt werden, um sicherzustellen, dass die
+Konfigurationsdatei aktuell ist.
+
 
 ## Dublin Core (DC.xml)
 
@@ -284,7 +316,7 @@ preprocess csv create <path-to-object-root-folder>
 
 ## CSV erzeugen 
 
-Es werden zwei CSV-Dateien im Projektordner erzeugt:
+Es werden zwei CSV-Dateien in jedem Objectordner erzeugt:
 
   * object.csv
   * datastreams.csv
