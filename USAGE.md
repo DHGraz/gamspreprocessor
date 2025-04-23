@@ -61,12 +61,44 @@ Existierende, noch benötigte Einträge werden dabei nicht verändert.
 
 
 ## Dublin Core
-- `DC.xml` muss für jedes digitale Objekt erzeugt werden
-  - für die TEI u. LIDO gibt's im `preprocessor` eine Pipeline,
-    die mit Hilfe von XSLTs jeweils ein DC.xml für die Objekte erzeugt
-  - `preprocess transform xslt -x <project.xsl> foo/TEI.xml foo/DC.xml`
-  - **NB**: Mindestens der Titel (`dc:title`) muss auf Englisch sein und 
-    das Attribut `xml:lang="en"` enthalten
+- `DC.xml` muss für jedes digitale Objekt erzeugt werden. Enthält ein 
+  Objektverzeichnis kein `DC.xml`, wird es bei allen folgenden Schritten ignoriert.
+- Für Objekte mit XML-basierten Datenströmen wie TEI oder LIDO kann das DC.xml 
+  auf bekannte Weise via XSLT erzeugt werden. (Bei Bedarf können weitere 
+  Transformationszenarien hinzugefügt werden).
+  Grundsätzlich gilt: Mindestens der Titel (`dc:title`) muss auf Englisch sein und 
+  das Attribut `xml:lang="en"` enthalten.
+  
+  - Um ein `DC.xml` für ein einzelnes Objekt zu erzeugen:
+    
+    ```
+    preprocess transform xslt -x project.xsl foo/TEI.xml foo/DC.xml
+    ```
+
+    `project.xsl` ist hier die XSLT-Datei, die z.B. TEI nach DC transformiert.
+
+  - Will man das xslt auf mehr als ein Objekt anwenden, muss statt
+    `transform` `multitransform` verwendet werden:
+
+    ```
+    preprocess multitransform xslt -r -x project.xsl -o DC.xml -p 'S*.xml' objects
+    ```
+
+    Soll die Transformation nur auf eine Verzeichnisebene angewendet werden, kann
+    das `-r` weggelassen werden. `-o` legt die Ausgabedatei für jedes Objektverzeichnis
+    fest, `-p` definiert ein Muster für die zu verarbeitenden Dateien: `S*.xml` würde
+    als das XSLT auf alle XML-Datei, der Name mit `S` beginnt angewendet. Vorsicht:
+    Das Muster muss pro Objektverzeichnis eindeutig sein, damit jeweils nur eine Datei
+    transformiert wird. `objects` ist das Verzeichnis in dem nach zu verarbeitenden Dateien
+    gesucht wird.
+
+    Alternativ kann man zuerst z.B. mit `find` eine Liste von Dateien in eine
+    Datei schreiben (eine Datei pro Zeile) und dann diese Datei übergeben:
+
+    ```
+    preprocess multitransform xslt -x project.xsl -o DC.xml -l files_to_process.txt objects
+    ```
+
 
 
 ## CSV bzw. Excel-Dateien erzeugen
