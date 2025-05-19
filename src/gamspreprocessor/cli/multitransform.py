@@ -54,6 +54,14 @@ def cli():
     ),
 )
 @click.option(
+    "-e",
+    "--exclude",
+    multiple=True,
+    help=(
+        "A list of file names to be excluded from the transformation. "
+        "This is a list of file names (without path), not patterns!"
+    ))
+@click.option(
     "-l",
     "--file-list",
     type=click.Path(exists=True),
@@ -66,6 +74,7 @@ def transform_xslt( # noqa: PLR0913
     output_filename: str,
     file_list: str = "",
     pattern: str = "",
+    exclude: list[str]|None = None,
     recursive: bool = False,
 ):
     """Apply a xslt on multiple xml files (in different directories)."""
@@ -88,6 +97,11 @@ def transform_xslt( # noqa: PLR0913
         xmlfiles = list(Path(start_dir[0]).rglob(pattern))
     else:
         xmlfiles = list(Path(start_dir[0]).glob(pattern))
+    
+    # exclude DC.xml files if not explicitly requested
+    if exclude is not None:
+        xmlfiles = [x for x in xmlfiles if x.name not in exclude]
+
     # As we have a fixed output file name, we need to make sure that the pattern only
     # matches one file per directory
     suspicious_dirs = utils.find_multiple_files_per_dir(xmlfiles)

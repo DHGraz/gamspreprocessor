@@ -72,6 +72,40 @@ def test_transform_xslt_multiple_files(datadir):
     assert output1_file.exists()
     assert output2_file.exists()
 
+def test_transform_xslt_multiple_files_with_excludes(datadir):
+    "Test transforming multiple XML files with a XSLT file using multiple ---exclude options."
+
+    objects_dir = datadir / "objects"
+    xslt_file = datadir / "tei2dc.xsl"
+    output1_file = datadir / "objects" / "o1" / "DC.xml"
+    output2_file = datadir / "objects" / "o2" / "DC.xml"
+    # this should be excluded.
+    foo_xml = datadir / "objects" / "o1" / "foo.xml"
+    foo_xml.write_text("<TEI></TEI>")
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "xslt",
+            "-x",
+            str(xslt_file),
+            "-r",
+            "-o",
+            "DC.xml",
+            "-p",
+            "*.xml",
+            "-e",
+            "foo.xml",
+            "-e",
+            "DC.xml",
+            str(objects_dir),
+        ],
+    )
+    assert result.exit_code == 0
+    assert output1_file.exists()
+    assert output2_file.exists()
+
 
 def test_transform_xslt_multiple_file_ambigous_pattern(datadir):
     "If the pattern matches multiple files in a single directiry, an error should be raised."

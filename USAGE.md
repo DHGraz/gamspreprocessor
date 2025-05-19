@@ -28,7 +28,10 @@
     - `project.toml`
     - `.gitignore`
     - `objects` Verzeichnis
-  - händisch lokal ein `bags` Verzeichnis anlegen
+  - händisch lokal ein `bags` Verzeichnis anlegen. Dieses kann im Prinzip überall
+    liegen. Nin nicht sicher, ob der Projektordner dafür optimal ist, weil es ja quasi
+    ein Zwischenschritt ist, der jederzeit wiederholt werden kann.
+
 - Verzeichnisse:
 ```
 <projektkuerzel>
@@ -46,7 +49,7 @@ Solange das Format für `project.toml` noch nicht stabil ist, empfiehlt es sich,
 nach dem Installieren einer neuen Version vom Packager diesen Befehl laufen zu lassen:
 
 ```
-preprocess project update
+preprocess project update <Pfad zum project.toml>
 ```
 
 Dadurch wir das existierende `project.toml` auf das aktuelle Format umgebaut.
@@ -83,7 +86,15 @@ Existierende, noch benötigte Einträge werden dabei nicht verändert.
     ```
     preprocess multitransform xslt -r -x project.xsl -o DC.xml -p 'S*.xml' objects
     ```
+    Bestimmte Dateinamen (z.B. 'DC.xml') können über die Option `--exclude` oder kurz `-e`)
+    aus dem Muster ausgenommen werden. `--exclude` kann mehrfach angegeben werden:
 
+    ```
+    preprocess multitransform xslt -r -x project.xsl -o DC.xml -p '*.xml' -e DC.xml -e foo.xml objects
+    ```
+
+    transformiert alle gefundenen `*.xml` Dateien, nicht jedoch `DC.xml` und `foo.xml`.
+    
     Soll die Transformation nur auf eine Verzeichnisebene angewendet werden, kann
     das `-r` weggelassen werden. `-o` legt die Ausgabedatei für jedes Objektverzeichnis
     fest, `-p` definiert ein Muster für die zu verarbeitenden Dateien: `S*.xml` würde
@@ -143,9 +154,9 @@ z.B. aus der Projektkonfiguration ableitbar ist. Die einzelnen CSV-Dateien müss
 händisch nachbarbeitet werden. Damit dies möglichst effizient erfolgen kann,
 empfehlen wir diesen Weg:
 
-  - `preprocess collect <objects-root>` `objects-root` ist dabei der Pfad zu dem Ordner,
+  - `preprocess csv collect <objects-root>`. `objects-root` ist dabei der Pfad zu dem Ordner,
     in dem die Objektverzeichnisse liegen, deren CSV-Dateien eingesammelt werden sollen.
-    Dieser Befehl  generiert eine Datei `all_objects.xlsx`im Excel-Format mit 2 Tabs:
+    Dieser Befehl  generiert im aktuellen Verzeichnis eine Datei `all_objects.xlsx`im Excel-Format mit 2 Tabs:
     einer enthält alle Daten auf allen eingesammelten CSV Dateien, der zweite die
     Daten aus allen eigensammelten Datenstrom-Dateien.
     Diese Sheets können nun bearbeitet werden, was wegen der von Excel bereit gestellten
