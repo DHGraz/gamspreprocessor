@@ -326,36 +326,174 @@ Der Curator hat dann die Möglichkeit, diese Daten noch einmal zu überarbeiten 
 für die Erzeugung des SIP verwendet werden. Diese beiden Dateien landen nicht im SIP
 (s.a. [packager](https://zimlab.uni-graz.at/gams5/production/packaging)).
 
-Die Logik bei Generierung der Objektmetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
-Daten ermittelt werden):
+### Beschreibung der Felder in object.csv
 
-| Key         | Beschreibung        |    DC.xml        | toml | Defaultwert | User |
-|-------------|---------------------|------------------|------|-------------|------|
-| recid       | Pid DigObj          | -                | -    | 1 (=PID)    | 3    |
-| title       | Titel DigObj        | 1 (dc:title)     | -    | 2 (=PID)    | 3    |
-| project     | Projektkürzel       | -                | 1    | 2 ("")      | 3    |
-| description | Beschr. DigO (opt.) | 1                | -    | 2 ("")      | 3    |
-| creator     | Projektkürzel?      | -                | 1    | 2 ("")      | 3    |
-| rights      |                     | 2 (dc:rights)    | 1    | 3 CC BY-NC  | 4    |
-| publisher   | Projleiter? GAMS?   | 2 (dc:publisher) | 1    | 3 ("")      | 4    |
-| source      | Quelle              | -                | -    | 1 "local"   | 2    |
-| objectType  |                     | -                | -    | 1 "text"    | 2    |
-| mainResource| Hauptdatenstrom     | -                | -    | 1 ("")      | 4    |
-| funder      | Fördergeber         | -                | 1    | 1 ("")      | 2    |
+#### Überblick
 
-
-Die Logik bei Generierung der Datenstrommetadaten ist diese (die Zahlen geben die Reihenfolge an, wie die
-Daten ermittelt werden):
+| Key          | Required  | Beschreibung                               | Beispiel       |  
+| ----------   | --------- | ------------------------------------------ | -------------- |
+| recid        | true      | PID des dig. Objekts                       | detamax.diary |   
+| title        | true      | Titel des dig. Objekts                     | Detamax Diary |     
+| project      | true      | Projektkürzel                              | detamax       |   
+| description  | false     | Beschreibung des dig. Objects              | Diary of Detamax    | 
+| creator      | true      | Creator des dig. Objekts                   | Max Musterfrau  | 
+| rights       | true      | Lizenz: Name (URI)                         | Public Domain (http://creativecommons.org/publicdomain/mark/1.0/)| 
+| publisher    | true      | Publisher of object                        | GAMS | 
+| source       | true      | Quelle aus der dig. Objekt generiert wurde | local |                 
+| objectType   | true      | basierend auf dc:type                      | text |
+| mainResource | false     | PID des Hauptdatenstroms                   | TEI.xml |
+| funder       | true      | Fördergeber                                | FFW (ausschreiben?) |
 
 
-| Key         | Beschreibung       | auto |object | Defaultwert  | User |
-|-------------|--------------------|------|-------|--------------|------|
-| dsid        | Data Stream ID     |   1  |  -    | -            |  -   |
-| dspath      | Path to data stream|   1  |  -    | -            |  -   |
-| mimetype    | type of DS         |   1  |  -    | -            |  -   |
-| title       |                    |   -  |  -    | 1 ("")       |  2   |
-| description | Optional           |   -  |  -    | 1 ("")       |  2   |
-| creator     |                    |   -  |  -    | 1 ("")       |  2   |
-| rights      | use obj rights?    |   -  |  1    | 2 (CC BY-NC) |  3   |
-| lang        | lang des DS        |   -  |  -    | -            |  1   |
-| tags        | user defined tags  |   -  |  -    | -            |  1   |
+#### recid
+
+`recid` ist der Identifikator des digitalen Objekts. Also etwas wie `hsa.letters.123`.
+
+Bei der Generierung des CSV (`preprocess csv create`) wird der Ordnername des Objekts als Defaultwert
+eingetragen.
+
+#### title
+
+`title` ist der Titel des digitalen Objekts. Er wird aus DC.xml extrahiert. Fehlt der Wert
+im DC.xml, wird der Name des Objekts (`recid`) verwendet.
+
+
+#### project
+
+`project` bezeichnet das Projektkürzel. Jedes digitale Objekt muss initial einem Projekt zugeordnet werden.
+Ist der Wert von `project_id` in `project.toml` gesetzt, wird dieser Wert verwendet.
+
+
+#### description
+
+`description` ist die verbale Beschreibung des Objekts. Dieser Wert ist optional.
+
+
+#### creator
+
+`creator` ist der Name der Person, die das digitale Objekt erzeugt hat. Ist der Wert von `metadata.creator` in `project.toml` gesetzt, wird dieser Wert verwendet.
+
+#### rights
+
+Dieses Feld beschreibt die Nutzungsbedingungen (Lizenz) für das Objekt. Idealerweise sollte dies
+der ausgeschriebene Name der Lizenz sein, gefolgt vom der URI zur Lizenz in runden Klammern:
+
+```
+Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)
+```
+
+Dieser Wert wird automatisch in dieser Reihenfolge ermittelt:
+
+    1. Aus dem Dublin Core
+    2. Aus `project.toml`: `metadata.rights`
+    3. Der Defaultwert ( `Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)`)
+
+#### source
+
+`source` beschreibt die Herkunft der Daten. Er wird auf den Defaultwert `local` gesetzt und sollte gegebenfalls in der CSV-Datei geändert werden.
+
+#### objectType
+
+Dieser Wert beschreibt die Art des Objekts, wie im DCMI Type Vocabulary festgelegt (https://www.dublincore.org/specifications/dublin-core/dcmi-type-vocabulary/). Der Default Type ist `text`.
+
+
+#### publisher
+
+`publisher` legt fest, wer das Objekt publiziert hat. Standardmässig wird hier 'GAMS' verwendet.
+
+#### mainResource
+
+`mainResource` erwartet als Wert die ID (`dsid`) des "Hauptdatenstroms" des Objekts. Dies ist der Datenstrom, der bei Aufruf des Objekts angezeigt wird.
+Falls es keinen Hauptdatenstrom gibt, kann der Wert leer bleiben.
+
+#### funder
+
+`funder` beschreibt, wer die Erstellung des Objekts finanziert hat. Ist in `project.toml` ein entsprechender Eintrag `metadata.funder` vorhanden, wird dieser verwendet.
+
+
+
+### Beschreibung der Felder in datatstreams.csv
+
+
+#### Überblick
+
+| Key          | Required  |  Beschreibung                               |  Beispiel |  
+|------------- | --------- |  ------------------------------------------ |  --------- |
+| dspath       | true      |  Pfad zur Datei (Verzeichnisnae/Dateiname)  |  detamax.diary/DC.xml |
+| dsid         | true      |  Name des Datenstrims                       |  DC.xml |
+| mimetype     | true      |  Content Type des Datastreams               |  image/jpeg |
+| title        | false?    |  Titel des Datenstroms                      |  Dublin Core Metadata |
+| description  | false     |  Beschreibung des Datenstroms               |  Portrait of M. Mustermann, ca. 1906 |
+| creator      | true      |  Creator des Datenstroms                    |  Max Musterfrau |
+| rights       | true?     |  Lizenz des Datenstroms: Name (URI)         |  Public Domain (http://creativecommons.org/publicdomain/mark/1.0/) |
+| lang         | false     |  Sprache(n) des Datenstroms                 |  de; en  |
+| tags         | false     |  Frei zu vergebende Tags                    |  foo; bar |
+
+
+#### dspath
+
+`dspath` bezeichnet den zweiteiligen (Objektverzeichnis/Dateiname) Pfad zur in das Bag aufzunehmende Datei.
+Der erste Teil ist also kein vollständiger Pfad, sondern nur die Objektid, also der Wert, der in object.csv als `recid` vergeben wurde. 
+Ein Beispiel könnte also so aussehen: `hsa/TEI.xml`. Der Wert wird automatisch gesetzt und braucht im Normallfall nie verändert zu werden.
+
+#### dsid
+
+Das ist der (finale) Name des Datenstroms. Dieser kann sich vom Dateinamen unterschieden, sollte aber der Übersichtlichkeit halber gleich sein. Der Name wird im Zuge der Generierung der CSV-Datei automatisch aus dem Dateinamen abgeleitet. Abhängig davon, ob in `project.toml` der Wert von `general.dsid_keep_extension`auf `true`(default) oder `false` steht, wird die Dateinamenerweiterung entweder erhalten oder abgestreift. 
+
+#### mimetype
+
+Beschreibt den Content Type des Datenstroms. Diesen explizit zu setzen, solle fast nie nötig sein, weil
+er für viele Formate automatisch ermittelt werden kann. 
+
+#### title
+
+Ein Titel für den Datenstrom wird nur für einige wenige Dateinamen automatisch gesetzt:
+
+Für einige wenige Dateinamen haben wir eigene Defaultwerte definiert:
+
+  * `DC.xml`: "Dublin Core Metadata"
+  * `RDF.xml: "RDF Statement"
+
+Für alle anderen Datenströme bleibt das Feld beim automatischen Generieren der CSV Datei leer.
+
+
+#### description
+
+`description` ist die verbale Beschreibung des Inhalts der Datenstroms. Dieser Wert ist optional.
+Automatisch befüllt wird dieses Feld nur für 'DC.xml': 
+"Dublin Core meta data in XML format for this Object"
+
+
+#### creator
+
+`creator` ist der Name der Person, die das digitale Objekt erzeugt hat. Ist der Wert von `metadata.creator` in `project.toml` gesetzt, wird dieser Wert verwendet.
+
+#### rights
+
+Dieses Feld beschreibt die Nutzungsbedingungen (Lizenz) für das Objekt. Idealerweise sollte dies
+der ausgeschriebene Name der Lizenz sein, gefolgt vom der URI zur Lizenz in runden Klammern:
+
+```
+Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)
+```
+
+Dieser Wert wird automatisch in dieser Reihenfolge ermittelt:
+
+    1. Aus dem Dublin Core
+    2. Aus `project.toml`: `metadata.rights`
+    3. Der Defaultwert ( `Creative Commons Attribution-NonCommercial 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)`)
+
+
+#### lang
+
+`lang` bezeichnet den oder die Sprache(n) des Datenstroms. Empfohlenes Format ist IETF BCP 47 
+(https://www.rfc-editor.org/info/bcp47). Alternativ können ISO 639 Codes verwendet werden.
+
+Mehrere Sprachen können durch ein Semikolon getrennt werden.
+
+#### tags
+
+Tags sind frei wählbare Bezeichner. Das Feld ist optional. Mehrere Werte werden durch Semikolons (`;`) voneinander getrennt.
+
+
+

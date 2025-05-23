@@ -35,9 +35,9 @@
 - Verzeichnisse:
 ```
 <projektkuerzel>
-├── bags
-├── objects
-└─ project.toml
+|-- bags
+|-- objects
+|-- project.toml
 ```
 
 ## `project.toml` bearbeiten
@@ -145,7 +145,7 @@ verändert. Dieses Verhalten kann durch Optionen verändert werden:
      in `project.toml` gemacht haben oder neue Datenströme in einem Objektverzeichnis
      angelegt haben, sollten Sie `preprocess csv create --update <folder>` laufen
      lassen.
-  - `--overwrite`.  Das ist eine gefährliche Operation, die alle bereits bestehenden 
+  - `--force-overwrite`.  Das ist eine gefährliche Operation, die alle bereits bestehenden 
      CSV-Dateien überschreibt. Sie sollte nur verwendet werden, wenn Sie wieder von
      ganz vorne beginnen möchten.
 
