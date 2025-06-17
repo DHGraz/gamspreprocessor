@@ -10,8 +10,8 @@
 
 
 ## gamspreprocessor und gamspackager installieren
-- `pip install gamspreprocessor-x.y.z.tar.gz`
-- `pip install gamspackaging-x.y.z.tar.gz`
+- `pip install -U gamspreprocessor-x.y.z.tar.gz`
+- `pip install -U gamspackaging-x.y.z.tar.gz`
 - die Pakete gamspreprocessor und gamspackaging werden später über PyPi zur Verfügung gestellt
 
 
@@ -174,5 +174,5 @@ empfehlen wir diesen Weg:
 
 ## Bags erzeugen
 - sind alle obigen Anpassungen erfolgt, können Bags von den Objekten erzeugt werden
-- `packager bag create <root-folder|projektkuerzel> -o <bag-folder>`, z.B. Bags für das
-  Projekt 'hsa': `packager bag create hsa -o bags`
+- `packager create <root-folder> -o <bag-folder>`, z.B. Bags für das
+  Projekt 'hsa' (z.B. mit 'root-folder' = 'hsa'): `packager create hsa -o bags`
