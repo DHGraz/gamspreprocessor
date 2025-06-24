@@ -11,6 +11,9 @@ import gamslib.projectconfiguration
 
 logger = logging.getLogger()
 
+def warning_to_debug(msg, *args, **kwargs):
+    """Convert warnings to debug messages."""
+    logger.debug(msg, *args, **kwargs)
 
 @click.group(name="csv")
 def cli():
@@ -83,24 +86,24 @@ def createcsv(
             )
 
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
-
     if update:
-        csv_objects = gamslib.objectcsv.create_csv_files(
-            Path(projectroot), cfg, update=True
-        )
+        with warnings.catch_warnings(action="ignore"):
+            csv_objects = gamslib.objectcsv.create_csv_files(
+                Path(projectroot), cfg, update=True
+            )
         click.echo(
             f"Updated csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
     else:  # create new csv files
-        csv_objects = gamslib.objectcsv.create_csv_files(
-            Path(projectroot), cfg, force_overwrite
-        )
+        with warnings.catch_warnings(action="ignore"):
+            csv_objects = gamslib.objectcsv.create_csv_files(
+                    Path(projectroot), cfg, force_overwrite
+            )
         click.echo(
             f"Created csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
-
 
 @click.command(name="collect")
 @click.option(
