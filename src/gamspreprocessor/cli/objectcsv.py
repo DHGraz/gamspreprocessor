@@ -3,7 +3,6 @@
 import logging
 
 from pathlib import Path
-import warnings
 
 
 import click
@@ -11,10 +10,6 @@ import gamslib.objectcsv
 import gamslib.projectconfiguration
 
 logger = logging.getLogger()
-
-def warning_to_debug(msg, *args, **kwargs):
-    """Convert warnings to debug messages."""
-    logger.debug(msg, *args, **kwargs)
 
 @click.group(name="csv")
 def cli():
@@ -89,11 +84,9 @@ def createcsv(
         config_path = Path(configfile)
 
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
-
     if update:
-        with warnings.catch_warnings(action="ignore"):
-            csv_objects = gamslib.objectcsv.create_csv_files(
-                Path(projectroot), cfg, update=True
+        csv_objects = gamslib.objectcsv.create_csv_files(
+            Path(projectroot), cfg, update=True
             )
         click.echo(
             f"Updated csv files for {len(csv_objects)} objects "
