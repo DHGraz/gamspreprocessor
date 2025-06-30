@@ -11,6 +11,7 @@ import gamslib.projectconfiguration
 
 logger = logging.getLogger()
 
+
 @click.group(name="csv")
 def cli():
     """Helpers for managing GAMS object CSV files."""
@@ -69,7 +70,7 @@ def createcsv(
     you have changed the project configuration. Updating will not touch fields
     like `description`, `tags` or `lang`. But it will replace fields which can be automatically
     derived from dublin core or the project configuration. So use with care if you have changed
-    fields like `title`, `creator`, `publisher` or `rights` by hand. If no new value can be 
+    fields like `title`, `creator`, `publisher` or `rights` by hand. If no new value can be
     derived, the existing field will be kept.
 
     Use `packager objectcsv create --help` to see the available options.
@@ -82,23 +83,24 @@ def createcsv(
             )
 
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
-    
+
     if update:
         csv_objects = gamslib.objectcsv.create_csv_files(
             Path(projectroot), cfg, update=True
-            )
+        )
         click.echo(
             f"Updated csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
     else:  # create new csv files
         csv_objects = gamslib.objectcsv.create_csv_files(
-                Path(projectroot), cfg, force_overwrite
+            Path(projectroot), cfg, force_overwrite
         )
         click.echo(
             f"Created csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
+
 
 @click.command(name="collect")
 @click.option(
@@ -126,12 +128,19 @@ def collectcsv(objects_dir: str, output_dir: str | None = None, to_csv: bool = F
     """
     # if output_dir is not None:
     output_path = Path(output_dir) if output_dir else Path.cwd()
-    all_objects_file = output_path / "all_objects.csv"
-    all_ds_file = output_path / "all_datastreams.csv"
+    all_objects_file = output_path / 'all_objects.csv'
+    all_ds_file = output_path / 'all_datastreams.csv'
 
-    obj_csv = gamslib.objectcsv.collect_csv_data(
-        Path(objects_dir), all_objects_file, all_ds_file
-    )
+    try:
+        obj_csv = gamslib.objectcsv.collect_csv_data(
+            Path(objects_dir), all_objects_file, all_ds_file
+        )
+    except gamslib.objectcsv.exception.ValidationError as e:
+        click.echo(f"Validation error: {e}")
+        raise e from e
+    except FileNotFoundError as e:
+        click.echo(f"File not found: {e}")
+        raise e from e
     if to_csv:
         click.echo(
             f"Created csv files {all_objects_file} and {all_ds_file} for data "
