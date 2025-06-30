@@ -11,6 +11,7 @@ import gamslib.projectconfiguration
 
 logger = logging.getLogger()
 
+
 @click.group(name="csv")
 def cli():
     """Helpers for managing GAMS object CSV files."""
@@ -84,10 +85,14 @@ def createcsv(
         config_path = Path(configfile)
 
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 88963ca (Update: Collecting csv without creating csv files first now fails with error message)
     if update:
         csv_objects = gamslib.objectcsv.create_csv_files(
             Path(projectroot), cfg, update=True
-            )
+        )
         click.echo(
             f"Updated csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
@@ -100,6 +105,7 @@ def createcsv(
             f"Created csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
+
 
 @click.command(name="collect")
 @click.option(
@@ -127,6 +133,7 @@ def collectcsv(objects_dir: str, output_dir: str | None = None, to_csv: bool = F
     """
     # if output_dir is not None:
     output_path = Path(output_dir) if output_dir else Path.cwd()
+<<<<<<< HEAD
 
     try:
         obj_csv = gamslib.objectcsv.manage_csv.collect_csv_data(
@@ -139,6 +146,20 @@ def collectcsv(objects_dir: str, output_dir: str | None = None, to_csv: bool = F
     except FileNotFoundError as e:
         click.echo(f"Cannot collect data, because of missing csv "
                    f"file(s): {e}. Try running 'csv create' first!")
+=======
+    all_objects_file = output_path / 'all_objects.csv'
+    all_ds_file = output_path / 'all_datastreams.csv'
+
+    try:
+        obj_csv = gamslib.objectcsv.collect_csv_data(
+            Path(objects_dir), all_objects_file, all_ds_file
+        )
+    except gamslib.objectcsv.exception.ValidationError as e:
+        click.echo(f"Validation error: {e}")
+        raise e from e
+    except FileNotFoundError as e:
+        click.echo(f"File not found: {e}")
+>>>>>>> 88963ca (Update: Collecting csv without creating csv files first now fails with error message)
         raise e from e
     if to_csv:
         all_objects_file = output_path / gamslib.objectcsv.objectcollection.ALL_OBJECTS_CSV

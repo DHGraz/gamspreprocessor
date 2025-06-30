@@ -53,4 +53,7 @@ extension-pkg-allow-list = ["saxonche"]
 [tool.ruff.lint]
 select = ["PL", "RUF", "SIM"]
 
+[tool.uv.sources]
+gamslib = { path = "../gamslib/dist/gamslib-0.5.8.tar.gz" }
+
 
