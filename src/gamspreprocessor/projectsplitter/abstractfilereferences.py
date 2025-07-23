@@ -128,8 +128,7 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
         # the source file is the one we want to distinguish the object
         if self.source_file is None:
             return hash(f"{self.__class__.__name__!s} {id(self)}")
-        else:
-            return hash(f"{self.__class__.__name__!s} {self.source_file.absolute()}")
+        return hash(f"{self.__class__.__name__!s} {self.source_file.absolute()}")
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.source_file!s})"
@@ -148,14 +147,45 @@ class AbstractXMLFileReference(AbstractFileReference):
     methods should be enough.
     """
 
-    def __init__(self, element: ET.Element) -> None:
+    def __init__(self, element: ET.Element) -> None:  # pylint: disable=I1101
         """Initialize the FileReference.
 
         Arguments:
         element: The XML element which contains the reference.
         """
         super().__init__()
-        self._element: ET.Element = element
+        self._element: ET.Element = element  # pylint: disable=I1101
+
+
+    @abc.abstractmethod
+    def get_reference(self) -> str:
+        """Return the reference as it is set in the element.
+
+        As this depends on the specific element, this method MUST be implemented by the subclass.
+        """
+
+    @abc.abstractmethod
+    def set_reference(self, new_reference: str) -> None:
+        """Set a new reference to the reference element.
+
+        As this depends on the specific element, this method MUST be
+        implemented by the subclass.
+
+        'new_reference' should be a string containing a path relative to
+        the object directory. Typically this will be something
+        like './foo.png'.
+        """
+
+    @abc.abstractmethod
+    def get_id(self) -> str:
+        """Return the id of the element.
+
+        As this depends on the specific element, this method MUST be
+        implemented by the subclass.
+
+        If no explicit id is set or not even possible in the schema of the
+        subclassed element, return "".
+        """
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self._element!r})"

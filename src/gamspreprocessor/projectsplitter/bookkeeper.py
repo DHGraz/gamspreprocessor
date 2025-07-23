@@ -8,7 +8,6 @@ files have not been processed yet. This is important for the incremental process
 
 import json
 import logging
-import os
 from pathlib import Path
 from typing import Any
 

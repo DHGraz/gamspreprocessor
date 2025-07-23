@@ -22,7 +22,7 @@ class AbstractObjectSource(ABC):
     """Define Interface for alls ObjectSource classes."""
 
     def __init__(
-            self, source_file: Path, strip_prefix: bool, strip_extension: bool
+        self, source_file: Path, strip_prefix: bool, strip_extension: bool
     ) -> None:
         """Initialize the ObjectSource.
 
@@ -48,7 +48,7 @@ class AbstractObjectSource(ABC):
         if self.strip_prefix and ":" in pid:
             pid = pid.split(":")[1]
         self.validate_pid(pid)
-        self._set_pid(pid)
+        self._set_pid(pid)  # pylint: disable=E1101 # pylint does not recognize the abstract method
         return pid
 
     @abstractmethod
@@ -92,21 +92,22 @@ class AbstractObjectSource(ABC):
 
     @classmethod
     def validate_pid(cls, pid: str) -> bool:
-        """Make sure, the pid only contains valid characters.
-        """
+        """Make sure, the pid only contains valid characters."""
         allowed_pattern = r"^([a-zA-Z]+(:|%3A|%3a))?[a-zA-Z0-9-._]+$"
 
         m = re.match(allowed_pattern, pid)
-        if m is not None:
-            if ":" in pid or "%3A" in pid.upper():
-                warnings.warn(
-                    f"PID {pid} contains a colon, which is discouraged in the new GAMS.",
-                    UserWarning,
-                )
-            return True
-        else:
+        if m is None:
+            # if the pid does not match the allowed pattern, raise an error
             raise ValueError(
-                f"PID {pid} does not match the allowed pattern {allowed_pattern}"
+                f"Invalid PID {pid} does not match the allowed pattern {allowed_pattern}"
+            )
+        if ":" in pid or "%3A" in pid.upper():
+            # we discourage the use of colons in PIDs, so we issue a warning
+            # but do not raise an error, because we still want to allow them
+            # for compatibility reasons.
+            warnings.warn(
+                f"PID {pid} contains a colon, which is discouraged in the new GAMS.",
+                UserWarning,
             )
 
     def _extract_pid_from_filename(self) -> str:
@@ -114,9 +115,11 @@ class AbstractObjectSource(ABC):
         return self.source_file.stem if self.strip_extension else self.source_file.name
 
     def __repr__(self) -> str:
-        return (f"{self.__class__.__name__}({self.source_file}, "
-                f"strip_prefix={self.strip_prefix!s}, "
-                f"strip_extension={self.strip_extension!s})")
+        return (
+            f"{self.__class__.__name__}({self.source_file}, "
+            f"strip_prefix={self.strip_prefix!s}, "
+            f"strip_extension={self.strip_extension!s})"
+        )
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.source_file})"
@@ -133,7 +136,7 @@ class XMLObjectSource(AbstractObjectSource):
     DEFAULT_NAMESPACES: frozendict = frozendict({})
 
     def __init__(
-            self, source_file: Path, strip_prefix: bool, strip_extension: bool
+        self, source_file: Path, strip_prefix: bool, strip_extension: bool
     ) -> None:
         """Initialize the TEIObjectSource.
 
@@ -146,7 +149,7 @@ class XMLObjectSource(AbstractObjectSource):
         """
         super().__init__(source_file, strip_prefix, strip_extension)
 
-        self.tree = ET.parse(source_file)
+        self.tree = ET.parse(source_file)  # pylint: disable=I1101
 
     @property
     def pid(self) -> str:
@@ -170,7 +173,7 @@ class XMLObjectSource(AbstractObjectSource):
 
         # iterate over all XPath expressions in the reference registry and create a new
         # Reference Object for each element found in the XML file.
-        for xpath, ref_class in self.REFERENCE_REGISTRY.items():
+        for xpath, ref_class in self.REFERENCE_REGISTRY.items():  # pylint: disable=E1101  # not in ABC class
             for element in root.findall(xpath, namespaces=self.DEFAULT_NAMESPACES):
                 ref = ref_class(element)
                 ref.replace_ref(self.source_file.parent, self.strip_extension)

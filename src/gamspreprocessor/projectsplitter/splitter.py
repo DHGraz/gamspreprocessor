@@ -10,7 +10,6 @@ import logging
 import shutil
 import warnings
 from pathlib import Path
-from xml.etree import ElementTree as ET
 
 from gamslib.formatdetect import detect_format
 from gamslib.formatdetect.formatinfo import SubType
@@ -90,7 +89,7 @@ class ProjectSplitter:
         """
         use_format = use_format.lower()
         if use_format == "auto":
-            mimetype, objecttype = guess_format(source_file)
+            _, objecttype = guess_format(source_file)
         elif use_format == 'tei':
             objecttype = SubType.TEI
         elif use_format == 'lido':
@@ -101,10 +100,9 @@ class ProjectSplitter:
 
         if objecttype == SubType.TEI:
             return TEIObjectSource(source_file, strip_prefix, strip_extension)
-        elif objecttype == SubType.LIDO:
+        if objecttype == SubType.LIDO:
             return LIDOObjectSource(source_file, strip_prefix, strip_extension)
-        else:
-            return GenericObjectSource(source_file, strip_prefix, strip_extension)
+        return GenericObjectSource(source_file, strip_prefix, strip_extension)
 
     def split(
             self, sourcefile: Path, objecttype: str = "auto", strip_prefix=True,
