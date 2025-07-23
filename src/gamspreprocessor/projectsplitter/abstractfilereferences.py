@@ -129,6 +129,7 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
         if self.source_file is None:
             return hash(f"{self.__class__.__name__!s} {id(self)}")
         return hash(f"{self.__class__.__name__!s} {self.source_file.absolute()}")
+        return hash(f"{self.__class__.__name__!s} {self.source_file.absolute()}")
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.source_file!s})"
