@@ -59,12 +59,12 @@ def cli():
     "--exclude",
     multiple=True,
     help=(
-        "A file name (e.g. 'DC.xml') which should be excluded from "
-        "the transformation. `--exclude` can be used multiple times " 
-        "to specify a list of file names. " 
-        "Attention: The values are file names, not filename patterns! "
-        "Example: multitransform xslt -p '*.xml' -e DC.xml -e DC2.xml will transform all "
-        "'.xml'-Files but 'DC.xml' and DC2.xml'"
+            "A file name (e.g. 'DC.xml') which should be excluded from "
+            "the transformation. `--exclude` can be used multiple times "
+            "to specify a list of file names. "
+            "Attention: The values are file names, not filename patterns! "
+            "Example: multitransform xslt -p '*.xml' -e DC.xml -e DC2.xml will transform all "
+            "'.xml'-Files but 'DC.xml' and DC2.xml'"
     ))
 @click.option(
     "-l",

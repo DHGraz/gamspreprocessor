@@ -156,7 +156,6 @@ class AbstractXMLFileReference(AbstractFileReference):
         super().__init__()
         self._element: ET.Element = element  # pylint: disable=I1101
 
-
     @abc.abstractmethod
     def get_reference(self) -> str:
         """Return the reference as it is set in the element.

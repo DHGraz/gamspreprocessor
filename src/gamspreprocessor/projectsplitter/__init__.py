@@ -15,7 +15,7 @@ from .teiobjectsource import TEIObjectSource
 
 
 def make_object_source(
-    source_file: Path, use_format="auto", strip_prefix=True, strip_extension=False
+        source_file: Path, use_format="auto", strip_prefix=True, strip_extension=False
 ) -> AbstractObjectSource:
     """ObjectSource factory function.
 

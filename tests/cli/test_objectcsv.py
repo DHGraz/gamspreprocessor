@@ -100,33 +100,32 @@ def test_create_csv_with_update_flag(datadir):
     )
     modified_obj_csvdata, modified_ds_csvdata = modify_csv_files(modified_objects_dir)
 
-    # # make sure the modify_csv_files function worked
-    # assert read_csv_file(modified_objects_dir / "object.csv") == modified_obj_csvdata
-    # assert (
-    #     read_csv_file(modified_objects_dir / "datastreams.csv") == modified_ds_csvdata
-    # )
+    # make sure the modify_csv_files function worked
+    assert read_csv_file(modified_objects_dir / "object.csv") == modified_obj_csvdata
+    assert (
+            read_csv_file(modified_objects_dir / "datastreams.csv") == modified_ds_csvdata
+    )
 
-    # # Now run the create command again with the --update flag.
-    # result = runner.invoke(cli, ["csv", "create", "--update", str(objects_dir)])
-    # assert result.exit_code == 0
-    # assert "Updated csv files for 2 objects (3 content files)" in result.output
+    # Now run the create command again with the --update flag.
+    result = runner.invoke(cli, ["csv", "create", "--update", str(objects_dir)])
+    assert result.exit_code == 0
+    assert "Updated csv files for 2 objects (3 content files)" in result.output
 
-    # final_obj_csvdata = read_csv_file(modified_objects_dir / "object.csv")
-    # assert len(final_obj_csvdata) == 1
-    # assert final_obj_csvdata[0]["title"] == initial_obj_csvdata[0]["title"]
+    final_obj_csvdata = read_csv_file(modified_objects_dir / "object.csv")
+    assert len(final_obj_csvdata) == 1
+    assert final_obj_csvdata[0]["title"] == initial_obj_csvdata[0]["title"]
 
-    # final_ds_csvdata = read_csv_file_to_dict(
-    #     modified_objects_dir / "datastreams.csv", "dsid"
-    # )
-    # assert "DC.xml" in final_ds_csvdata
-    # assert "SOURCE.xml" in final_ds_csvdata
+    final_ds_csvdata = read_csv_file_to_dict(
+        modified_objects_dir / "datastreams.csv", "dsid"
+    )
+    assert "DC.xml" in final_ds_csvdata
+    assert "SOURCE.xml" in final_ds_csvdata
 
-    # assert (
-    #     final_ds_csvdata["SOURCE.xml"]["title"]
-    #     == initial_ds_csvdata["SOURCE.xml"]["title"]
-    # )
-    # assert final_ds_csvdata["DC.xml"]["title"] == initial_ds_csvdata["DC.xml"]["title"]
-
+    assert (
+            final_ds_csvdata["SOURCE.xml"]["title"]
+            == initial_ds_csvdata["SOURCE.xml"]["title"]
+    )
+    assert final_ds_csvdata["DC.xml"]["title"] == initial_ds_csvdata["DC.xml"]["title"]
 
 def test_collect_csv(datadir, monkeypatch):
     """Test the csv collect command."""

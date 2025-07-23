@@ -11,7 +11,6 @@ import gamslib.projectconfiguration
 
 logger = logging.getLogger()
 
-
 @click.group(name="csv")
 def cli():
     """Helpers for managing GAMS object CSV files."""
