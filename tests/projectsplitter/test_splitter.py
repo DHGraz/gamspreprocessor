@@ -127,7 +127,8 @@ def test_split_lido(shared_datadir, tmp_path):
     splitter = ProjectSplitter(target_dir, source_dir)
     #with pytest.warns(UserWarning, match=r"colon"):
     result = splitter.split(testfile, "lido")
-    assert len(result) == 3
+    assert len(result) == 3 # noqa: PLR2004
+    assert len(result) == 3 # noqa: PLR2004
     assert all(f.is_file() for f in result)
 
     filenames = [f.name for f in result]
@@ -186,7 +187,7 @@ def test_strip_with_no_strip_prefix_and_from_content(
     testfile = source_dir / "TEI_1.xml"
     with pytest.warns(UserWarning, match=r"colon"):
         result = splitter.split(testfile, strip_prefix=False)
-    assert len(result) == 3
+    assert len(result) == 3 # noqa: PLR2004
     assert all(f.is_file() for f in result)
 
     tei_file = target_dir / "o%3Ahsa.letter.12137" / "TEI_1.xml"

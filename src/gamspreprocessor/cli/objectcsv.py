@@ -1,16 +1,15 @@
 """CLI commands for managing GAMS object CSV files."""
 
 import logging
-import tempfile
+
 from pathlib import Path
-import warnings
+
 
 import click
 import gamslib.objectcsv
 import gamslib.projectconfiguration
 
 logger = logging.getLogger()
-
 
 @click.group(name="csv")
 def cli():
@@ -81,6 +80,8 @@ def createcsv(
             config_path = gamslib.projectconfiguration.utils.find_project_toml(
                 Path(projectroot)
             )
+    else:
+        config_path = Path(configfile)
 
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
 
@@ -128,29 +129,30 @@ def collectcsv(objects_dir: str, output_dir: str | None = None, to_csv: bool = F
     """
     # if output_dir is not None:
     output_path = Path(output_dir) if output_dir else Path.cwd()
-    all_objects_file = output_path / 'all_objects.csv'
-    all_ds_file = output_path / 'all_datastreams.csv'
 
     try:
-        obj_csv = gamslib.objectcsv.collect_csv_data(
-            Path(objects_dir), all_objects_file, all_ds_file
+        obj_csv = gamslib.objectcsv.manage_csv.collect_csv_data(
+            Path(objects_dir),  # all_objects_file, all_ds_file
         )
-    except gamslib.objectcsv.exception.ValidationError as e:
-        click.echo(f"Validation error: {e}")
+    except ValueError as e:
+        click.echo(f"Cannot collect data, because of empty csv "
+                  f"files: {e}. Try running csv create first!")
         raise e from e
     except FileNotFoundError as e:
-        click.echo(f"File not found: {e}")
+        click.echo(f"Cannot collect data, because of missing csv "
+                   f"file(s): {e}. Try running 'csv create' first!")
         raise e from e
     if to_csv:
+        all_objects_file = output_path / gamslib.objectcsv.objectcollection.ALL_OBJECTS_CSV
+        all_ds_file = output_path / gamslib.objectcsv.objectcollection.ALL_DATASTREAMS_CSV
+        obj_csv.save_to_csv(all_objects_file, all_ds_file)
         click.echo(
             f"Created csv files {all_objects_file} and {all_ds_file} for data "
-            f"in folder {obj_csv.object_dir.name}."
+            f"in folder {all_ds_file.parent}."
         )
     else:
         xlsx_file = output_path / "all_objects.xlsx"
-        gamslib.objectcsv.csv_to_xlsx(all_objects_file, all_ds_file, xlsx_file)
-        all_objects_file.unlink()
-        all_ds_file.unlink()
+        obj_csv.save_to_xlsx(xlsx_file)
         click.echo(f"Created xlsx file {xlsx_file}")
 
 
@@ -189,21 +191,27 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
     input_path = Path(input_dir) if isinstance(input_dir, str) else Path.cwd()
 
     if from_csv:
-        num_of_obj, num_of_ds = gamslib.objectcsv.split_csv_files(
-            Path(projectroot), input_path
+        obj_csv_file = input_path / gamslib.objectcsv.objectcollection.ALL_OBJECTS_CSV
+        ds_csv_file = input_path / gamslib.objectcsv.objectcollection.ALL_DATASTREAMS_CSV
+        if not obj_csv_file.exists() or not ds_csv_file.exists():
+            raise FileNotFoundError(
+                f"Cannot find {obj_csv_file.name} or {ds_csv_file.name} in {input_path}. "
+                "Please run 'collect' first to create these files."
+            )
+        num_of_obj, num_of_ds = gamslib.objectcsv.split_from_csv(
+            Path(projectroot), obj_csv_file, ds_csv_file
         )
 
     else:
-        # convert xlsx to csv files before update
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp_path = Path(tmpdir)
-            xlsx_file = input_path / "all_objects.xlsx"
-            obj_file = tmp_path / "all_objects.csv"
-            ds_file = tmp_path / "all_datastreams.csv"
-            gamslib.objectcsv.xlsx_to_csv(xlsx_file, obj_file, ds_file)
-            num_of_obj, num_of_ds = gamslib.objectcsv.split_csv_files(
-                Path(projectroot), tmp_path
+        xlsx_file = input_path / gamslib.objectcsv.objectcollection.ALL_OBJECTS_XLSX
+        if not xlsx_file.exists():
+            raise FileNotFoundError(
+                f"Cannot find {xlsx_file.name} in {input_path}. "
+                "Please run 'collect' first to create this file."
             )
+        num_of_obj, num_of_ds = gamslib.objectcsv.split_from_xlsx(
+            Path(projectroot), xlsx_file
+        )
     click.echo(
         f"Updated {num_of_obj} object records and {num_of_ds} datatstream records."
     )

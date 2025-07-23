@@ -9,7 +9,6 @@ from gamspreprocessor.projectsplitter.abstractobjectsources import XMLObjectSour
 from .abstractfilereferences import AbstractXMLFileReference
 
 
-
 class LIDOResourceSet(AbstractXMLFileReference):
     "A wrapper around a ResourceSet element in a LIDO file."
 

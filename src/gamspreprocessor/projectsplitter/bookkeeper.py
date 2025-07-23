@@ -45,14 +45,13 @@ class BookKeeper:
         ## read stored data from disk (if it exists)
         self._load_data()
 
-
     def save(self) -> None:
         "Write data to disk."
         with self.storage_path.open("w", encoding="utf-8") as f:
             json.dump(self._data, f, ensure_ascii=False)
         logger.debug("Bookkeeper data written to '%a'", self.storage_path)
 
-    def add_pid(self, filepath: Path|str, pid: str) -> None:
+    def add_pid(self, filepath: Path | str, pid: str) -> None:
         """Mark a file as used for an object with ID pid.
 
         As a file can be used by more than one object, we keep the
@@ -64,7 +63,7 @@ class BookKeeper:
         posix_path = filepath.resolve().as_posix()
 
         pids_for_file = self._data.get(posix_path, [])
-        
+
         if pid not in pids_for_file:
             pids_for_file.append(pid)
             logger.debug("Added object pid '%s' for '%s' to bookkeeper", pid, posix_path)
@@ -124,7 +123,7 @@ class BookKeeper:
                     logger.debug("skipping '%s' while updating bookkeeper", filepath)
                     continue
                 posix_path = filepath.resolve().as_posix()
-                #relative_path = filepath.relative_to(project_path).as_posix() 
+                # relative_path = filepath.relative_to(project_path).as_posix()
                 if posix_path not in self._data:
                     self._data[posix_path] = []
                 all_files.add(posix_path)
@@ -134,4 +133,3 @@ class BookKeeper:
             self._data.pop(file)
             logger.debug("Removed deleted file '%s' from bookkeeper", file)
         self.save()
-

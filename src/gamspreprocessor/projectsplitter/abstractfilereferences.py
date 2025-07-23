@@ -15,7 +15,7 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         """Initialize the FileReference.
         """
-        self.source_file: Path|None = None
+        self.source_file: Path | None = None
 
     @abc.abstractmethod
     def get_reference(self) -> str:
@@ -28,24 +28,33 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
     def set_reference(self, new_reference: str) -> None:
         """Set a new reference to the reference element.
 
-        As this depends on the specific element, this method MUST be implemented by the subclass.
-        'new_reference' should be a string containing a path relativ to the object directory. Typically
-        this will be something like './foo.png'.
+        As this depends on the specific element, this method MUST be
+        implemented by the subclass.
+
+        'new_reference' should be a string containing a path relative to
+        the object directory. Typically this will be something
+        like './foo.png'.
         """
 
     @abc.abstractmethod
     def get_id(self) -> str:
         """Return the id of the element.
 
-        As this depends on the specific element, this method MUST be implemented by the subclass.
-        If no explicit id is set or not even possible in the schema of the subclassed element, return "".
+        As this depends on the specific element, this method MUST be
+        implemented by the subclass.
+
+        If no explicit id is set or not even possible in the schema of the
+        subclassed element, return "".
         """
 
     def replace_ref(self, file_root: Path, strip_extension: bool) -> None:
         """Replace the reference in the graphic element with a new value.
 
-        If strip_extension is set to True, the extension of the source file will be stripped from the reference.
-        Normally there is no need to implement this method in the subclass, as it will work for any subclass.
+        If strip_extension is set to True, the extension of the source file
+        will be stripped from the reference.
+
+        Normally there is no need to implement this method in the subclass,
+        as it will work for any subclass.
         """
         ref_uri = self.get_reference()
         self.source_file = self._find_source_file(ref_uri, file_root)
@@ -60,22 +69,22 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
                     new_ref = f"./{self.source_file.stem}"
             self.set_reference(new_ref)
 
-    def copy_file(self, object_dir: Path) -> Path|None:
+    def copy_file(self, object_dir: Path) -> Path | None:
         """Copy the referenced file to the object directory.
 
-        Normally there is no need to implement this method in the subclass, as it should work for any subclass.
+        Normally there is no need to implement this method in the
+        subclass, as it should work for any subclass.
 
         Return the path to the copied file in object_dir.
         """
         target_file = None
         # it makes no sense to copy a file which does not exist
-        if self.source_file is not None: 
+        if self.source_file is not None:
             target_name = self.get_reference()
             target_file = object_dir / target_name
             if not target_file.exists():
                 shutil.copy(self.source_file, target_file)
         return target_file
-            
 
     @classmethod
     def _find_source_file(cls, referenced_uri: str, file_root: Path) -> Path | None:
@@ -102,7 +111,7 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
         "Return how many chars are the same at the end of both paths."
         score = 0
 
-        long_str = long_path.as_posix()   
+        long_str = long_path.as_posix()
         short_str = short_path.as_posix()
 
         # An empty paths as_posix() will return ".". We need to handle this case
@@ -147,6 +156,6 @@ class AbstractXMLFileReference(AbstractFileReference):
         """
         super().__init__()
         self._element: ET.Element = element
-        
+
     def __repr__(self):
         return f"{self.__class__.__name__}({self._element!r})"

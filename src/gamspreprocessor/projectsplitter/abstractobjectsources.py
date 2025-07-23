@@ -8,17 +8,13 @@ This module provides 2 abstract Classes:
 """
 
 import re
-import shutil
 import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
-from warnings import warn
 
 from frozendict import frozendict
 from lxml import etree as ET
-from uritools import urisplit
 
-from .abstractfilereferences import AbstractXMLFileReference
 from .abstractfilereferences import AbstractFileReference
 
 
@@ -26,13 +22,16 @@ class AbstractObjectSource(ABC):
     """Define Interface for alls ObjectSource classes."""
 
     def __init__(
-        self, source_file: Path, strip_prefix: bool, strip_extension: bool
+            self, source_file: Path, strip_prefix: bool, strip_extension: bool
     ) -> None:
         """Initialize the ObjectSource.
 
-        :param source_file: Path to the source file, which should be transformed into an object directory.
-        :param strip_prefix: If True, the prefix of the pid ('o:') will be removed.
-        :param strip_extension: If True, the file extension will be removed from the pid.
+        :param source_file: Path to the source file, which should be
+            transformed into an object directory.
+        :param strip_prefix: If True, the prefix of the pid ('o:') will
+            be removed.
+        :param strip_extension: If True, the file extension will be
+            removed from the pid.
         """
         self.source_file: Path = source_file
         self.strip_prefix: bool = strip_prefix
@@ -93,7 +92,8 @@ class AbstractObjectSource(ABC):
 
     @classmethod
     def validate_pid(cls, pid: str) -> bool:
-        "Make sure, the pid only contains valid charcters."
+        """Make sure, the pid only contains valid characters.
+        """
         allowed_pattern = r"^([a-zA-Z]+(:|%3A|%3a))?[a-zA-Z0-9-._]+$"
 
         m = re.match(allowed_pattern, pid)
@@ -114,7 +114,9 @@ class AbstractObjectSource(ABC):
         return self.source_file.stem if self.strip_extension else self.source_file.name
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.source_file}, strip_prefix={self.strip_prefix!s}, strip_extension={self.strip_extension!s})"
+        return (f"{self.__class__.__name__}({self.source_file}, "
+                f"strip_prefix={self.strip_prefix!s}, "
+                f"strip_extension={self.strip_extension!s})")
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.source_file})"
@@ -131,14 +133,16 @@ class XMLObjectSource(AbstractObjectSource):
     DEFAULT_NAMESPACES: frozendict = frozendict({})
 
     def __init__(
-        self, source_file: Path, strip_prefix: bool, strip_extension: bool
+            self, source_file: Path, strip_prefix: bool, strip_extension: bool
     ) -> None:
         """Initialize the TEIObjectSource.
 
-        :param source_file: Path to the source file, which should be transformed into an object directory.
-        :param strip_prefix: If True, the prefix of the pid ('o:') will be removed.
-        :param strip_extension: If True, the file extension will be removed from the pid.
-
+        :param source_file: Path to the source file, which should be
+            transformed into an object directory.
+        :param strip_prefix: If True, the prefix of the pid ('o:')
+            will be removed.
+        :param strip_extension: If True, the file extension will
+            be removed from the pid.
         """
         super().__init__(source_file, strip_prefix, strip_extension)
 
