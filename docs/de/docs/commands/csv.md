@@ -1,7 +1,4 @@
-Comments marked with ###COMMENT###
-
-
-# CSV
+# csv
 
 Hilfsfunktionen mit denen die CSV Dateien mit den Objekt-Metadaten erzeugt und verwaltet werden.
 
