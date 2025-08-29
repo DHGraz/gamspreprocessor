@@ -8,7 +8,11 @@ Sie `gamspreprocessor` installiert haben.
 
 `preprocess` muss (fast) immer mit einem Unterbefehl aufgerufen werden, die
 jeweils eigene Kommandozeilenoptionen und -argumente unterstützen. 
-`preprocess` selbst kennt einige wenige globake Optionen. Diese sind:
+`preprocess` selbst kennt einige wenige globale Optionen. 
+
+## Globale Optionen
+
+Globale Optionen sind **vor** dem jewiligen Unterbefehl anzugeben und stehen global, also unabhängig von einem spezifischen Unterbefehl zur Verfügung. Diese globalen Optionen sind:
 
   * `--verbose` bzw. `-v`: Führt zu zusätzlichen Zeilen in der Ausgabe. Darf nicht
     zusammen mit `--qiet` verwendet werden. `--verbose` kann bei hilfreich bei
@@ -29,8 +33,8 @@ Mit `preprocess --help` können Sie sich diese Optionen ausgeben lassen.
 
 Das Programm `preprocess` kennt eine Reihen von Subcommands, die jeweils 
 in einem eigenen Dokument beschrieben werden. Deshalb werden die 
-Unterbefehle hier nur sehr kurz beschrieben und und auf die ausführlicheren 
-Dokumente verlinkt. Sie können sich aber auch mit
+einzelnen Unterbefehle hier nur kurz beschrieben und und auf das ausführlichere 
+Dokument verlinkt. Sie können sich aber auch mit
 `preprocess <subcommand> --help` die Hilfe zu den einzelnen Unterbefehlen
 anzeigen lassen.
  
@@ -43,28 +47,20 @@ Folgende Subcommands stehen zur Verfügung:
    * [transform](preprocess-transform) - Ausführen einer Transformation 
      z.B. mit XSLT
    * [multitransform](preprocess-multitransform) - Wie `transform`, aber 
-     für viele Dateien.
+     für viele Dateien
    * [splitproject](preprocess-splitproject) - Zerlegt die Daten eines 
-     alten GAMS-Projekts in Objektordner
+     alten GAMS 3 Projekts, wie sie unter `projekte` liegen, in Objektordner
 
 
-### preprocess project
+### Der Unterbefehl project
 
-`preprocess project` stellt Unterbefehle für die Erzeugung und Aktualisierung
-eines GAMS-Projekts bereit.
-
-```
-preprocess project init <pfad>
-```
-
-legt ein Gerüst für ein neues Projekt im Verzeichnis `<pfad>` an. Danach
-muss noch die Konfiguration in der Datei `<pfad>/project.toml` an das Projekt 
-angepasst werden.
+`preprocess project` stellt weitere Unterbefehle für die Erzeugung und Aktualisierung
+eines GAMS-Projekts bereit. Dies ist der empfohlende Weg ein neues Projekt anzulegen.
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
 Sie [hier](./commands/project.md) oder via `preprocess project --help`.
 
-### preprocess csv
+### Der Unterbefehl csv
 
 `preprocess csv` stellt einige Unterbefehle bereit, mit denen die CSV Dateien
 mit den Objekt-Metadaten erzeugt und verwaltet werden könne.
@@ -74,7 +70,7 @@ Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in
 Sie [hier](./commands/csv.md) oder via `preprocess csv --help`.
 
 
-### preprocess transform
+### Der Unterbefehl transform
 
 `preprocess transform` führt Transformationen von Daten aus. Aktuell
 gibt es nur die Möglichkeit XSLT-Transformationen auszuhühren (via Saxon).
@@ -82,7 +78,7 @@ gibt es nur die Möglichkeit XSLT-Transformationen auszuhühren (via Saxon).
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
 Sie [hier](./commands/transform.md) oder via `preprocess transform --help`.
 
-### preprocess multitransform
+### Der Unterbefehl multitransform
 
 `preprocess multitransform` funktioniert gleich wie `preprocess transform`,
 führt die Transformation aber auf viele Objekte aus. Das ist beispielsweise
@@ -92,7 +88,7 @@ dem TEI Header in das zwingend vorgegebene DC.xml zu überführen.
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
 Sie [hier](./commands/multitransform.md) oder via `preprocess multitransform --help`.
 
-### preprocess splitproject
+### Der Unterbefehl splitproject
 
 `preprocess splitproject` ist ein Mittel, um ein Projekt, wie es 
 typischerweise in GAMS 3 vor dem Ingest angelegt wurde in eine

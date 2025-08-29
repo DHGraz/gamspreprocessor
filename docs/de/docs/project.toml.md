@@ -3,7 +3,7 @@
 Die Datei `project.toml` enthält die Konfigurationseinstellungen für die `gams-xxx` 
 Programme, speziell für das Preprocessing Werkzeug.
 
-Im Prizip ist es es egal, wo diese Datei liegt, wir empfehlen aber das 
+Im Prinzip ist es es egal, wo diese Datei liegt, wir empfehlen aber das 
 Wurzelverzeichnis des Projektordners. Idealerweise sollte es nur eine
 einzige Konfigurationsdatei pro Projekt geben. Die einzelnen Settings
 können bei Bedarf, wie weiter unten über Umgebungsvariablen bzw. 

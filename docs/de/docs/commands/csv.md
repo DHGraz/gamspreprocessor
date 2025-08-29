@@ -3,7 +3,47 @@ Comments marked with ###COMMENT###
 
 # CSV
 
-Hilfsfunktionen mit denen die CSV Dateien mit den Objekt-Metadaten erzeugt und verwaltet werden könne.
+Hilfsfunktionen mit denen die CSV Dateien mit den Objekt-Metadaten erzeugt und verwaltet werden.
+
+## Verwendungszweck
+
+Der Gams-Packager, der die Bagit-Pakete für den Ingest erzeugt, benötigt einige
+Metadaten, die das Paket und die darin enthaltenen Dateien beschreibt. Da diese
+Daten nicht vollständig aus den Dateien selbst abgeleitet werden können, erwartet
+der Packager in jedem Objektverzeichnis (jedes Objekt muss in einem eigenen Verzeichnis
+liegen) zwei CSV-Dateien:
+
+   * object.csv
+   * datastreams.csv
+  
+Diese beiden Dateien landen nicht im Bag, werden aber für die Erzeugung der Bag-Metadaten
+gebraucht. Da die händische Erzeugung und Pflege dieser CSV-Dateien sehr mühsam ist,
+stellt der `csv` Unterbefehl von `preprocess` nützliche Funktionen dafür bereit.
+
+Ein prototypischer Ablauf sieht so aus:
+
+  1. Erstellung der Objektordner (z.B. via `updatecsv split`). Wichtig dabei ist,
+     dass in jedem Objektordner eine Datei `DC.xml` vorhanden ist. Diese kann
+     z.B. via XSLT aus einem TEI erzeugt werden (siehe 
+     `preprocess multitransform`).
+  1. Ist diese Voraussetzung erfüllt, und zusätzlich die Projekt-Konfigurationsdatei
+     `project.toml` erzeugt (siehe `preprocess init`), können mit dem Befehl
+     `preprocess csv create OBJECT_ROOT` für alle Objektordner unterhalb von `OBJECT_ROOT`
+     diese beiden CSV Dateien erzeugt werden.
+  1. Gibt es mehrere oder sogar viele Projektordner, wäre die separate Bearbeitung der 
+     einzelnen CSV-Dateien sehr mühsam. Deshalb wird empfohlen, mit dem Befehl
+     `preprocess csv collect` alle CSV-Daten aus den einzelnen  Objektordnern
+     einzusammeln und zusammen in eine Excel-Datei `all_objects.csv` zu speichern.
+     Diese Datei kann dann sehr effizient bearbeitet werden, indem beispielsweise
+     die Einträge nach bestimmten Spalten sortiert werden und/oder fehlende Werte
+     in viele Zeilen gleichzeitig hineinkopiert werden. 
+  1. Ist die Bearbeitung von `all_objects.csv` abgeschlossen, werden die dort
+     vorgenommenen Änderungen mit dem Befehl `preprocess csv update` wieder in
+     die einzelnen CSV-Datei zurückgespielt. `all_objects.csv` sollte danach
+     aus Konsistenzgründen gelöscht werden, da die Datei jederzeit neu
+     via `preprocess csv collect` erzeugt werden kann.
+
+
 
 ## Verwendung 
 
@@ -13,95 +53,198 @@ preprocess csv [OPTIONS] COMMAND [ARGS]
 
 ## Unterbefehle
 
-* `preprocess csv collect` Sammelt Daten von allen CSV Dateien in allen Objektordnern
 * `preprocess csv create` Generiert CSV Dateien mit Metadaten für Objektverzeichnisse
-* `preprocess csv csv2xslx` Konvertiert CSV-Dateien in XLSX-Dateien
-* `preprocess csv xlsx2csv` Konvertiert XLSX-Dateien in 2 csv Dateien 
+* `preprocess csv collect` Sammelt Daten von allen CSV Dateien in allen Objektordnern
 * `preprocess csv update` Aktualisiert Objekt- und Datenstrom CSV Dateien anhand der gesammelten CSV Dateien
+* `preprocess csv csv2xslx` Konvertiert CSV-Dateien in XLSX-Dateien (wird normalerweise nicht benötigt)
+* `preprocess csv xlsx2csv` Konvertiert XLSX-Dateien in 2 csv Dateien (wird normalerweise nicht benötigt) 
+
+### preprocess csv create
+
+`preprocess csv create` Generiert CSV Dateien mit Metadaten für Objektverzeichnisse
+
+```
+preprocess csv create [OPTIONS] AUSGANGSVERZEICHNIS
+```
+
+Geht rekursiv durch alle Verzeichnisse unterhalb von `AUSGANGSVERZEICHNIS`, prüft ob es sich um ein
+Objektverzeichnis handelt, und legt in jedem Objektverzeichnis zwei CSV-Dateien an: `object.csv` und 
+`datastreams.csv`. Das Programm versucht dabei, so viele Werte wie sinnvoll möglich automatisch zu setzen,
+indem die vorhandenen Daten untersucht werden bzw. Werte aus der Projektkonfiguration (`project.toml`)
+verwendet werden.
+ 
+Dieser Befehl überschreibt keine bereits existierenden csv-Dateien, es sei denn, dass einer der Flags `--force-overwrite` oder `--update` genutzt wird (siehe unten).
+
+#### Optionen
+
+##### --configfile, -c 
+
+Diese Option setzt den Pfad zur Projektkonfigurationsdatei (project.toml):
+
+```
+preprocess csv create -c <Pfad zur Konfigurationsdatei>
+```
+        
+Wird diese Option nicht verwendet, wird der der Pfad zur Projektkonfiguration in dieser
+Reihenfolge ermittelt:
+
+1. Es wird überprüft, ob die Umgebungsvariable `GAMSCFG_PROJECT_TOML` gesetzt ist. 
+2. Falls die Umgebungsvariable nicht gesetzt ist, wird überprüft ob eine '.env' Datei im aktuellen Ordner exisitiert und ob sie die Zeile `project_toml=` beinhaltet. 
+3. Falls keine dieser Optionen existiert wird nach einer `project.toml` in folgender Reihenfolge gesucht: 
+
+    1. In dem Objektordner oder in einem übergeordneten Ordner des Objektordners 
+    2. Im aktuellen Verzeichnis. 
+
+Falls dann noch immer keine toml-Datei gefunden wurde, wird das Programm beendet.
+
+#####   --force-overwrite, -f
+
+Ist diese Option gesetzt, werden allfällig bereits existierende CSV-Dateien ohne Rückfrage 
+überschrieben. 
+
+**!!! Achtung: Diese Option sollte nur mit großer Vorsicht verwenden werden, weil dadruch alle manuell veränderten oder ergänzten Eintragungen in den CSV Dateien verloren gehen !!!**
+
+##### --update, -u 
+
+Die Verwendung des Flags `--update` führt dazu, dass die Daten für bestimmte Felder aus den vorhanden csv-Dateien aktualisiert werden.
+
+Dies macht beispielsweise Sinn, wenn die Projektkonfiguration nachträglich geändert wurde, oder wenn nach der 
+initialen Erzeugung der CSV-Dateien neue Datenströme angelegt wurden, die noch nicht in `datastreams.csv` enthalten
+sind.
+
+Dabei werden niemals Veränderungen an den Feldern `description`, `tags` oder `lang` vorgenommen. Felder, die automatisch von Dublin Core oder der Projektkonfiguration (.toml) übernommen werden können (`title`, `creator`, `publisher`und `rights`), werden aktualisiert. Das bedeutet, dass händisch vorgenommene Änderungen an diesen Felder überschrieben werden. Falls Sie diese Felder bereits händisch überarbeitet haben (was im Normalfall eher nicht der Fall sein wird), sollten sie evtl. zuvor mit `preproess csv collect` eine Excel oder CSV Datei mit den alten Werten erzeugen, damit Sie die Änderungen nach dem
+Update überprüfen können. 
+
+
+#####  --help
+
+Gibt den Hilfetext für `csv create` aus.
 
 ### preprocess csv collect
 
-`preprocess csv collect` Sammelt Daten aus allen CSV-Dateien in allen Objektordnern
+`preprocess csv collect` dient dazu, Daten aus den CSV-Dateien in den Objektordnern
+einzusammeln und zusammen in eine Excel-Datei (`all_objects.xlsx`) zu speichern. 
+Diese Excel-Datei sollte die Bearbeitung der Metadaten erheblich erleichtern und 
+beschleunigen. Der Befehl `proprocess csv update` kann dann dazu verwendet werden, 
+alle CSV Datei in den Objektordnern durch die Daten aus dem Excel-File neu zu generieren. 
+Diese beiden Vorgänge können beliebig oft wiederholt werden. `all_objects.csv` kann 
+jederzeit aus den Objekt-CSV-Dateien neu generiert werden, vorausgesetzt, dass die Änderungen
+in der Excel-Datei wieder via `proprocess csv update` in die CSV-Dateie zurück gespielt
+wurden.
 
 ```
 preprocess csv collect [OPTIONS] OBJECTS_DIR
 ```
-* Sammelt alle Daten in 'object.csv' und 'datastrams.csv' Dateien innerhalb von 'objects-dir' in einer 'all_objects.xlsx' Datei
-* Wenn die Option `--to-csv` gesetzt wird, werden statt einer XLSX Datei zwei CSV-Dateien erzeugt, 'all_objects.csv' und 'all_datastreams.csv'
-* Ohne Angaben eines Ausgabeordners `--output-dir` werden Dateien im aktuellen Arbeitsverzeichnis erstellt
-* Optionen:
-    * -o, --output-dir TEXT   Pfad zum Ausgabeverzeichnis. Standard: aktuelles Arbeitsverzeichnis
-    * -c, --to-csv            Gibt CSV-Dateien statt einer Excel-Datei aus.
-    * --help                  Gibt Hilfe für -collect aus
 
-### preprocess csv create
-`preprocess csv create` Generiert CSV Dateien mit Metadaten für Objektverzeichnisse
 
-```
-preprocess csv create [OPTIONS] PROJECTROOT
-```
-* Generiert eine 'object.csv' und eine 'datastreams.csv' Datei für jedes Objektverzeichnis in oder unter dem Wurzelverzeichnis. Das bedeutet, dass dieser Befehl sowohl auf einzelnen Objektverzeichnisse als auch auf Projektverzeichnisse mit mehreren Objektverzeichnissen angewendet werden kann.
-* Dieser Befehl überschreibt keine bereits existierenden csv-Dateien, es sei denn die Flag `--force-overwrite` oder `--update` wird genutzt
-* Die Flag `--force-overwrite`  überschreibt alle exisitierenden csv-Dateien. Alle exisitierenden Metadaten werden gelöscht. Die Nutzung der Flag ist also nur sinnvoll, wenn die Metadaten komplett neu angelegt werden sollen. 
-* Die Verwendung des Flags `--update` führt dazu, dass die Daten für bestimmte Felder aus den vorhanden csv-Dateien zusammgengeführt werden. Dies ist sinnvoll, wenn Metadaten geupdatet werden sollen nachdem Datastreams hinzugefügt wurden oder wenn sich Projektkonfigurationen geändert haben. Es werden keine Veränderungen an den Feldern 'description', 'tags' oder 'lang' vorgenommen. Aber Felder, die automatisch von Dublin Core oder der Projektkonfiguration (.toml) übernommen werden können, werden angepasst. Wenn jedoch Veränderungen an 'title', 'creator', 'publisher' oder 'rights' vorgenommen wurden, sollte dieser Befehl nur nach vorherigem Absichern vorgenommen werden. Falls keine neuen Werte gefunden werden können, bleibt das existierende Feld unverändert.  
-* Optionen: 
-    * -c, --configfile TEXT     
-        Pfad zur Projektkonfiguration (.toml). Wenn dieser Pfad noch nicht gesetzt wurde, wird überprüft, ob die Variable 'GAMSCFG-PROJECT-TOML' gesetzt wurde. Falls nicht, wird überprüft ob eine '.env' Datei im aktuellen Ordner exisitiert und ob sie die Zeile 'project_toml=' beinhaltet. Falls keine dieser Optionen existiert wird nach einer 'project.toml' in folgender Reihenfolge gesucht: 1) In dem Objektordner oder im übergeordneten Ordner des Objektordners, 2) im aktuellen Verzeichnis. Falls keine toml-Datei gefunden werden kann, scheitert dieser Befehl. 
-    * -f, --force-overwrite 
-        Überschreibt die existierenden csv-Dateien. Nur mit großer Vorsicht verwenden, weil alle manuell veränderten Metadaten verloren gehen.
-    * -u, --update 
-        Updated alle exisiterenden csv-Dateien
-    * --help
-        Gibt Hilfe für create aus
+#### Optionen:
 
-    
-### preprocess csv csv2xslx
+##### --output-dir <PFAD>
 
-`preprocess csv csv2xslx` Wandelt csv-Dateien in xlsx-Dateien um
+Diese Option erlaubt es, den Ordner festzulegen, in dem die Datei `all_objects.xlsx` (bzw. bei Verwendung
+der Option `--to-csv` die beiden CSV-Dateien `all_objects.csv` und `all_datastreams.csv`) erzeugt werden.
+Ist sie nicht gesetzt, wird das aktuelle Verzeichnis verwendet.
 
-```
-preprocess csv csv2xlsx [OPTIONS] OBJECT_CSV DS_CSV
-```
+##### --to-csv
 
-* Umwandlung von ausgewählten csv-Dateien in xlsx-Dateien  ###COMMENT werden ALLE Dateien umgewandelt oder nur ausgewählte?###
-* Optionen: 
-    * -o, --outputfile TEXT
-        Pfad zur ausgegebenen xlsx-Datei. Standard ist 'all_objects.xlsx' im Ordner in dem 'all_object.csv' ausgelesen wurde ###COMMENT Ich glaube, das ist ein Typo und es müsste 'all_objects.csv' sein, weil das in den anderen Befehlen so vorkommt###
-    * --help
-        zeigt Hilfe für diesen Befehl an
+Ist diese Option gesetzt, erzeugt das Programm statt der Excel-Datei `all_objects.xlsx` zwei
+CSV-Dateien: `all_objects.csv` und `all_datastreams.csv`. Die Verwendung dieser Option wird
+nur benötigt, falls z.B. die Weiterverarbeitung der so generierten Datein im CSV Format einfacher ist.
+Im Normalfall sollte sie nicht verwendet werden.
 
-### preprocess csv xlsx2csv
+##### --help
 
-`preprocess csv xlsx2csv` Wandelt eine xslx-Metadaten-Datei in 2 csv-Dateien um ###COMMENT Warum sind das zwei csv Dateien? Sollen wir das dazu schreiben?###
-
-```
-preprocess csv xlsx2csv [OPTIONS] XLSX_FILE
-```
-* Umwandlung einer ausgewählten xlsx-Datei in 2 csv-Dateien
-* Optionen:
-    * --object-csv TEXT
-        Pfad zu der ausgegbenen csv-Datei. Standard ist 'all_objects.csv' im Ordner, in dem die xlsx-Datei gespeichert ist
-    * --ds-csv TEXT
-        Pfad zu den ausgegebenen Datastreams csv-Dateien. Standard ist 'all_datastreams.csv' im Ordner in dem die xlsx-Datei gespeichert ist
-    * --help
-        zeigt Hilfe für diesen Befehl an
+Gibt den Hilfetext für diesen Unterbefehl aus.
 
 ### preprocess csv update
 
-`preprocess csv update` Updated die Objekt- und Datastream-csv-Dateien aus den gesammelten csv-Dateien
+`preprocess csv update` schreibt die in `all_objects.xslx` geänderten Daten wieder zurück in die 
+`object.csv` und `datastreams.csv` in die einzelnen Objektordner. Voraussetzung ist, dass
+die Excel-Datei zuvor mit `preprocess csv collect` erzeugt worden ist. 
+`csv update` ist also das Gegenstück zu `csv collect`: `csv collect` sammelt die Daten aus den
+Objektverzeichnissen ein, `csv update` schreibt sie wieder dorthin zurück.
 
 ```
 preprocess csv update [OPTIONS] PROJECTROOT
 ```
 
-* Updated die Objekt- und Datastream-csv-Dateien aus den gesammelten csv-Dateien
-* Dies ist das Gegenstück zum `-collect` Befehl. `-update` liest Daten aus 'all_objects.xlsx' aus und updated 'object.csv' und 'datastreams.csv' in jedem Objektordner
-* `--from-csv` liest aus 'all_objects.csv' und 'all_datastreams.csv' anstatt aus der xlsx-Datei
-* Falls kein 'input_dir' angegeben wurde, wird erwartet, dass alle Dateien im aktuellen Ordner sind.
-* Optionen:
-    * -i, --input-dir TEXT
-        Pfad zu dem Ordner, in dem sich die gesammelten csv-Dateien befinden. Dies ist der selbe Ordner, der auch mit '--output-dir' im `-collect` Befehl gesetzt wurde. Standard ist das Wurzelverzeichnis des Projekts
-    * -c, --from-csv
-        Liest aus der csv-Datei anstatt aus der xlsx
-    * --help 
-        Zeigt Hilfe für diesen Befehl an
+`PROJECTROOT` ist das Verzeichnis in dem die Objektordner liegen.
+
+#### Optionen
+
+##### --input-dir, -i
+
+Diese Option bietet die Möglichkeit, den Ordner festzulegen, in dem `all_objects.xlsx` liegt. Diese Option muss
+nur gesetzt werden, falls die Excel Datei nicht im aktuellen Arbeitsverzeichnis liegt.
+
+##### --from-csv, -c 
+
+Ist diese Option gesetzt, liest das Programm die gesammelten Daten nicht aus der Datei
+`all_objects.xlsx`, sondern aus den beiden CSV-Dateien `all_objects.csv` und `all_datastreams.csv`.
+Falls diese Dateien nicht im aktuellen Arbeitsverzeichnis liegen, kann der Pfad zur korrekten
+Verzeichnis mit der Option `--input-dir` gesetzt werden.
+
+##### --help
+
+Gibt den Hilfetext für diesen Unterbefehl aus.
+    
+### preprocess csv csv2xslx
+
+Im empfohlenen Workflow wird dieser Befehl nicht benötigt, weil der `collect` Unterbefehl
+die Excel Datei direkt erzeugt.
+
+Dieser Befehl wandelt die beiden verpflichtend anzugebenen CSV Datein in eine Excel-Datei um.
+
+
+```
+preprocess csv csv2xlsx [OPTIONS] <PFAD ZU OBJECT_CSV> <PFAD ZU DATASTREAMS_CSV>
+```
+
+Dieser Befehl erzeugt eine Datei `all_objects.csv` im aktuellen Arbeitsverzeichnis.
+
+#### Optionen
+
+##### --outputfile, -o
+
+Pfad zur zu erzeugenden xlsx-Datei. 
+Standardmässig wird eine Datei  'all_objects.xlsx' im selben Verzeichnis erzeugt, in dem 'all_objects.csv' liegt.
+
+
+#####  --help
+
+Gibt den Hilfetext für diesen Unterbefehl aus.
+       
+
+### preprocess csv xlsx2csv
+
+Im empfohlenen Workflow wird dieser Befehl nicht benötigt, weil die `collect` und
+`update` Unterbefehle direkt auf der Excel Datei operieren können.
+
+`preprocess csv xlsx2csv` Wandelt eine xslx-Metadaten-Datei in zwei CSV Dateien um. 
+Da die Excel Datei zwei Blätter (Tabellen) enthält (je eine für Objekte und Datenströme), werden zwei 
+CSV-Dateien erzeugt.
+
+
+```
+preprocess csv xlsx2csv [OPTIONS] XLSX_FILE
+```
+
+wandelt `XLSX_FILE` in zwei Dateien `all_objects.csv` und `all_datastreams.csv` um. Diese werden im selben Verzeichnis
+erzeugt, in dem auch `XLSX_FILE` liegt.
+
+#### Optionen:
+
+##### --object-csv <PFAD ZUR ZU ERZEUGENDEN OBJECTS_CSV DATEI>
+        
+Pfad zu der zu erzeugenden OBJECT_CSV Datei. Wird diese Option nicht gesetzt, wird eine Datei 'all_objects.csv' in dem 
+Ordner erzeugt, in dem die xlsx-Datei (`XLSX_FILE`) gespeichert ist.
+
+##### --ds-csv <PFAD ZUR ZU ERZEUGENDEN DATASTREAMS_CSV Datei>
+
+Pfad zu der zu erzeugenden DATASTREAMS_CSV Datei. Wird diese Option nicht gesetzt, wird eine 
+Datei 'all_datastreams.csv' in dem Ordner erzeugt, in dem die xlsx-Datei (`XLSX_FILE`) gespeichert ist.
+
+##### --help
+
+Gibt den Hilfetext für diesen Unterbefehl aus.
+
