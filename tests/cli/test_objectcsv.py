@@ -299,9 +299,9 @@ def test_xlsx2csv(datadir, tmp_path):
             "csv",
             "xlsx2csv",
             str(xlsx_file),
-            "--object-csv",
+            "--object-csv-file",
             str(obj_csv),
-            "--ds-csv",
+            "--ds-csv-file",
             str(ds_csv),
         ],
     )

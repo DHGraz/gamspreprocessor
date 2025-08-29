@@ -223,30 +223,30 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
     default="all_objects.xlsx",
     help=(
         "Path to the output xlsx file. Default is 'all_objects.xlsx' "
-        "in the folder where all_object.csv was read from."
+        "in the folder where all_objects.csv was read from."
     ),
 )
-@click.argument("object_csv", required=True, type=click.Path(exists=True))
-@click.argument("ds_csv", required=True, type=click.Path(exists=True))
-def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
+@click.argument("objects_csv_file", required=True, type=click.Path(exists=True))
+@click.argument("datastreams_csv_file", required=True, type=click.Path(exists=True))
+def csv2xlsx(objects_csv_file: str, datastreams_csv_file: str, outputfile: str):
     """Convert csv files to xlsx files.
 
     Use 'preprocess csv csv2xlsx --help' to see the available options.
     """
-    object_csv_path = Path(object_csv)
-    ds_csv_path = Path(ds_csv)
+    objects_csv_path = Path(objects_csv_file)
+    datastreams_csv_path = Path(datastreams_csv_file)
 
     if outputfile == "all_objects.xlsx":
-        outputfile_path = object_csv_path.parent / "all_objects.xlsx"
+        outputfile_path = objects_csv_path.parent / "all_objects.xlsx"
     else:
         outputfile_path = Path(outputfile)
-    gamslib.objectcsv.csv_to_xlsx(object_csv_path, ds_csv_path, outputfile_path)
+    gamslib.objectcsv.csv_to_xlsx(objects_csv_path, datastreams_csv_path, outputfile_path)
     logger.info("Converted csv files to %s", outputfile_path)
 
 
 @click.command(name="xlsx2csv")
 @click.option(
-    "--object-csv",
+    "--object-csv-file",
     default="all_object.csv",
     help=(
         "Path to the output object csv file. Default is 'all_objects.csv' in "
@@ -254,7 +254,7 @@ def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
     ),
 )
 @click.option(
-    "--ds-csv",
+    "--ds-csv-file",
     default="all_datastreams.csv",
     help=(
         "Path to the output datastreams csv file. Default is 'all_datastreams.csv' "
@@ -262,20 +262,20 @@ def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
     ),
 )
 @click.argument("xlsx_file", required=True, type=click.Path(exists=True))
-def xlsx2csv(object_csv: str, ds_csv: str, xlsx_file: str):
+def xlsx2csv(object_csv_file: str, ds_csv_file: str, xlsx_file: str):
     """Convert a xlsx metadata file to 2 csv files.
 
     Use 'preprocess csv xlsx2csv --help' to see the available options.
     """
     xlsx_file_path = Path(xlsx_file)
-    if object_csv == "all_object.csv":
+    if object_csv_file == "all_object.csv":
         object_csv_path = xlsx_file_path.parent / "all_objects.csv"
     else:
-        object_csv_path = Path(object_csv)
-    if ds_csv == "all_datastreams.csv":
+        object_csv_path = Path(object_csv_file)
+    if ds_csv_file == "all_datastreams.csv":
         ds_csv_path = xlsx_file_path.parent / "all_datastreams.csv"
     else:
-        ds_csv_path = Path(ds_csv)
+        ds_csv_path = Path(ds_csv_file)
     gamslib.objectcsv.xlsx_to_csv(xlsx_file_path, object_csv_path, ds_csv_path)
     logger.info(
         "Converted xlsx file to csv files: %s and %s", object_csv_path, ds_csv_path
