@@ -129,11 +129,11 @@ def transform_xslt(  # noqa: PLR0913
             raise click.ClickException(f"Error transforming {xmlfile}: {exp}") from exp
 
 
-@click.command(name="saxon-version")
-def saxon_version():
-    """Show the version of the Saxon processor."""
+@click.command(name="xslt-processor")
+def xslt_processor():
+    """Show the version of the XSLT processor."""
     click.echo(f"{get_saxon_version()}")
 
 
-cli.add_command(saxon_version)
+cli.add_command(xslt_processor)
 cli.add_command(transform_xslt)

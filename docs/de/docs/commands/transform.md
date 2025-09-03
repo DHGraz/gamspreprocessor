@@ -1,43 +1,55 @@
-# transform
+# Der Unterbefehl transform
 
-Hilfsfunktionen um GAMS-Dateien umzuwandeln. Diese Befehle können hilfreich sein, um GAMS-Dateien in andere Formate zu übertragen.
+Dieser Unterbefehl transformiert den Inhalt einer Datei und schreibt das Ergebnis in eine neue Datei.
+
+Um mehrere Dateien auf einen Schlag umzuwandeln, verwenden Sie diesen Befehl mehrfach z.B. in einem 
+Shellscript oder verwenden statt dessen den Unterbefehl [multitransform](./multitransform.md).
 
 ## Verwendung 
 
 ```
 preprocess transform [OPTIONS] COMMAND [ARGS]...
 ```
-* Optionen:
-    * --help
-        Zeigt Hilfe für diesen Befehl an
 
 ## Unterbefehle
 
-* `preprocess transform saxon-version` Zeigt die Version des Saxon Prozessors
-* `preprocess transform xslt` Teilt Projektdateien in Objektordner auf
+* `xslt` Wendet eine XSL Transformation an
+* `saxon-version` Zeigt die Version des Saxon Prozessors
 
-### preprocess transform saxon-version
 
-`preprocess transform saxon-version` Zeigt die Version des Saxon Prozessors.
+### xslt
 
-```
-preprocess transform saxon-version [OPTIONS]
-```
-* Zeigt die Version des Saxon Prozessors
-* Optionen: 
-    * --help
-        Zeigt Hilfe für diesen Befehl an
-
-### preprocess transform xslt
-
-`preprocess transform xslt` Wendet eine xslt auf eine einzelne xml Datei an
+`preprocess transform xslt -x <XSLT-DATEI> <EINGABEDATEI> <AUSGABEDATEI>` 
+wendet die XSL Transformation `XSLT-DATEI` auf die Ausgangsdatei `EINGABEDATEI` an und schreibt das Ergebnis in die Datei
+`AUSGABEDATEI`.
 
 ```
 preprocess transform xslt [OPTIONS] XML_FILE OUTPUT_FILE
 ```
 
-* Optionen:
-    * -x, --xslt-file PATH 
-        ###COMMENT: hier gab es keinen Text, bei multitransform steht, dieser Pfad müsse immer angegbene werden. ###
-    * --help
-        Zeigt Hilfe für diesen Befehl an
+#### Optionen:
+    
+##### `--xslt-file <PFAD>`, `-x <PFAD>` 
+
+Legt den Pfad zur anzuwendenden XSLT Datei fest. Die Option MUSS verwendet werden.
+
+##### `--help`
+
+Zeigt den Hilfetext für diesen Unterbefehl an.
+
+
+### xslt-processor
+
+Über diesen Unterbefehl lässt sich die genaue Version des verwendeten XSLT Prozessors herausfinden.
+
+```
+preprocess transform xslt-processor
+```
+
+zeigt die Version des installierten XSLT Prozessors
+
+#### Optionen 
+
+##### `--help`
+
+Zeigt den Hilfetext für diesen Unterbefehl an.

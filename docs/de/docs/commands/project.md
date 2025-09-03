@@ -1,6 +1,6 @@
-# project
+# Der Unterbefehl project
 
-Hilfsfunktionen um GAMS-Projekte zu managen. 
+Dieser Unterbefehl dient zum Anlegen von neuen Projekten und und zum Aktualisieren des Konfigurationsschemas.
 
 ## Verwendung 
 
@@ -10,29 +10,42 @@ preprocess project [OPTIONS] COMMAND [ARGS]...
 
 ## Unterbefehle
 
-* `preprocess project init` Erstellt eine grundlegende Projektstruktur und project.toml
-* `preprocess project update` Updatet die project.toml Datei im aktuellen Ordner
+* `init` Erstellt eine grundlegende Projektstruktur und `project.toml`.
+* `update` Bringt das Format der `project.toml` Datei auf den Stand der aktuellen Programmversion.
 
-### preprocess project init
+### init
 
-`preprocess project init` Erstellt eine grundlegende Projektstruktur und project.toml
+Der Befehl `preprocess project init` erstellt eine grundlegende Verzeichnisstruktur für das Projekt und legt eine initiale  Konfigurationsdatei `project.toml` im Wurzelbverzeichnis des Projekts an. Diese Konfigurationsdatei muss danach händisch
+an das jeweilige Projekt angepasst werden.
+
+Beispiel:
 
 ```
-preprocess project init [OPTIONS] PROJECT_ROOT
+preprocess project init [OPTIONS] projects/myproject
 ```
-* Erstellt eine grundlegende Projektstruktur und project.toml
-* Optionen: 
-    * --help 
-        Zeigt Hilfe für diesen Befehl an
 
-### preprocess project update
+Mit diesem Befehl wird ein neues Projekt im Verzeichnis `projects/myproject` angelegt.
 
-`preprocess project update` Updatet die project.toml Datei im aktuellen Ordner
+
+#### Optionen
+
+##### `--help`
+
+Gibt den Hilfetext für diesen Unterbefehl aus.
+
+
+### update
+
+`preprocess project update` aktualisiert das Format der Datei `project.toml`. 
 
 ```
 preprocess project update [OPTIONS] CONFIG_FILE
 ```
-* Dieser Befehl sollte ausgeführt werden, wenn sie das Schema in der Konfigurationsdatei geändert hat. Er kann so oft wie nötig ausgeführt werden, und überschreibt keine Einstellungen. Er fügt nur neue Einstellungen hinzu und entfernt alte. 
-* Optionen: 
-    * --help 
-        Zeigt Hilfe für diesen Befehl an
+
+Dieser Befehl sollte immer nach dem Upgrade auf eine neue Version das gamspreprocessors ausgeführt werden. Er sorgt dafür, dass das Format der bestehenden Konfigurationsdatei mit dem möglicherweise erweiterten neuen Format in der neuen Version abgeglichen wird.
+
+#### Optionen: 
+
+##### `--help`
+
+Gibt den Hilfetext für diesen Unterbefehl aus.

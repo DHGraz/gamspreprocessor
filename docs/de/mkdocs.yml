@@ -1,0 +1,21 @@
+site_name: Gamspreprocessor 
+site_description: Tools to prepare data as digital objects for GAMS
+
+theme:
+    name: "material"
+nav:
+  - Installation: installation.md
+  - Projektkonfiguration: 'project.toml.md'
+  - Kommandozeile:
+    - preprocess: 
+      - Beschreibung: preprocess.md
+      - Unterbefehle: 
+        - project: commands/project.md
+        - csv: commands/csv.md
+        - transform: commands/transform.md
+        - multitransform: commands/multitransform.md
+        - splitproject: commands/splitproject.md
+  - Tutorials: tutorial.md
+
+
+
