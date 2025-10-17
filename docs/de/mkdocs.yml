@@ -4,18 +4,28 @@ site_description: Tools to prepare data as digital objects for GAMS
 theme:
     name: "material"
 nav:
-  - Installation: installation.md
-  - Projektkonfiguration: 'project.toml.md'
+  - Installation: reference/installation.md
+  - Projektkonfiguration: reference/project.toml.md
+  - Objektverzeichnisse: reference/object_dirs.md
+  - Metadaten:
+    - DC.xml: reference/dublin_core.md
+    - object.csv: reference/object.csv.md
+    - datastreams.csv: reference/datastreams.csv.md
   - Kommandozeile:
     - preprocess: 
-      - Beschreibung: preprocess.md
+      - Beschreibung: reference/preprocess.md
       - Unterbefehle: 
-        - project: commands/project.md
-        - csv: commands/csv.md
-        - transform: commands/transform.md
-        - multitransform: commands/multitransform.md
-        - splitproject: commands/splitproject.md
-  - Tutorials: tutorial.md
+        - project: reference/preprocess/project.md
+        - csv: reference/preprocess/csv.md
+        - transform: reference/preprocess/transform.md
+        - multitransform: reference/preprocess/multitransform.md
+        - splitproject: reference/preprocess/splitproject.md
+  - Tutorials: 
+    - Empfohlene Workflows: tutorials/workflows.md
+    - Einfache Projektaufteilung: tutorials/splitproject.md
+    - CSV-Daten einbinden: tutorials/csv.md
+    - Daten transformieren: tutorials/transform.md
+    - multitransform: tutorials/multitransform.md
 
 
 

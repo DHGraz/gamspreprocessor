@@ -41,62 +41,62 @@ anzeigen lassen.
 
 Folgende Subcommands stehen zur Verfügung:
 
-   * [project](###preprocess-project) - Initialisieren eines neuen Projekts
-   * [csv](###preprocess-csv) - Erstellung und Verwaltung von CSV-Dateien 
+   * [project](#der-unterbefehl-project) - Initialisieren eines neuen Projekts
+   * [csv](#der-unterbefehl-csv) - Erstellung und Verwaltung von CSV-Dateien 
      (`object.csv` und `datastreams.csv`) in den einzelnen Objektordnern
-   * [transform](preprocess-transform) - Ausführen einer Transformation 
+   * [transform](#der-unterbefehl-transform) - Ausführen einer Transformation 
      z.B. mit XSLT
-   * [multitransform](preprocess-multitransform) - Wie `transform`, aber 
+   * [multitransform](#der-unterbefehl-multitransform) - Wie `transform`, aber 
      für viele Dateien
-   * [splitproject](preprocess-splitproject) - Zerlegt die Daten eines 
+   * [splitproject](#der-unterbefehl-splitproject) - Zerlegt die Daten eines 
      alten GAMS 3 Projekts, wie sie unter `projekte` liegen, in Objektordner
 
 
 ### Der Unterbefehl project
 
-`preprocess project` stellt weitere Unterbefehle für die Erzeugung und Aktualisierung
+[`preprocess project`](preprocess/project.md) stellt weitere Unterbefehle für die Erzeugung und Aktualisierung
 eines GAMS-Projekts bereit. Dies ist der empfohlende Weg ein neues Projekt anzulegen.
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
-Sie [hier](./commands/project.md) oder via `preprocess project --help`.
+Sie [hier](preprocess/project.md) oder via `preprocess project --help`.
 
 ### Der Unterbefehl csv
 
-`preprocess csv` stellt einige Unterbefehle bereit, mit denen die CSV Dateien
+[`preprocess csv`](preprocess/csv.md) stellt einige Unterbefehle bereit, mit denen die CSV Dateien
 mit den Objekt-Metadaten erzeugt und verwaltet werden könne.
 
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
-Sie [hier](./commands/csv.md) oder via `preprocess csv --help`.
+Sie [hier](preprocess/csv.md) oder via `preprocess csv --help`.
 
 
 ### Der Unterbefehl transform
 
-`preprocess transform` führt Transformationen von Daten aus. Aktuell
+[`preprocess transform`](preprocess/transform.md) führt Transformationen von Daten aus. Aktuell
 gibt es nur die Möglichkeit XSLT-Transformationen auszuhühren (via Saxon).
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
-Sie [hier](./commands/transform.md) oder via `preprocess transform --help`.
+Sie [hier](preprocess/transform.md) oder via `preprocess transform --help`.
 
 ### Der Unterbefehl multitransform
 
-`preprocess multitransform` funktioniert gleich wie `preprocess transform`,
+[`preprocess multitransform`](preprocess/multitransform.md) funktioniert gleich wie `preprocess transform`,
 führt die Transformation aber auf viele Objekte aus. Das ist beispielsweise
 praktisch, um via XSLT auf einen Schlag für alle Objekte Metadaten aus 
 dem TEI Header in das zwingend vorgegebene DC.xml zu überführen.
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
-Sie [hier](./commands/multitransform.md) oder via `preprocess multitransform --help`.
+Sie [hier](preprocess/multitransform.md) oder via `preprocess multitransform --help`.
 
 ### Der Unterbefehl splitproject
 
-`preprocess splitproject` ist ein Mittel, um ein Projekt, wie es 
+[`preprocess splitproject`](preprocess/splitproject.md) ist ein Mittel, um ein Projekt, wie es 
 typischerweise in GAMS 3 vor dem Ingest angelegt wurde in eine
-Struktur zu überführen, aus der Bags für den Ingest in GAMS 5 
+Struktur zu überführen, aus der Bags für den Ingest in GAMS 5 s
 erzeugt werden können. Es zerlegt also das Projekt in 
 Objektverzeichnisse, kopiert referenzierte Ressourcen und benennt
 diese ggf. um.
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
-Sie [hier](./commands/splitproject.md) oder via 
+Sie [hier](preprocess/splitproject.md) oder via 
 `preprocess splitproject --help`.

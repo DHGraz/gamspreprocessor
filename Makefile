@@ -4,6 +4,7 @@ SHELL := /bin/bash
 .PHONY: all test coverage clean test-all build
 
 all: test coverage lint build
+
 test:
 	@uv run pytest tests 
 
@@ -22,5 +23,12 @@ coverage:
 lint:
 	@uv run ruff check src
 
+# buuild documentation into dist-docs folder
+docs-de:
+	@uv run mkdocs build --clean --config-file docs/de/mkdocs.yml --site-dir dist-docs
+
+# serve documentation at localhost:8000
+docserve:
+	@uv run mkdocs serve -o -f docs/de/mkdocs.yml --dev-addr 0.0.0.0:8000
 build:
 	@uv build	
