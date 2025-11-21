@@ -20,6 +20,7 @@ Die Datei besteht aus folgenden Spalten:
 | objectType   | true      | basierend auf dc:type                      | text |
 | mainResource | false     | PID des Hauptdatenstroms                   | TEI.xml |
 | funder       | true      | Fördergeber                                | FFW (ausschreiben?) |
+| tags         | false     | Frei zu vergebende Tags                    |Tag1; Tag2 |
 
 
 ### recid
@@ -87,6 +88,14 @@ Falls es keinen Hauptdatenstrom gibt, kann der Wert leer bleiben.
 
 `funder` beschreibt, wer die Erstellung des Objekts finanziert hat. Ist in `project.toml` ein entsprechender Eintrag `metadata.funder` vorhanden, wird dieser verwendet.
 
+### tags
+
+Frei zu vergebende Tags. Mehrere Tags können durch `;` (Semicolons) getrennt angegeben werden. Das `tags` Feld kann leer bleiben, wenn es nicht benötigt wird.
+
+Dieses Feld bietet die Möglichkeit, zusätzliche Filtermöglichkeiten zu realisieren, die sinnvollerweise nicht über die normalen Metadaten möglich oder sinnvoll sind.
+
+Hinweis: Falls gewünscht kann beim `csv create` Unterbefehl durch Setzen der Option `--use-subjects-as-tags` dieses Feld mit allen in DC.xml vergebenen 
+Werten von `dc:subject` vorbelegt werden.
 
 ## Beispiel
 

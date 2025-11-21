@@ -1,11 +1,14 @@
 """
 Test the csv commands in the cli module."""
+
 import csv
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
 
+from gamslib.objectcsv import objectdata
+from gamslib.objectcsv import dsdata
 from gamspreprocessor.cli.main import cli
 
 
@@ -74,13 +77,24 @@ def test_create_csv(datadir):
     runner = CliRunner()
     # cfgfile = str(datadir / "objects" / "project.toml")
     result = runner.invoke(cli, ["csv", "create", str(datadir / "objects")])
-    print(result.output)
     assert result.exit_code == 0
     assert "Created csv files for 2 objects (3 content files)" in result.output
     assert (datadir / "objects" / "obj1" / "object.csv").exists()
     assert (datadir / "objects" / "obj1" / "datastreams.csv").exists()
     assert (datadir / "objects" / "obj2" / "object.csv").exists()
     assert (datadir / "objects" / "obj2" / "datastreams.csv").exists()
+
+    # check if all csv colums are present in object.csv
+    obj_csvdata = read_csv_file(datadir / "objects" / "obj1" / "object.csv")
+    for field in objectdata.ObjectData.fieldnames():
+        assert field in obj_csvdata[0]
+    # As we did not use the --use-subjects-as-tags option, tags should be empty
+    assert obj_csvdata[0]["tags"] == ""
+
+    # check if all csv colums are present in datastreams.csv
+    ds_csvdata = read_csv_file(datadir / "objects" / "obj1" / "datastreams.csv")
+    for field in dsdata.DSData.fieldnames():
+        assert field in ds_csvdata[0], f"Missing field '{field}' in datastreams.csv"
 
 
 def test_create_csv_with_update_flag(datadir):
@@ -103,7 +117,7 @@ def test_create_csv_with_update_flag(datadir):
     # make sure the modify_csv_files function worked
     assert read_csv_file(modified_objects_dir / "object.csv") == modified_obj_csvdata
     assert (
-            read_csv_file(modified_objects_dir / "datastreams.csv") == modified_ds_csvdata
+        read_csv_file(modified_objects_dir / "datastreams.csv") == modified_ds_csvdata
     )
 
     # Now run the create command again with the --update flag.
@@ -122,10 +136,85 @@ def test_create_csv_with_update_flag(datadir):
     assert "SOURCE.xml" in final_ds_csvdata
 
     assert (
-            final_ds_csvdata["SOURCE.xml"]["title"]
-            == initial_ds_csvdata["SOURCE.xml"]["title"]
+        final_ds_csvdata["SOURCE.xml"]["title"]
+        == initial_ds_csvdata["SOURCE.xml"]["title"]
     )
     assert final_ds_csvdata["DC.xml"]["title"] == initial_ds_csvdata["DC.xml"]["title"]
+
+
+def test_create_csv_with_tags(datadir):
+    """Test the csv create command with --use-subjects-as-tags."""
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["csv", "create", "--use-subjects-as-tags", str(datadir / "objects")],
+    )
+    assert result.exit_code == 0
+    assert "Created csv files for 2 objects (3 content files)" in result.output
+    obj1_csv = read_csv_file(datadir / "objects" / "obj1" / "object.csv")
+    obj2_csv = read_csv_file(datadir / "objects" / "obj2" / "object.csv")
+
+    assert "tags" in obj1_csv[0]
+    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+
+    # obj2 has no subjects, so tags should be empty
+    assert "tags" in obj2_csv[0]
+    assert obj2_csv[0]["tags"] == ""
+
+
+def test_create_csv_with_update_flag_and_tags(datadir):
+    """Test the csv create command with --update and --use-subjects-as-tags."""
+    runner = CliRunner()
+
+    # create the initial csv files without tags
+    objects_dir = datadir / "objects"
+    result = runner.invoke(cli, ["csv", "create", str(objects_dir)])
+    assert result.exit_code == 0
+
+    # Now run the create command again with the --update and --use-subjects-as-tags flag.
+    cmd = "csv create --update --use-subjects-as-tags " + str(objects_dir)
+    result = runner.invoke(cli, cmd.split())
+    assert result.exit_code == 0
+
+    obj1_csv = read_csv_file(datadir / "objects" / "obj1" / "object.csv")
+
+    assert "tags" in obj1_csv[0]
+    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+
+
+def test_create_csv_with_update_flag_and_tags_does_not_overwrite_existing_tags(datadir):
+    """Test the csv create command with --update and --use-subjects-as-tags.
+    Make sure that existing tags are not overwritten.
+    """
+    runner = CliRunner()
+    objects_dir = datadir / "objects"
+
+    # create the initial csv files with tags
+    result = runner.invoke(
+        cli, ["csv", "create", "--use-subjects-as-tags", str(objects_dir)]
+    )
+    assert result.exit_code == 0
+    obj1_csv = read_csv_file(objects_dir / "obj1" / "object.csv")
+    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+
+    # Change subjects in DC.xml to see if they get picked up (they should not)
+    dc_xml = datadir / "objects" / "obj1" / "DC.xml"
+    dc_xml_contents = dc_xml.read_text(encoding="utf-8")
+    dc_xml_contents = dc_xml_contents.replace(
+        "<dc:subject>Tag1</dc:subject>", "<dc:subject>NewTag1</dc:subject>"
+    )
+    dc_xml_contents = dc_xml_contents.replace(
+        "<dc:subject>Tag2</dc:subject>", "<dc:subject>NewTag2</dc:subject>"
+    )
+    dc_xml.write_text(dc_xml_contents, encoding="utf-8")
+
+    cmd = "csv create --update --use-subjects-as-tags " + str(objects_dir)
+    result = runner.invoke(cli, cmd.split())
+    assert result.exit_code == 0
+    obj1_csv = read_csv_file(datadir / "objects" / "obj1" / "object.csv")
+    # tags must be unchanged
+    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+
 
 def test_collect_csv(datadir, monkeypatch):
     """Test the csv collect command."""
@@ -147,7 +236,7 @@ def test_collect_csv(datadir, monkeypatch):
 
     # and now with option --to-csv
     result = runner.invoke(
-        cli, ["csv", "collect", '--to-csv', str(datadir / "objects")]
+        cli, ["csv", "collect", "--to-csv", str(datadir / "objects")]
     )
     assert result.exit_code == 0
     assert "Created csv files" in result.output
@@ -159,12 +248,12 @@ def test_collect_csv_with_missing_csv_file(datadir):
     runner = CliRunner()
     obj1_dir = datadir / "objects" / "obj1"
 
-    # Create all csv files first 
+    # Create all csv files first
     result = runner.invoke(cli, ["csv", "create", str(datadir / "objects")])
     assert result.exit_code == 0
 
     # move object.csv out of th way
-    (obj1_dir / 'object.csv').rename(obj1_dir / "object.csv.bak")
+    (obj1_dir / "object.csv").rename(obj1_dir / "object.csv.bak")
     assert not (obj1_dir / "object.csv").exists()
 
     result = runner.invoke(cli, ["csv", "collect", str(datadir / "objects")])
@@ -190,16 +279,19 @@ def remove_csv_data(csv_file: Path, keep_column_names: bool = True):
         f.flush()
 
 
-@pytest.mark.parametrize("obj, csv_filename, keep_column_names", [
-    ("obj1", "object.csv", True),
-    ("obj1", "object.csv", False),
-    ("obj1", "datastreams.csv", True),
-    ("obj1", "datastreams.csv", False),
-    ("obj2", "object.csv", True),
-    ("obj2", "object.csv", False),
-    ("obj2", "datastreams.csv", True),
-    ("obj2", "datastreams.csv", False),
-])
+@pytest.mark.parametrize(
+    "obj, csv_filename, keep_column_names",
+    [
+        ("obj1", "object.csv", True),
+        ("obj1", "object.csv", False),
+        ("obj1", "datastreams.csv", True),
+        ("obj1", "datastreams.csv", False),
+        ("obj2", "object.csv", True),
+        ("obj2", "object.csv", False),
+        ("obj2", "datastreams.csv", True),
+        ("obj2", "datastreams.csv", False),
+    ],
+)
 def test_collect_csv_with_empty_csv_file(obj, csv_filename, keep_column_names, datadir):
     """Running collect on objects with empty csv.
 
@@ -218,13 +310,8 @@ def test_collect_csv_with_empty_csv_file(obj, csv_filename, keep_column_names, d
 
     result = runner.invoke(cli, ["csv", "collect", str(datadir / "objects")])
     assert result.exit_code != 0
-    assert (
-            "metadata (csv) is not set "
-            in result.output
-    )
-    assert (
-            "Try running" in result.output
-    )
+    assert "metadata (csv) is not set " in result.output
+    assert "Try running" in result.output
 
 
 def test_update_csv_from_xlsx(datadir):

@@ -106,7 +106,7 @@ Ist diese Option gesetzt, werden allfällig bereits existierende CSV-Dateien ohn
 **!!! Achtung: Diese Option sollte nur mit großer Vorsicht verwenden werden, weil dadurch alle manuell 
 veränderten oder ergänzten Eintragungen in den CSV Dateien verloren gehen !!!**
 
-##### `-update`, `-u` 
+##### `--update`, `-u` 
 
 Die Verwendung des Flags `--update` führt aktualisiert Einträge in den CSV-Dateien. Dies macht beispielsweise Sinn, wenn die Projektkonfiguration nachträglich geändert wurde, oder wenn nach der 
 initialen Erzeugung der CSV-Dateien neue Datenströme angelegt wurden, die noch nicht in `datastreams.csv` enthalten
@@ -115,6 +115,12 @@ sind.
 Dabei werden niemals Veränderungen an den Feldern `description`, `tags` oder `lang` vorgenommen. Felder, die automatisch von Dublin Core oder der Projektkonfiguration (.toml) übernommen werden können (`title`, `creator`, `publisher`und `rights`), werden aktualisiert. Das bedeutet, dass händisch vorgenommene Änderungen an diesen Felder überschrieben werden. Falls Sie diese Felder bereits händisch überarbeitet haben (was im Normalfall eher nicht der Fall sein wird), sollten sie evtl. zuvor mit `preproess csv collect` eine Excel oder CSV Datei mit den alten Werten erzeugen, damit Sie die Änderungen nach dem
 Update überprüfen können. 
 
+#### `--use-subjects-as-tags`, `-s`
+
+Durch Setzen dieses Flags werden die Werte aller `dc:subject` Einträge von `DC.xml`  als `tags`-Einträge in `object.csv` übernommen.
+
+Das kann Arbeit ersparen, wenn die Subjects als Ausgangsbasis zur Nachbearbeitung der Tags verwendet werden sollen. Ein "blindes" Übernehmen der Werte erzeugt Redundanz und wird nicht empfohlen.
+Ein typischer Workflow könnte also so aussehen, das zuerst die Subject-Werte übernommen werden und dann in der CSV-Datei oder im kumulierten all_objects.csv nachbearbeitet werden.
 
 #####  ``--help`
 
