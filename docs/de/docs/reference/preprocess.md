@@ -44,6 +44,7 @@ Folgende Subcommands stehen zur Verfügung:
    * [project](#der-unterbefehl-project) - Initialisieren eines neuen Projekts
    * [csv](#der-unterbefehl-csv) - Erstellung und Verwaltung von CSV-Dateien 
      (`object.csv` und `datastreams.csv`) in den einzelnen Objektordnern
+   * [validate](#validate) - Validieren von Objektverzeichnissen  
    * [transform](#der-unterbefehl-transform) - Ausführen einer Transformation 
      z.B. mit XSLT
    * [multitransform](#der-unterbefehl-multitransform) - Wie `transform`, aber 
@@ -52,13 +53,14 @@ Folgende Subcommands stehen zur Verfügung:
      alten GAMS 3 Projekts, wie sie unter `projekte` liegen, in Objektordner
 
 
+
 ### Der Unterbefehl project
 
 [`preprocess project`](preprocess/project.md) stellt weitere Unterbefehle für die Erzeugung und Aktualisierung
 eines GAMS-Projekts bereit. Dies ist der empfohlende Weg ein neues Projekt anzulegen.
 
-Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
-Sie [hier](preprocess/project.md) oder via `preprocess project --help`.
+Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie 
+[hier](preprocess/project.md) oder via `preprocess project --help`.
 
 ### Der Unterbefehl csv
 
@@ -66,16 +68,23 @@ Sie [hier](preprocess/project.md) oder via `preprocess project --help`.
 mit den Objekt-Metadaten erzeugt und verwaltet werden könne.
 
 
-Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
+Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
 Sie [hier](preprocess/csv.md) oder via `preprocess csv --help`.
 
+## Der Unterbefehl validate
+
+`preprocess validate`(preprocess/validate.md) kann bzw. sollte verwendet werden, um ein oder
+mehrere Objektverzeichnisse auf ihre Korrektheit zu überprüfen. 
+
+Deails und weitere Möglichkeiten zu diesem Unterbefehl find Sie [hier](preprocess/validate.md) 
+oder via `preprocess validate --help`.
 
 ### Der Unterbefehl transform
 
 [`preprocess transform`](preprocess/transform.md) führt Transformationen von Daten aus. Aktuell
 gibt es nur die Möglichkeit XSLT-Transformationen auszuhühren (via Saxon).
 
-Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
+Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
 Sie [hier](preprocess/transform.md) oder via `preprocess transform --help`.
 
 ### Der Unterbefehl multitransform
@@ -85,7 +94,7 @@ führt die Transformation aber auf viele Objekte aus. Das ist beispielsweise
 praktisch, um via XSLT auf einen Schlag für alle Objekte Metadaten aus 
 dem TEI Header in das zwingend vorgegebene DC.xml zu überführen.
 
-Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
+Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
 Sie [hier](preprocess/multitransform.md) oder via `preprocess multitransform --help`.
 
 ### Der Unterbefehl splitproject
@@ -97,6 +106,6 @@ erzeugt werden können. Es zerlegt also das Projekt in
 Objektverzeichnisse, kopiert referenzierte Ressourcen und benennt
 diese ggf. um.
 
-Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie in 
+Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
 Sie [hier](preprocess/splitproject.md) oder via 
 `preprocess splitproject --help`.

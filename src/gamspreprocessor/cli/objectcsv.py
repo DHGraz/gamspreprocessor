@@ -6,7 +6,9 @@ from pathlib import Path
 
 
 import click
-import gamslib.objectcsv
+import gamslib.objectcsv.create_csv
+import gamslib.objectcsv.manage_csv
+import gamslib.objectcsv.xlsx
 import gamslib.projectconfiguration
 
 logger = logging.getLogger()
@@ -94,7 +96,7 @@ def createcsv(
 
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
     if update:
-        csv_objects = gamslib.objectcsv.create_csv_files(
+        csv_objects = gamslib.objectcsv.create_csv.create_csv_files(
             Path(projectroot),
             cfg,
             update=True,
@@ -105,7 +107,7 @@ def createcsv(
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
     else:  # create new csv files
-        csv_objects = gamslib.objectcsv.create_csv_files(
+        csv_objects = gamslib.objectcsv.create_csv.create_csv_files(
             Path(projectroot),
             cfg,
             force_overwrite=force_overwrite,
@@ -222,7 +224,7 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
                 f"Cannot find {obj_csv_file.name} or {ds_csv_file.name} in {input_path}. "
                 "Please run 'collect' first to create these files."
             )
-        num_of_obj, num_of_ds = gamslib.objectcsv.split_from_csv(
+        num_of_obj, num_of_ds = gamslib.objectcsv.manage_csv.split_from_csv(
             Path(projectroot), obj_csv_file, ds_csv_file
         )
 
@@ -233,7 +235,7 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
                 f"Cannot find {xlsx_file.name} in {input_path}. "
                 "Please run 'collect' first to create this file."
             )
-        num_of_obj, num_of_ds = gamslib.objectcsv.split_from_xlsx(
+        num_of_obj, num_of_ds = gamslib.objectcsv.manage_csv.split_from_xlsx(
             Path(projectroot), xlsx_file
         )
     click.echo(
@@ -265,10 +267,10 @@ def csv2xlsx(objects_csv_file: str, datastreams_csv_file: str, outputfile: str):
         outputfile_path = objects_csv_path.parent / "all_objects.xlsx"
     else:
         outputfile_path = Path(outputfile)
-    gamslib.objectcsv.csv_to_xlsx(
+    gamslib.objectcsv.xlsx.csv_to_xlsx(
         objects_csv_path, datastreams_csv_path, outputfile_path
     )
-    logger.info("Converted csv files to %s", outputfile_path)
+    click.echo(f"Converted csv files to {outputfile_path}")
 
 
 @click.command(name="xlsx2csv")
@@ -303,10 +305,8 @@ def xlsx2csv(object_csv_file: str, ds_csv_file: str, xlsx_file: str):
         ds_csv_path = xlsx_file_path.parent / "all_datastreams.csv"
     else:
         ds_csv_path = Path(ds_csv_file)
-    gamslib.objectcsv.xlsx_to_csv(xlsx_file_path, object_csv_path, ds_csv_path)
-    logger.info(
-        "Converted xlsx file to csv files: %s and %s", object_csv_path, ds_csv_path
-    )
+    gamslib.objectcsv.xlsx.xlsx_to_csv(xlsx_file_path, object_csv_path, ds_csv_path)
+    click.echo(f"Converted xlsx file to csv files: {object_csv_path} and {ds_csv_path}")
 
 
 cli.add_command(createcsv)
