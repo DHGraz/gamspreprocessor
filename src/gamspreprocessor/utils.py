@@ -88,10 +88,10 @@ def find_multiple_files_per_dir(paths: list[Path]) -> list[tuple[Path, list[Path
         path_files.append(path)
         multi_file_dirs[containing_dir] = path_files
 
-    prolematic_dirs = []
-    for dir, files in multi_file_dirs.items():
+    problematic_dirs = []
+    for dir_, files in multi_file_dirs.items():
         if len(files) > 1:
             files.sort()
-            prolematic_dirs.append((Path(dir), files))
-    prolematic_dirs.sort(key=lambda x: x[0])
-    return prolematic_dirs
+            problematic_dirs.append((Path(dir_), files))
+    problematic_dirs.sort(key=lambda x: x[0])
+    return problematic_dirs

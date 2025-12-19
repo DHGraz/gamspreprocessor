@@ -1,13 +1,11 @@
-from pathlib import Path
-import warnings
+"""LIDOObjectSource module for splitting up legacy project LIDO objects.
+"""
 
 from frozendict import frozendict
-from lxml import etree as ET
 
 from gamspreprocessor.projectsplitter.abstractobjectsources import XMLObjectSource
 
 from .abstractfilereferences import AbstractXMLFileReference
-
 
 
 class LIDOResourceSet(AbstractXMLFileReference):
@@ -26,7 +24,8 @@ class LIDOResourceSet(AbstractXMLFileReference):
 
         if linkresource_node is None or linkresource_node.text == "":
             raise ValueError(
-                f"No linkResource element found in resourceSet element (line {self._element.sourceline})."
+                "No linkResource element found in resourceSet element "
+                f"(line {self._element.sourceline})."
             )
         return linkresource_node.text
 

@@ -27,7 +27,7 @@ def test_main_quiet_and_verbose():
 
     # using both --quiet and --verbose should raise an error
     result = runner.invoke(cli, ["--quiet", "--verbose", "project", "init"])
-    assert result.exit_code == 2
+    assert result.exit_code == 2  # noqa: PLR2004
     assert "Cannot use --quiet and --verbose together." in result.output
 
     runner.invoke(cli, ["--quiet", "project", "init"])

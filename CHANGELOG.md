@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.3.0] - 2025-12-02
+
+### Changed
+
+  * Add validate command to check object directories.
+    
+## [0.2.9] - 2025-11-21
+
+### Changed
+
+  * object.csv has a new colums 'tags'
+  * 'csv create' has a new option '--use-subjects-as-tags'
+  
 ## [0.2.2] - 2025-02-28
 
 ### Changed
@@ -42,4 +55,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Extend pyproject.toml
-  
+
+## [0.2.7] - 2025-05-23
+
+- Add `--exclude` option to multitransform
+
+## [0.2.8] - 2025-
+
+- Add an new option to configuration: 
+  `general.ds_ignore_files = ['*.log',]`
+- `preprocess csv create/update` now guesses `mainRessource` 
+  if there is only one xml data stream besides DC.xml.
+
+
+
+
+
+
+
+

@@ -41,7 +41,6 @@ class TEIObjectSource(XMLObjectSource):
         ".//tei:graphic": TEIGraphicReference,
     })
 
-
     def _extract_pid_from_content(self) -> str:
         """Return the pid (object id) of the object.
 

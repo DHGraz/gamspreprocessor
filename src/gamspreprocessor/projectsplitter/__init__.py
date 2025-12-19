@@ -2,14 +2,17 @@
 
 This package contains modules for splitting up project folders into object directories.
 """
+
 from pathlib import Path
-from .teiobjectsource import TEIObjectSource
-from .lidoobjectsource import LIDOObjectSource
-from .genericobjectsource import GenericObjectSource
-from .abstractobjectsources import AbstractObjectSource
 
 from gamslib.formatdetect import detect_format
 from gamslib.formatdetect.formatinfo import SubType
+
+from .abstractobjectsources import AbstractObjectSource
+from .genericobjectsource import GenericObjectSource
+from .lidoobjectsource import LIDOObjectSource
+from .teiobjectsource import TEIObjectSource
+
 
 def make_object_source(
     source_file: Path, use_format="auto", strip_prefix=True, strip_extension=False
@@ -29,13 +32,10 @@ def make_object_source(
     use_format_lower = use_format.lower()
     if use_format_lower == "auto":
         format_info = detect_format(source_file)
-        mimetype = format_info.mimetype
         subtype = format_info.subtype
     elif use_format_lower == "tei":
-        mimetype = "text/tei+xml"
         subtype = SubType.TEI
     elif use_format_lower == "lido":
-        mimetype = "application/xml"
         subtype = SubType.LIDO
     else:
         raise ValueError(

@@ -22,6 +22,7 @@ def cli():
     These commands might be useful to transform GAMS files into other formats.
     """
 
+
 # pylint: disable=too-many-arguments, too-many-positional-arguments
 @click.command(name="xslt")
 @click.option("--xslt-file", "-x", type=click.Path(exists=True), required=True)
@@ -30,9 +31,9 @@ def cli():
     "--output-filename",
     required=True,
     help=(
-        "The output file name. This file will be created in the same folder "
-        "as the input file. This means, the output file name is the same for "
-        "all transformations (but in different directories). "
+            "The output file name. This file will be created in the same folder "
+            "as the input file. This means, the output file name is the same for "
+            "all transformations (but in different directories). "
     ),
 )
 @click.option(
@@ -40,8 +41,8 @@ def cli():
     "-p",
     default="",
     help=(
-        "A pattern (*,?,!) to identify the files to be transformed. Cannot be used "
-        "together with --file-list"
+            "A pattern (*,?,!) to identify the files to be transformed. Cannot be used "
+            "together with --file-list"
     ),
 )
 @click.option(
@@ -49,8 +50,8 @@ def cli():
     "-r",
     is_flag=True,
     help=(
-        "Apply pattern set as argument also on subdirectories. "
-        "Can only be used together with --pattern."
+            "Apply pattern set as argument also on subdirectories. "
+            "Can only be used together with --pattern."
     ),
 )
 @click.option(
@@ -58,8 +59,12 @@ def cli():
     "--exclude",
     multiple=True,
     help=(
-        "A list of file names to be excluded from the transformation. "
-        "This is a list of file names (without path), not patterns!"
+            "A file name (e.g. 'DC.xml') which should be excluded from "
+            "the transformation. `--exclude` can be used multiple times "
+            "to specify a list of file names. "
+            "Attention: The values are file names, not filename patterns! "
+            "Example: multitransform xslt -p '*.xml' -e DC.xml -e DC2.xml will transform all "
+            "'.xml'-Files but 'DC.xml' and DC2.xml'"
     ))
 @click.option(
     "-l",
@@ -68,14 +73,14 @@ def cli():
     help="A file containing a list of files (with path, if necessary) to be transformed.",
 )
 @click.argument("start-dir", nargs=-1)
-def transform_xslt( # noqa: PLR0913
-    xslt_file: str,
-    start_dir: list[str],
-    output_filename: str,
-    file_list: str = "",
-    pattern: str = "",
-    exclude: list[str]|None = None,
-    recursive: bool = False,
+def transform_xslt(  # noqa: PLR0913
+        xslt_file: str,
+        start_dir: list[str],
+        output_filename: str,
+        file_list: str = "",
+        pattern: str = "",
+        exclude: list[str] | None = None,
+        recursive: bool = False,
 ):
     """Apply a xslt on multiple xml files (in different directories)."""
     # check input
@@ -97,7 +102,7 @@ def transform_xslt( # noqa: PLR0913
         xmlfiles = list(Path(start_dir[0]).rglob(pattern))
     else:
         xmlfiles = list(Path(start_dir[0]).glob(pattern))
-    
+
     # exclude DC.xml files if not explicitly requested
     if exclude is not None:
         xmlfiles = [x for x in xmlfiles if x.name not in exclude]
@@ -107,7 +112,7 @@ def transform_xslt( # noqa: PLR0913
     suspicious_dirs = utils.find_multiple_files_per_dir(xmlfiles)
     if suspicious_dirs:
         first_problematic_dir = str(suspicious_dirs[0][0])
-        problem_files  = ", ".join([x.name for x in suspicious_dirs[0][1]])
+        problem_files = ", ".join([x.name for x in suspicious_dirs[0][1]])
         raise click.ClickException(
             f"Ambiguous pattern '{pattern}' matches more than one file in at least one directory. "
             f"{first_problematic_dir}: {problem_files}."
@@ -124,11 +129,11 @@ def transform_xslt( # noqa: PLR0913
             raise click.ClickException(f"Error transforming {xmlfile}: {exp}") from exp
 
 
-@click.command(name="saxon-version")
-def saxon_version():
-    """Show the version of the Saxon processor."""
+@click.command(name="xslt-processor")
+def xslt_processor():
+    """Show the version of the XSLT processor."""
     click.echo(f"{get_saxon_version()}")
 
 
-cli.add_command(saxon_version)
+cli.add_command(xslt_processor)
 cli.add_command(transform_xslt)

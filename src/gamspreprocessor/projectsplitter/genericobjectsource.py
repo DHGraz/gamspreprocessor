@@ -1,9 +1,12 @@
+""" Module for handling a file which is used as base for a single generic GAMS object.
+
+Use this class for any file types, where no reference rewriting
+is necessary or possible.
+"""
 import shutil
 from pathlib import Path
 
 from gamspreprocessor.projectsplitter.abstractobjectsources import AbstractObjectSource
-
-from .abstractfilereferences import AbstractFileReference
 
 
 class GenericObjectSource(AbstractObjectSource):
@@ -14,10 +17,10 @@ class GenericObjectSource(AbstractObjectSource):
     """
 
     def __init__(
-        self, source_file: Path, strip_prefix: bool, strip_extension: bool
+            self, source_file: Path, strip_prefix: bool, strip_extension: bool
     ) -> None:
         super().__init__(source_file, strip_prefix, strip_extension)
-        self._new_pid: str|None = None
+        self._new_pid: str | None = None
 
     @property
     def pid(self) -> str:
@@ -30,7 +33,7 @@ class GenericObjectSource(AbstractObjectSource):
         else:
             pid = self._new_pid
         return pid
-            
+
     def save(self, object_dir: Path) -> None:
         """Save the object to the target directory.
 
@@ -44,11 +47,9 @@ class GenericObjectSource(AbstractObjectSource):
         shutil.copy(self.source_file, target_path)
         return [target_path]
 
-
     def _set_pid(self, new_pid: str) -> None:
         self._new_pid = new_pid
 
     def rewrite_references(self) -> None:
         """Rewrite internal references if appropriate."""
         # As we ignore content of files, there is no need to rewrite references.
-        pass
