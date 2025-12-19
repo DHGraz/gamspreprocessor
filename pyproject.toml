@@ -10,7 +10,7 @@ dependencies = [
     "uritools>=4.0.3",
     "saxonche>=12.5.0",
     "frozendict>=2.4.6",
-    "gamslib>=0.7.9",
+    "gamslib==0.7.10",
 ]
 readme = "README.md"
 # due to a problem with saxonche, 3.13 currently does not work!
