@@ -21,7 +21,8 @@ def cli():
 
 
 @click.command(name="xslt")
-@click.option("--xslt-file", "-x", type=click.Path(exists=True))
+@click.option("--xslt-file", "-x", type=click.Path(exists=True),
+              help="Path to the XSLT file to be applied.")
 @click.argument("xml-file", type=click.Path(exists=True))
 @click.argument("output-file", type=click.Path())
 def transform_xslt(xslt_file: str, xml_file: str, output_file: str):
@@ -33,11 +34,11 @@ def transform_xslt(xslt_file: str, xml_file: str, output_file: str):
         raise click.ClickException(f"Error transforming {xml_file}: {exp}") from exp
 
 
-@click.command(name="saxon-version")
-def saxon_version():
-    """Show the version of the Saxon processor."""
+@click.command(name="xslt-processor")
+def xslt_processor():
+    """Show the version of the XSLT processor."""
     click.echo(f"{get_saxon_version()}")
 
 
-cli.add_command(saxon_version)
+cli.add_command(xslt_processor)
 cli.add_command(transform_xslt)

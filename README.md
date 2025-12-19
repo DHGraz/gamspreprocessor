@@ -303,7 +303,12 @@ Konfigurationsdatei aktuell ist.
   - title
   - creator
   - rights
-- kann zusätzlich weitere Felder enthalten wie bspw.
+- optionale Felder für Filter (in der API) sind:
+  - coverage
+  - creator
+  - language
+  - subject
+- kann weitere zusätzliche Felder enthalten wie bspw.
   - date (im ISO-Format?)
   - location 
   - ... (s. [DC Template](https://zimlab.uni-graz.at/gams/metadata/templates/dc_template.xml))

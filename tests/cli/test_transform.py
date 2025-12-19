@@ -14,10 +14,11 @@ def test_transform():
     assert "transforming" in result.output
 
 
-def test_saxon_version():
-    "Test getting the Saxon version."
+def test_xslt_version():
+    "Test getting the XSLT version."
     runner = CliRunner()
-    result = runner.invoke(cli, ["saxon-version"])
+    result = runner.invoke(cli, ["xslt-processor"])
+    print(result.output)
     assert result.exit_code == 0
     assert result.output.startswith("SaxonC-HE")
 

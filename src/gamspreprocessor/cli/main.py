@@ -14,6 +14,7 @@ from . import project
 from . import projectsplitter
 from . import transform
 from . import multitransform
+from . import validate
 
 
 @click.group()
@@ -67,3 +68,4 @@ cli.add_command(project.cli)
 cli.add_command(projectsplitter.cli)
 cli.add_command(transform.cli)
 cli.add_command(multitransform.cli)
+cli.add_command(validate.validate)

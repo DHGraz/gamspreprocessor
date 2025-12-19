@@ -14,10 +14,10 @@ def test_multitransform():
     assert "at once" in result.output
 
 
-def test_saxon_version():
+def test_xslt_version():
     "Test getting the Saxon version."
     runner = CliRunner()
-    result = runner.invoke(cli, ["saxon-version"])
+    result = runner.invoke(cli, ["xslt-processor"])
     assert result.exit_code == 0
     assert result.output.startswith("SaxonC-HE")
 

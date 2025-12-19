@@ -16,3 +16,7 @@ objects/
 bags/
 debug.log
 .idea/
+foo.py
+all_objects.xlsx
+.DS_Store
+validation_errors.log

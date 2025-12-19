@@ -1,11 +1,14 @@
 """CLI commands for managing GAMS object CSV files."""
 
 import logging
-import tempfile
+
 from pathlib import Path
 
+
 import click
-import gamslib.objectcsv
+import gamslib.objectcsv.create_csv
+import gamslib.objectcsv.manage_csv
+import gamslib.objectcsv.xlsx
 import gamslib.projectconfiguration
 
 logger = logging.getLogger()
@@ -45,12 +48,20 @@ def cli():
 @click.option(
     "--update", "-u", is_flag=True, default=False, help="Update existing csv files."
 )
+@click.option(
+    "-s",
+    "--use-subjects-as-tags",
+    is_flag=True,
+    default=False,
+    help="(Deprecated) Use 'subject' field from dublin core as tags in object.csv.",
+)
 @click.argument("projectroot", required=True, type=click.Path(exists=True))
 def createcsv(
     projectroot: str,
     configfile: str | None,
     force_overwrite: bool = False,
     update: bool = False,
+    use_subjects_as_tags: bool = False,
 ):
     """Generate csv files with metadata for object directories.
 
@@ -69,7 +80,7 @@ def createcsv(
     you have changed the project configuration. Updating will not touch fields
     like `description`, `tags` or `lang`. But it will replace fields which can be automatically
     derived from dublin core or the project configuration. So use with care if you have changed
-    fields like `title`, `creator`, `publisher` or `rights` by hand. If no new value can be 
+    fields like `title`, `creator`, `publisher` or `rights` by hand. If no new value can be
     derived, the existing field will be kept.
 
     Use `packager objectcsv create --help` to see the available options.
@@ -80,19 +91,27 @@ def createcsv(
             config_path = gamslib.projectconfiguration.utils.find_project_toml(
                 Path(projectroot)
             )
+    else:
+        config_path = Path(configfile)
 
     cfg = gamslib.projectconfiguration.get_configuration(config_path)
     if update:
-        csv_objects = gamslib.objectcsv.create_csv_files(
-            Path(projectroot), cfg, update=True
+        csv_objects = gamslib.objectcsv.create_csv.create_csv_files(
+            Path(projectroot),
+            cfg,
+            update=True,
+            use_subjects_as_tags=use_subjects_as_tags,
         )
         click.echo(
             f"Updated csv files for {len(csv_objects)} objects "
             f"({sum(obj.count_datastreams() for obj in csv_objects)} content files)."
         )
-    else:
-        csv_objects = gamslib.objectcsv.create_csv_files(
-            Path(projectroot), cfg, force_overwrite
+    else:  # create new csv files
+        csv_objects = gamslib.objectcsv.create_csv.create_csv_files(
+            Path(projectroot),
+            cfg,
+            force_overwrite=force_overwrite,
+            use_subjects_as_tags=use_subjects_as_tags,
         )
         click.echo(
             f"Created csv files for {len(csv_objects)} objects "
@@ -126,22 +145,38 @@ def collectcsv(objects_dir: str, output_dir: str | None = None, to_csv: bool = F
     """
     # if output_dir is not None:
     output_path = Path(output_dir) if output_dir else Path.cwd()
-    all_objects_file = output_path / "all_objects.csv"
-    all_ds_file = output_path / "all_datastreams.csv"
 
-    obj_csv = gamslib.objectcsv.collect_csv_data(
-        Path(objects_dir), all_objects_file, all_ds_file
-    )
+    try:
+        obj_csv = gamslib.objectcsv.manage_csv.collect_csv_data(
+            Path(objects_dir),  # all_objects_file, all_ds_file
+        )
+    except ValueError as e:
+        click.echo(
+            f"Cannot collect data, because of empty csv "
+            f"files: {e}. Try running csv create first!"
+        )
+        raise e from e
+    except FileNotFoundError as e:
+        click.echo(
+            f"Cannot collect data, because of missing csv "
+            f"file(s): {e}. Try running 'csv create' first!"
+        )
+        raise e from e
     if to_csv:
+        all_objects_file = (
+            output_path / gamslib.objectcsv.objectcollection.ALL_OBJECTS_CSV
+        )
+        all_ds_file = (
+            output_path / gamslib.objectcsv.objectcollection.ALL_DATASTREAMS_CSV
+        )
+        obj_csv.save_to_csv(all_objects_file, all_ds_file)
         click.echo(
             f"Created csv files {all_objects_file} and {all_ds_file} for data "
-            f"in folder {obj_csv.object_dir.name}."
+            f"in folder {all_ds_file.parent}."
         )
     else:
         xlsx_file = output_path / "all_objects.xlsx"
-        gamslib.objectcsv.csv_to_xlsx(all_objects_file, all_ds_file, xlsx_file)
-        all_objects_file.unlink()
-        all_ds_file.unlink()
+        obj_csv.save_to_xlsx(xlsx_file)
         click.echo(f"Created xlsx file {xlsx_file}")
 
 
@@ -180,21 +215,29 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
     input_path = Path(input_dir) if isinstance(input_dir, str) else Path.cwd()
 
     if from_csv:
-        num_of_obj, num_of_ds = gamslib.objectcsv.split_csv_files(
-            Path(projectroot), input_path
+        obj_csv_file = input_path / gamslib.objectcsv.objectcollection.ALL_OBJECTS_CSV
+        ds_csv_file = (
+            input_path / gamslib.objectcsv.objectcollection.ALL_DATASTREAMS_CSV
+        )
+        if not obj_csv_file.exists() or not ds_csv_file.exists():
+            raise FileNotFoundError(
+                f"Cannot find {obj_csv_file.name} or {ds_csv_file.name} in {input_path}. "
+                "Please run 'collect' first to create these files."
+            )
+        num_of_obj, num_of_ds = gamslib.objectcsv.manage_csv.split_from_csv(
+            Path(projectroot), obj_csv_file, ds_csv_file
         )
 
     else:
-        # convert xlsx to csv files before update
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp_path = Path(tmpdir)
-            xlsx_file = input_path / "all_objects.xlsx"
-            obj_file = tmp_path / "all_objects.csv"
-            ds_file = tmp_path / "all_datastreams.csv"
-            gamslib.objectcsv.xlsx_to_csv(xlsx_file, obj_file, ds_file)
-            num_of_obj, num_of_ds = gamslib.objectcsv.split_csv_files(
-                Path(projectroot), tmp_path
+        xlsx_file = input_path / gamslib.objectcsv.objectcollection.ALL_OBJECTS_XLSX
+        if not xlsx_file.exists():
+            raise FileNotFoundError(
+                f"Cannot find {xlsx_file.name} in {input_path}. "
+                "Please run 'collect' first to create this file."
             )
+        num_of_obj, num_of_ds = gamslib.objectcsv.manage_csv.split_from_xlsx(
+            Path(projectroot), xlsx_file
+        )
     click.echo(
         f"Updated {num_of_obj} object records and {num_of_ds} datatstream records."
     )
@@ -207,30 +250,32 @@ def updatecsv(projectroot: str, input_dir: str | None = None, from_csv: bool = F
     default="all_objects.xlsx",
     help=(
         "Path to the output xlsx file. Default is 'all_objects.xlsx' "
-        "in the folder where all_object.csv was read from."
+        "in the folder where all_objects.csv was read from."
     ),
 )
-@click.argument("object_csv", required=True, type=click.Path(exists=True))
-@click.argument("ds_csv", required=True, type=click.Path(exists=True))
-def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
+@click.argument("objects_csv_file", required=True, type=click.Path(exists=True))
+@click.argument("datastreams_csv_file", required=True, type=click.Path(exists=True))
+def csv2xlsx(objects_csv_file: str, datastreams_csv_file: str, outputfile: str):
     """Convert csv files to xlsx files.
 
     Use 'preprocess csv csv2xlsx --help' to see the available options.
     """
-    object_csv_path = Path(object_csv)
-    ds_csv_path = Path(ds_csv)
+    objects_csv_path = Path(objects_csv_file)
+    datastreams_csv_path = Path(datastreams_csv_file)
 
     if outputfile == "all_objects.xlsx":
-        outputfile_path = object_csv_path.parent / "all_objects.xlsx"
+        outputfile_path = objects_csv_path.parent / "all_objects.xlsx"
     else:
         outputfile_path = Path(outputfile)
-    gamslib.objectcsv.csv_to_xlsx(object_csv_path, ds_csv_path, outputfile_path)
-    logger.info("Converted csv files to %s", outputfile_path)
+    gamslib.objectcsv.xlsx.csv_to_xlsx(
+        objects_csv_path, datastreams_csv_path, outputfile_path
+    )
+    click.echo(f"Converted csv files to {outputfile_path}")
 
 
 @click.command(name="xlsx2csv")
 @click.option(
-    "--object-csv",
+    "--object-csv-file",
     default="all_object.csv",
     help=(
         "Path to the output object csv file. Default is 'all_objects.csv' in "
@@ -238,7 +283,7 @@ def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
     ),
 )
 @click.option(
-    "--ds-csv",
+    "--ds-csv-file",
     default="all_datastreams.csv",
     help=(
         "Path to the output datastreams csv file. Default is 'all_datastreams.csv' "
@@ -246,24 +291,22 @@ def csv2xlsx(object_csv: str, ds_csv: str, outputfile: str):
     ),
 )
 @click.argument("xlsx_file", required=True, type=click.Path(exists=True))
-def xlsx2csv(object_csv: str, ds_csv: str, xlsx_file: str):
+def xlsx2csv(object_csv_file: str, ds_csv_file: str, xlsx_file: str):
     """Convert a xlsx metadata file to 2 csv files.
 
     Use 'preprocess csv xlsx2csv --help' to see the available options.
     """
     xlsx_file_path = Path(xlsx_file)
-    if object_csv == "all_object.csv":
+    if object_csv_file == "all_object.csv":
         object_csv_path = xlsx_file_path.parent / "all_objects.csv"
     else:
-        object_csv_path = Path(object_csv)
-    if ds_csv == "all_datastreams.csv":
+        object_csv_path = Path(object_csv_file)
+    if ds_csv_file == "all_datastreams.csv":
         ds_csv_path = xlsx_file_path.parent / "all_datastreams.csv"
     else:
-        ds_csv_path = Path(ds_csv)
-    gamslib.objectcsv.xlsx_to_csv(xlsx_file_path, object_csv_path, ds_csv_path)
-    logger.info(
-        "Converted xlsx file to csv files: %s and %s", object_csv_path, ds_csv_path
-    )
+        ds_csv_path = Path(ds_csv_file)
+    gamslib.objectcsv.xlsx.xlsx_to_csv(xlsx_file_path, object_csv_path, ds_csv_path)
+    click.echo(f"Converted xlsx file to csv files: {object_csv_path} and {ds_csv_path}")
 
 
 cli.add_command(createcsv)

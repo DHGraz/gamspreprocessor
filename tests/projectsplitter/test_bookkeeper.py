@@ -176,7 +176,7 @@ def test_get_unhandled(tmp_path):
 
     unhandled = bk.get_unhandled()
 
-    assert len(unhandled) == 2
+    assert len(unhandled) == 2 # noqa: PLR2004
     assert Path(file2) in unhandled
     assert Path(file3) in unhandled
 
@@ -219,7 +219,7 @@ def test_update_with_ignores(datadir, tmp_path):
     # create a BookKeeper object, run update and check if all files registered with the BookKeeper
     bk = BookKeeper(bk_file)
     bk.update(project_path)
-    assert len(bk._data) == 4
+    assert len(bk._data) == 4 # noqa: PLR2004
 
     filenames = [os.path.basename(file) for file in bk._data]
 

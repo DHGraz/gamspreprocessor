@@ -47,7 +47,7 @@ def test_find_mutliple_files_per_dir():
         Path("bar/bar1/file1.xml"),
     ]
     result = find_multiple_files_per_dir(input_paths)
-    assert len(result) == 2
+    assert len(result) == 2 # noqa: PLR2004
 
     # check sorting of directories
     assert result[0][0] == Path("bar/bar1")
