@@ -91,14 +91,14 @@ class ProjectSplitter:
         if use_format == "auto":
             _, objecttype = guess_format(source_file)
         elif use_format == 'tei':
-            objecttype = SubType.TEI
+            objecttype = SubType.TEIP5
         elif use_format == 'lido':
             objecttype = SubType.LIDO
         else:
             raise ValueError(f"Invalid format type: '{use_format}'. Must be "
                              f"'auto', 'tei' or 'lido'.")
 
-        if objecttype == SubType.TEI:
+        if objecttype in (SubType.TEIP4, SubType.TEIP5):
             return TEIObjectSource(source_file, strip_prefix, strip_extension)
         if objecttype == SubType.LIDO:
             return LIDOObjectSource(source_file, strip_prefix, strip_extension)

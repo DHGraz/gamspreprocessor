@@ -34,7 +34,7 @@ def make_object_source(
         format_info = detect_format(source_file)
         subtype = format_info.subtype
     elif use_format_lower == "tei":
-        subtype = SubType.TEI
+        subtype = SubType.TEIP5
     elif use_format_lower == "lido":
         subtype = SubType.LIDO
     else:
@@ -42,7 +42,7 @@ def make_object_source(
             f"Invalid format type: '{use_format}'. Must be 'auto', 'tei' or 'lido'."
         )
 
-    if subtype == SubType.TEI:
+    if subtype in (SubType.TEIP4, SubType.TEIP5):
         obj_src = TEIObjectSource(source_file, strip_prefix, strip_extension)
     elif subtype == SubType.LIDO:
         obj_src = LIDOObjectSource(source_file, strip_prefix, strip_extension)

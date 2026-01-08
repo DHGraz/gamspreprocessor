@@ -2,26 +2,25 @@
 
 import json
 import logging
-from pathlib import Path
 import shutil
+from xml.etree import ElementTree as ET
 
 import pytest
+from gamslib.formatdetect.formatinfo import SubType
 
 # pylint: disable=protected-access
 from gamspreprocessor.projectsplitter import bookkeeper
-from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource
 from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSource
+from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource
 from gamspreprocessor.projectsplitter.splitter import ProjectSplitter, guess_format
 from gamspreprocessor.projectsplitter.teiobjectsource import TEIObjectSource
-from gamslib.formatdetect.formatinfo import SubType
 
-from xml.etree import ElementTree as ET
 
 def test_guess_format(shared_datadir):
     """Make sure the usage of the formatdetector lib is correct."""
     mimetype, subtype = guess_format(shared_datadir / "projects" / "TEI_1.xml")
     assert mimetype == "application/tei+xml"
-    assert subtype == SubType.TEI
+    assert subtype == SubType.TEIP5
 
 
 def test_init(shared_datadir, tmp_path):

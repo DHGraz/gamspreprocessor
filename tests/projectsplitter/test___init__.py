@@ -22,7 +22,7 @@ def test_make_object_source_auto_tei(monkeypatch, shared_datadir):
     "Test make_object_source with auto format detection for TEI files"
     source_file = shared_datadir / "projects" / "TEI_1.xml"
     # we fake the format detector used by make_object_source
-    monkeypatch.setattr(projectsplitter, 'detect_format', lambda x: FormatInfo('foodector', "application/tei+xml", SubType.TEI ))
+    monkeypatch.setattr(projectsplitter, 'detect_format', lambda x: FormatInfo('foodector', "application/tei+xml", SubType.TEIP5 ))
 
     obj_src = projectsplitter.make_object_source(source_file, use_format="auto")
     assert isinstance(obj_src, TEIObjectSource)
