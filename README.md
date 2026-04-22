@@ -43,11 +43,12 @@ Option, die alle Möglichkeiten auflistet.
 
 Aktuell sind diese Unterbefehle implementiert:
 
-  - project
-  - splitproject
-  - transform
-  - multitransform
-  - csv create
+  - csv - create and manage the csv metadata files
+  - multitransform - like tranform, but for many files
+  - project  - initialize an update a project
+  - splitproject - split up data from an existing project into object folders
+  - transform - Transform datastreams
+  # - validate - currently not available
 
 
 ### project init
@@ -274,6 +275,9 @@ Die Toml-Datei **muss** die o.g. Felder enthalten.
 
 Nur die Einträge im Abschnitt 'metdata', werden für die Metadaten-Extraktion in die CSV-Dateien verwendet.
 
+Die vollständige Beschreibung der Konfigurationsdatei findet sich in der Dokumentation der gamslib. 
+TODO: ad url as we've decided where the documentation should live.
+
 ### Eine Konfiguration erzeugen lassen
 
 Mit dem Befehl 
@@ -424,7 +428,7 @@ Falls es keinen Hauptdatenstrom gibt, kann der Wert leer bleiben.
 
 | Key          | Required  |  Beschreibung                               |  Beispiel |  
 |------------- | --------- |  ------------------------------------------ |  --------- |
-| dspath       | true      |  Pfad zur Datei (Verzeichnisnae/Dateiname)  |  detamax.diary/DC.xml |
+| dspath       | true      |  Pfad zur Datei                             |  DC.xml |
 | dsid         | true      |  Name des Datenstrims                       |  DC.xml |
 | mimetype     | true      |  Content Type des Datastreams               |  image/jpeg |
 | title        | false?    |  Titel des Datenstroms                      |  Dublin Core Metadata |
@@ -437,9 +441,8 @@ Falls es keinen Hauptdatenstrom gibt, kann der Wert leer bleiben.
 
 #### dspath
 
-`dspath` bezeichnet den zweiteiligen (Objektverzeichnis/Dateiname) Pfad zur in das Bag aufzunehmende Datei.
-Der erste Teil ist also kein vollständiger Pfad, sondern nur die Objektid, also der Wert, der in object.csv als `recid` vergeben wurde. 
-Ein Beispiel könnte also so aussehen: `hsa/TEI.xml`. Der Wert wird automatisch gesetzt und braucht im Normallfall nie verändert zu werden.
+`dspath` beinhaltet den Pfad zu Datei des Datenstroms relativ zum Objektverzeichnis. Der korrekte Wert wird automatisch
+gesetzt und sollte im Normalfall nicht verändert zu werden. 
 
 #### dsid
 

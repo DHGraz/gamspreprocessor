@@ -12,7 +12,7 @@ requirements-dev.lock
 requirements.lock
 .coverage
 uv.lock
-objects/
+./objects/
 bags/
 debug.log
 .idea/

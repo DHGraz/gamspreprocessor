@@ -11,7 +11,7 @@ def test_init_project(tmp_path):
     result = runner.invoke(cli, ["project", "init", str(tmp_path)])
     assert result.exit_code == 0
     assert "Please edit this file" in result.output
-    assert (tmp_path / "project.toml").is_file()
+    assert (tmp_path / "gamsproject.toml").is_file()
 
     def test_update_project_needed(tmp_path, mocker): # pragma: no cover
         "Test for updating a project that needs updating."
@@ -68,13 +68,13 @@ def test_init_and_update_flow(tmp_path, monkeypatch):
     runner = CliRunner()
     init_result = runner.invoke(cli, ["project", "init", str(tmp_path)])
     assert init_result.exit_code == 0
-    assert (tmp_path / "project.toml").is_file()
+    assert (tmp_path / "gamsproject.toml").is_file()
 
     # Update an up to date project
     monkeypatch.setattr(
         "gamspreprocessor.cli.project.configuration_needs_update", lambda x: False
     )
-    result = runner.invoke(cli, ["project", "update", str(tmp_path / "project.toml")])
+    result = runner.invoke(cli, ["project", "update", str(tmp_path / "gamsproject.toml")])
     assert result.exit_code == 0
     assert "already up to date" in result.output
 
@@ -82,6 +82,6 @@ def test_init_and_update_flow(tmp_path, monkeypatch):
     monkeypatch.setattr(
         "gamspreprocessor.cli.project.configuration_needs_update", lambda x: True
     )
-    result = runner.invoke(cli, ["project", "update", str(tmp_path / "project.toml")])
+    result = runner.invoke(cli, ["project", "update", str(tmp_path / "gamsproject.toml")])
     assert result.exit_code == 0
     assert "Updated" in result.output

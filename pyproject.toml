@@ -1,6 +1,6 @@
 [project]
 name = "gamspreprocessor"
-version = "0.3.1"
+version = "0.4.0"
 description = "A utility which helps to preprocess GAMS objects before ingestion."
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" }
@@ -10,7 +10,7 @@ dependencies = [
     "uritools>=4.0.3",
     "saxonche>=12.5.0",
     "frozendict>=2.4.6",
-    "gamslib>=0.7.12",
+    "gamslib",
 ]
 readme = "README.md"
 # due to a problem with saxonche, 3.13 currently does not work!
@@ -54,5 +54,8 @@ extension-pkg-allow-list = ["saxonche"]
 
 [tool.ruff.lint]
 select = ["PL", "RUF", "SIM"]
+
+[tool.uv.sources]
+gamslib = { path = "../gamslib/dist/gamslib-0.8.0b3-py3-none-any.whl" }
 
 

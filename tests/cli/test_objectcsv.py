@@ -96,6 +96,11 @@ def test_create_csv(datadir):
     for field in dsdata.DSData.fieldnames():
         assert field in ds_csvdata[0], f"Missing field '{field}' in datastreams.csv"
 
+    # version 0.4.0 we changed the expected value of dspath: In the created csv file, 
+    # it should be the relative path to the object folder (no longer including the 'objects' folder)
+    for dc_dict in ds_csvdata:
+        assert dc_dict["dspath"] == dc_dict["dsid"]
+
 
 def test_create_csv_with_update_flag(datadir):
     """Test the csv collect command."""
