@@ -1,48 +1,56 @@
-variables:
-    UV_VERSION: 0.5
-    PYTHON_BASE_VERSION: 3.12
-    BASE_LAYER: bookworm-slim
-
 stages:
   - test
   - lint
-#  - build
+  - nightly-test
 
-# A hidden job template that can be used by different Python versions
-.test-template:
+variables:
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
+
+cache:
+  key:
+    files:
+      - uv.lock
+  paths:
+    - .uv-cache
+
+# run on any push
+pytest:
   stage: test
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: always
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
   script:
-    - echo "uv environment version"
-    - uv --version
-    - echo "Pinning ${PYTHON_VERSION}"
-    - uv python pin ${PYTHON_VERSION}
-    - uv sync
-    - echo "Using python version:"
-    - python --version
-    - echo "Running tests with uv"
-    - uv run pytest tests
+    - uv python install $PYTHON_VERSION
+    - uv run --python $PYTHON_VERSION pytest
 
-# Specific jobs for Python versions
-test-py_3.11:
-  extends: .test-template
-  variables:
-    PYTHON_VERSION: "3.11"
-
-test-py_3.12:
-  extends: .test-template
-  variables:
-    PYTHON_VERSION: "3.12"
-
-lint:
+# Linting (Ruff normally only needs one python version): run on any push 
+lint-ruff:
   stage: lint
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_BASE_VERSION-$BASE_LAYER
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: always
   script:
-    - echo "uv environment version"
-    - uv --version
-    - echo "Using python version:"
-    - python --version
-    - echo "Running uv check with ruff"
     - uv run ruff check src
+
+
+
+# Nightly matrix: force fresh environments and dependency upgrades
+nightly-pytest:
+  stage: nightly-test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: never
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
+  script:
+    - uv python install $PYTHON_VERSION
+    - uv run --python $PYTHON_VERSION pytest
 
 

@@ -160,7 +160,7 @@ def test_create_csv_with_tags(datadir):
     obj2_csv = read_csv_file(datadir / "objects" / "obj2" / "object.csv")
 
     assert "tags" in obj1_csv[0]
-    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+    assert obj1_csv[0]["tags"] == "Tag1; Tag2"
 
     # obj2 has no subjects, so tags should be empty
     assert "tags" in obj2_csv[0]
@@ -184,7 +184,7 @@ def test_create_csv_with_update_flag_and_tags(datadir):
     obj1_csv = read_csv_file(datadir / "objects" / "obj1" / "object.csv")
 
     assert "tags" in obj1_csv[0]
-    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+    assert obj1_csv[0]["tags"] == "Tag1; Tag2"
 
 
 def test_create_csv_with_update_flag_and_tags_does_not_overwrite_existing_tags(datadir):
@@ -200,7 +200,7 @@ def test_create_csv_with_update_flag_and_tags_does_not_overwrite_existing_tags(d
     )
     assert result.exit_code == 0
     obj1_csv = read_csv_file(objects_dir / "obj1" / "object.csv")
-    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+    assert obj1_csv[0]["tags"] == "Tag1; Tag2"
 
     # Change subjects in DC.xml to see if they get picked up (they should not)
     dc_xml = datadir / "objects" / "obj1" / "DC.xml"
@@ -218,7 +218,7 @@ def test_create_csv_with_update_flag_and_tags_does_not_overwrite_existing_tags(d
     assert result.exit_code == 0
     obj1_csv = read_csv_file(datadir / "objects" / "obj1" / "object.csv")
     # tags must be unchanged
-    assert obj1_csv[0]["tags"] == "Tag1;Tag2"
+    assert obj1_csv[0]["tags"] == "Tag1; Tag2"
 
 
 def test_collect_csv(datadir, monkeypatch):

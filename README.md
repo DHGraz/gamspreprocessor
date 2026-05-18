@@ -268,8 +268,9 @@ format_detector_url = "" # URL of a dector service (currently unused)
 
 `format_detector` erwartet zur Zeit einen der beiden Werte: 
 
-  * `magika` (default) ein auf der Google Magika Bibliothek basierenden Detector
-  * `base` ein minimaler Detector, der primär Dateinamen auswertet.
+  * `siegfried` (default) ein auf dem FormatDetector Siegfried (nutzt PRONOM) basierender Detector
+  * `magika` (default) ein auf der Google Magika Bibliothek basierenden Detector (wird vermutlich entfernt).
+  * `base` ein minimaler Detector, der primär Dateinamen auswertet (wird vermutlich entfernt).
 
 Die Toml-Datei **muss** die o.g. Felder enthalten.
 
@@ -351,7 +352,9 @@ für die Erzeugung des SIP verwendet werden. Diese beiden Dateien landen nicht i
 | source       | true      | Quelle aus der dig. Objekt generiert wurde | local |                 
 | objectType   | true      | basierend auf dc:type                      | text |
 | mainResource | false     | PID des Hauptdatenstroms                   | TEI.xml |
-| funder       | true      | Fördergeber                                | FFW (ausschreiben?) |
+| funder       | false     | Fördergeber                                | FFW (ausschreiben?) |
+| created_by   | false     | Erzeuger des Pakets (Software)             | text
+| sip_creation_timestamp | true | Zeitpunkt der Erzeugung des Package    | number
 
 
 #### recid
@@ -417,7 +420,9 @@ Falls es keinen Hauptdatenstrom gibt, kann der Wert leer bleiben.
 
 #### funder
 
-`funder` beschreibt, wer die Erstellung des Objekts finanziert hat. Ist in `project.toml` ein entsprechender Eintrag `metadata.funder` vorhanden, wird dieser verwendet.
+`funder` beschreibt, wer die Erstellung des Objekts finanziert hat. Ist in `project.toml` ein entsprechender Eintrag `metadata.funder` vorhanden, wird dieser verwendet. Funder ist ein optionales Feld, das aber dringend 
+empfohlen ist. 
+
 
 
 
@@ -428,7 +433,7 @@ Falls es keinen Hauptdatenstrom gibt, kann der Wert leer bleiben.
 
 | Key          | Required  |  Beschreibung                               |  Beispiel |  
 |------------- | --------- |  ------------------------------------------ |  --------- |
-| dspath       | true      |  Pfad zur Datei                             |  DC.xml |
+| dspath       | true     |  Pfad zur Datei im Bag                      |  DC.xml |
 | dsid         | true      |  Name des Datenstrims                       |  DC.xml |
 | mimetype     | true      |  Content Type des Datastreams               |  image/jpeg |
 | title        | false?    |  Titel des Datenstroms                      |  Dublin Core Metadata |
@@ -437,6 +442,9 @@ Falls es keinen Hauptdatenstrom gibt, kann der Wert leer bleiben.
 | rights       | true?     |  Lizenz des Datenstroms: Name (URI)         |  Public Domain (http://creativecommons.org/publicdomain/mark/1.0/) |
 | lang         | false     |  Sprache(n) des Datenstroms                 |  de; en  |
 | tags         | false     |  Frei zu vergebende Tags                    |  foo; bar |
+| size         | true      | Size of the file in bytes                   | 123456 |
+| puid         | false     | The PRONOM id (file format). Wäre für Repo usage wichtig  | fmt/!23 |
+| checksum     | true      | Checksummen für den Datenstrom: Array von strings im format md5 abab12..; required: md5 und sha512| sha512 ebd4.... | 
 
 
 #### dspath
@@ -502,6 +510,5 @@ Mehrere Sprachen können durch ein Semikolon getrennt werden.
 #### tags
 
 Tags sind frei wählbare Bezeichner. Das Feld ist optional. Mehrere Werte werden durch Semikolons (`;`) voneinander getrennt.
-
 
 
