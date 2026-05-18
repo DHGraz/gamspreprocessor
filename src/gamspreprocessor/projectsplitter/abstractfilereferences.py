@@ -96,7 +96,7 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
         Return path to the first file which matches or None if no file was found
         """
         uri_path: str = urisplit(referenced_uri).path
-        glob_pattern = uri_path.split("/", maxsplit=1)[-1]
+        glob_pattern = uri_path.rsplit("/", maxsplit=1)[-1]
         ranked_paths = []
         for file in file_root.rglob(glob_pattern):
             ranked_paths.append((cls._rank_path(Path(uri_path), file), file, uri_path))
