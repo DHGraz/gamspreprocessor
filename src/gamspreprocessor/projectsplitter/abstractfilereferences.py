@@ -88,7 +88,7 @@ class AbstractFileReference(metaclass=abc.ABCMeta):
 
     @classmethod
     def _find_source_file(cls, referenced_uri: str, file_root: Path) -> Path | None:
-        """Try to find a file below source_dir with might match the file referenced in uri.
+        """Try to find a file below source_dir which might match the file referenced in uri.
 
         The file will be identified by the best matching path (dir + filename)
         If 2 or more paths are ranked equally, the shortest matching path will be returned.
