@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objectDatastreams xmlns="http://www.fedora.info/definitions/1/0/access/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.fedora.info/definitions/1/0/access/ http://www.fedora-commons.org/definitions/1/0/listDatastreams.xsd"
+    pid="o:vipa.np.hbg.17200323" baseURL="http://fedora:8380/archive/">
+    <datastream dsid="BIBTEX" label="BIBTEX Source" mimeType="text/xml"/>
+    <datastream dsid="PID" label="Persistent Identifier" mimeType="text/html"/>
+    <datastream dsid="VOYANT" label="Reference to Voyant Tools" mimeType="text/html"/>
+    <datastream dsid="METHODS" label="Dissemination Methods" mimeType="text/xml"/>
+    <datastream dsid="SOURCE_REF" label="Reference to source stream" mimeType="text/xml"/>
+    <datastream dsid="METADATA" label="Mulgara Triplestore Metadata" mimeType="text/xml"/>
+    <datastream dsid="LATEX_STYLESHEET" label="Reference to TEI2LaTeX Stylesheet"
+        mimeType="text/xml"/>
+    <datastream dsid="FO_STYLESHEET" label="TEI resp. BibTeX to FO Stylesheet" mimeType="text/xml"/>
+    <datastream dsid="DC_MAPPING" label="TEI to DC mapping rules" mimeType="text/xml"/>
+    <datastream dsid="RDF_MAPPING" label="Reference to RDF Template for generating RELS-INT"
+        mimeType="text/xml"/>
+    <datastream dsid="REPLACEMENT_RULESET" label="Set of REGEX replacements" mimeType="text/xml"/>
+    <datastream dsid="HSSF_STYLESHEET" label="Stylesheet to generate HSSF stream"
+        mimeType="text/xml"/>
+    <datastream dsid="STYLESHEET" label="TEI resp. BibTeX to HTML Stylesheet" mimeType="text/xml"/>
+    <datastream dsid="QUERY" label="Mulgara Triplestore Query" mimeType="text/plain"/>
+    <datastream dsid="TORDF" label="XSLT Stylesheet to create RDF-Triples from TEI_SOURCE"
+        mimeType="text/xml"/>
+    <datastream dsid="QR" label="QR Code" mimeType="image/jpeg"/>
+    <datastream dsid="METS_REF" label="Reference to mets stream" mimeType="text/xml"/>
+    <datastream dsid="RDF" label="RDF Stream created by TORDF" mimeType="text/xml"/>
+    <datastream dsid="RELS-EXT" label="RDF Statments about this object" mimeType="text/xml"/>
+    <datastream dsid="facs_1" label="Facsimile" mimeType="image/jpeg"/>
+    <datastream dsid="THUMBNAIL" label="Thumbnail" mimeType="image/jpeg"/>
+    <datastream dsid="DC" label="Dublin Core Record" mimeType="text/xml"/>
+    <datastream dsid="METS_SOURCE" label="METS Source" mimeType="text/xml"/>
+    <datastream dsid="TEI_SOURCE" label="TEI Object" mimeType="text/xml"/>
+</objectDatastreams>

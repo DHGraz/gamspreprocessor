@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<result xmlns="http://www.fedora.info/definitions/1/0/types/">
+  <listSession>
+    <token>integration-token-2</token>
+    <cursor>25</cursor>
+    <expirationDate>2026-05-21T11:30:05.282Z</expirationDate>
+  </listSession>
+  <resultList>
+    <objectFields>
+      <pid>o:integration.page2.1</pid>
+    </objectFields>
+    <objectFields>
+      <pid>o:integration.page2.2</pid>
+    </objectFields>
+  </resultList>
+</result>
