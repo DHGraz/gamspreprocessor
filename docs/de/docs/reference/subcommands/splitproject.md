@@ -1,4 +1,4 @@
-# splitproject
+# Der Unterbefehl splitproject
 
 Der Unterbefehl `splitproject` ist dazu gedacht, aus bestehenden GAMS 3 Projektdaten Objektordner für GAMS 5 zu erzeugen. Der Befehl ist also nur für Mitarbeiter:innen des DDH relevant.
 

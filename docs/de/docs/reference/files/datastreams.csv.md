@@ -9,7 +9,7 @@ Die Datei besteht aus folgenden Spalten:
 
 | Key          | Required  |  Beschreibung                               |  Beispiel |  
 |------------- | --------- |  ------------------------------------------ |  --------- |
-| dspath       | true      |  Pfad zur Datei (Verzeichnisnae/Dateiname)  |  detamax.diary/DC.xml |
+| dspath       | true      |  Pfad zur Datei relativ zum Objektverzeichnis  |  DC.xml |
 | dsid         | true      |  Name des Datenstrims                       |  DC.xml |
 | mimetype     | true      |  Content Type des Datastreams               |  image/jpeg |
 | title        | false?    |  Titel des Datenstroms                      |  Dublin Core Metadata |
@@ -21,9 +21,11 @@ Die Datei besteht aus folgenden Spalten:
 
 ### dspath
 
-`dspath` bezeichnet den zweiteiligen (Objektverzeichnis/Dateiname) Pfad zur in das Bag aufzunehmende Datei.
-Der erste Teil ist also kein vollständiger Pfad, sondern nur die Objektid, also der Wert, der in object.csv als `recid` vergeben wurde. 
-Ein Beispiel könnte also so aussehen: `hsa/TEI.xml`. Der Wert wird automatisch gesetzt und braucht im Normallfall nie verändert zu werden.
+`dspath` bezeichnet den Pfad zur in das Bag aufzunehmende Datei relativ zum Objektverzeichnis.
+Ein Beispiel könnte also so aussehen: `TEI.xml`. Der Wert wird automatisch gesetzt und braucht 
+im Normallfall nie verändert zu werden. Die Datei kann auch in einem Unterverzeichnis des
+Objektordners liegen. Beim Packagen werden aber alle Dateien direkt im Objektordner 
+unter dem als `dsid` angegebenen Namen abgelegt.
 
 ### dsid
 
