@@ -17,7 +17,7 @@ from gamslib.objectdir import (
 logger = logging.getLogger(__name__)
 
 
-@click.group(invoke_without_command=True)
+@click.command(name="validate")
 @click.option(
     "-c",
     "--continue-on-error",
