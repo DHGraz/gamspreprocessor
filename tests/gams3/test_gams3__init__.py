@@ -1,4 +1,6 @@
-from gamspreprocessor.gams3 import export_objects
+from pathlib import Path
+
+from gamspreprocessor.gams3 import ExportResult, export_objects
 
 
 class FakeObject:
@@ -6,11 +8,13 @@ class FakeObject:
         self.pid = pid
         self.export_calls = []
 
-    def export(self, output_dir, overwrite=False):
-        self.export_calls.append((output_dir, overwrite))
+    def export(self, output_dir, overwrite=False, strip_prefix=False):
+        self.export_calls.append((output_dir, overwrite, strip_prefix))
+        return [Path(output_dir) / f"{self.pid}.xml"]
 
 
 def test_export_objects_creates_output_dir_and_yields_objects(tmp_path, monkeypatch):
+    "Test that export_objects creates the output directory and yields ExportResult instances for each object."
     objects = [FakeObject("o:one"), FakeObject("o:two")]
     captured = {}
 
@@ -36,6 +40,12 @@ def test_export_objects_creates_output_dir_and_yields_objects(tmp_path, monkeypa
 
     assert (tmp_path / "exported").exists()
     assert captured == {"base_url": "https://example.com/fedora", "pattern": "o:*"}
-    assert yielded == objects
+    assert all(isinstance(item, ExportResult) for item in yielded)
+    assert [item.obj for item in yielded] == objects
+    assert [item.exported_files for item in yielded] == [
+        [tmp_path / "exported" / "o:one.xml"],
+        [tmp_path / "exported" / "o:two.xml"],
+    ]
+    assert [item.warnings for item in yielded] == [[], []]
     for obj in objects:
-        assert obj.export_calls == [((tmp_path / "exported"), True)]
+        assert obj.export_calls == [((tmp_path / "exported"), True, False)]

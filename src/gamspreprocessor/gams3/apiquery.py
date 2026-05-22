@@ -25,7 +25,15 @@ class Gams3Query:
         self.api_url = f"{self.base_url}/objects"
 
     def find_objects(self, pid_pattern: str) -> Generator[Gams3Object, None, None]:
-        "Find all objects with the given pid."
+        """Find all objects with the given pid.
+        
+        Args:
+            pid_pattern: A pattern to match PIDs, e.g. "o:foo*"
+        Yields:
+            Gams3Object instances for each matching PID.
+        Raises:
+            ValueError: If the PID pattern is invalid.
+        """
         if not self.is_valid_pid_pattern(pid_pattern):
             raise ValueError(f"Invalid PID pattern: '{pid_pattern}'")
         initial_url = self._build_initial_query_url(pid_pattern)

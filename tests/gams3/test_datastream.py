@@ -33,7 +33,7 @@ def test_datastream_content(monkeypatch, lazy_shared_datadir, make_fake_response
 
     def fake_get(url, timeout):
         assert timeout == 30
-        assert url == "https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEI_SOURCE"
+        assert url == "https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEI_SOURCE/content"
         xml = (lazy_shared_datadir / "tei_source.xml").read_bytes()
         return make_fake_response(xml, 200)
 
@@ -168,7 +168,7 @@ def test_export_warns_on_unknown_mime_type(recwarn, tmp_path: Path, monkeypatch,
     result = ds.export(tmp_path)
 
     assert result is not None
-    assert result.name == "o_foo.testobject1"
+    assert result.name == "CUSTOM"
     assert len(recwarn) == 1
 
 
@@ -207,6 +207,7 @@ def test_export_writes_special_datastream_to_subdirectory(
 
     assert result is not None
     assert result.parent.name == "special_datastreams"
+    assert result.name == "METADATA.xml"
     assert result.read_bytes() == b"<xml>metadata</xml>"
 
 
@@ -227,4 +228,5 @@ def test_export_writes_regular_datastream_to_object_directory(
 
     assert result is not None
     assert result.parent == tmp_path
+    assert result.name == "TEI_SOURCE.xml"
     assert result.read_bytes() == b"<TEI/>"

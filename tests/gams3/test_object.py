@@ -38,6 +38,7 @@ def test_get_datastreams(lazy_shared_datadir, monkeypatch, make_fake_response):
 
 
 def test_export_creates_object_directory_and_exports_datastreams(tmp_path, monkeypatch):
+    "Test that export creates an object-specific directory and exports datastreams into it."
     exported = []
 
     class FakeDatastream:
@@ -62,6 +63,7 @@ def test_export_creates_object_directory_and_exports_datastreams(tmp_path, monke
 
 
 def test_export_raises_if_object_dir_exists_and_overwrite_false(tmp_path):
+    "Test that export raises FileExistsError if the target object directory already exists and overwrite is False."
     obj = Gams3Object(pid="o:foo.testobject1", base_url="https://example.com/fedora")
     object_dir = tmp_path / "o%3Afoo.testobject1"
     object_dir.mkdir(parents=True)
@@ -71,6 +73,7 @@ def test_export_raises_if_object_dir_exists_and_overwrite_false(tmp_path):
 
 
 def test_export_overwrite_cleans_existing_directory(tmp_path, monkeypatch):
+    "Test that export with overwrite=True cleans the existing object directory before exporting."
     obj = Gams3Object(pid="o:foo.testobject1", base_url="https://example.com/fedora")
     object_dir = tmp_path / "o%3Afoo.testobject1"
     nested = object_dir / "nested"
@@ -91,3 +94,16 @@ def test_export_overwrite_cleans_existing_directory(tmp_path, monkeypatch):
     assert list(object_dir.iterdir()) == []
 
 
+def test_export_strip_prefix(tmp_path, monkeypatch):
+    "Test that export with strip_prefix=True creates an object directory without the type prefix."
+    obj = Gams3Object(pid="o:foo.testobject1", base_url="https://example.com/fedora")
+
+    monkeypatch.setattr(
+        "gamspreprocessor.gams3.object.Gams3Object.get_datastreams",
+        lambda self: [],
+    )
+
+    obj.export(tmp_path, strip_prefix=True)
+
+    object_dir = tmp_path / "foo.testobject1"
+    assert object_dir.exists()

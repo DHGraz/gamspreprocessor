@@ -11,6 +11,7 @@ from gamspreprocessor.gams3.datastream import DataStream
 
 # pylint: disable=c-extension-no-member
 
+
 class Gams3Object:
     "A Fedora 3 object."
 
@@ -32,19 +33,26 @@ class Gams3Object:
         response = requests.get(url, timeout=30)
         response.raise_for_status()
         tree = ET.fromstring(response.content)
-        for datastream in tree.findall("./fedora:datastream", namespaces=self.NAMESPACES):
+        for datastream in tree.findall(
+            "./fedora:datastream", namespaces=self.NAMESPACES
+        ):
             ds_url = f"{self.object_url}/datastreams/{datastream.get('dsid')}"
             dsid = datastream.get("dsid")
             label = datastream.get("label")
             mime_type = datastream.get("mimeType")
-            yield DataStream(url=ds_url, dsid=dsid, pid=self.pid, label=label, mime_type=mime_type)
+            yield DataStream(
+                url=ds_url, dsid=dsid, pid=self.pid, label=label, mime_type=mime_type
+            )
 
-    def export(self, output_root: Path, overwrite: bool = False) -> list[Path]:
+    def export(
+        self, output_root: Path, overwrite: bool = False, strip_prefix: bool = False
+    ) -> list[Path]:
         """Export this object and its datastreams into an object-specific directory.
 
         Args:
             output_root: Root directory where the object directory will be created.
             overwrite: Whether to overwrite an existing object directory.
+            strip_prefix: Whether to strip the "o:" prefix from the PID when naming the subdirectories.
 
         Returns:
             Paths of all exported datastream files.
@@ -53,12 +61,16 @@ class Gams3Object:
             FileExistsError: If the target object directory exists and `overwrite` is False.
         """
         exported_ds_files = []
-        object_dir = output_root / self.pid.replace(":", "%3A")
+        object_dir = output_root / self._get_object_dir_name(strip_prefix)
         if object_dir.exists():
             if not overwrite:
-                raise FileExistsError(f"Output directory for PID {self.pid} already exists: {object_dir}")
+                raise FileExistsError(
+                    f"Output directory for PID {self.pid} already exists: {object_dir}"
+                )
             else:
-                warnings.warn(f"Overwriting existing directory for PID {self.pid}: {object_dir}")
+                warnings.warn(
+                    f"Overwriting existing directory for PID {self.pid}: {object_dir}"
+                )
                 self._clean_directory(object_dir)
         object_dir.mkdir(parents=True, exist_ok=True)
         for ds in self.get_datastreams():
@@ -75,3 +87,14 @@ class Gams3Object:
             else:
                 self._clean_directory(item)
                 item.rmdir()
+
+    def _get_object_dir_name(self, strip_prefix: bool) -> str:
+        """Return a clean object dir name.
+
+        Escapes colons in the PID and optionally strips the prefix (o:, context:, etc).
+        """
+        if strip_prefix and ':' in self.pid:
+            dirname = self.pid.split(":", 1)[1]
+        else:
+            dirname = self.pid
+        return dirname.replace(":", "%3A")

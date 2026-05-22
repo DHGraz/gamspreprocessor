@@ -49,16 +49,25 @@ class DataStream:
     pid: str
     label: str
     mime_type: str
-    _content: bytes = field(init=False, default=None)
+    # if requesting fails, we set it to None to avoid re-requesting it
+    _content: bytes|None = field(init=False, default=b"")
 
 
     @property
     def content(self):
-        "Return the content of the datastream as bytes."
+        """Return the content of the datastream as bytes.
+        
+        If the content is not available (e.g. because the datastream is empty 
+        or the request fails), return an empty byte string.
+        """
+        if self._content is None:
+            return b""
         if not self._content:
-            response = requests.get(self.url, timeout=30)
-            response.raise_for_status()
-            self._content = response.content
+            response = requests.get(f"{self.url}/content", timeout=30)
+            if response.status_code >= 400:  # noqa: PLR2004
+                self._content = None
+            else:
+                self._content = response.content
         return self._content
 
     def export(self, output_dir: Path) -> Path | None:
@@ -109,5 +118,5 @@ class DataStream:
             )
         # Use dsid as base filename, and append label if it exists and is not the same as dsid
         # Replace any characters that are not safe for filenames with underscores
-        safe_name = "".join(c if c.isalnum() or c in "-_." else "_" for c in self.pid)
+        safe_name = "".join(c if c.isalnum() or c in "-_." else "_" for c in self.dsid)
         return safe_name + extension
