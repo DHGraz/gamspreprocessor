@@ -8,10 +8,12 @@ from pathlib import Path
 from gamslib.formatdetect import detect_format
 from gamslib.formatdetect.formatinfo import SubType
 
-from gamspreprocessor.objectsource import AbstractObjectSource, GenericObjectSource, LIDOObjectSource, TEIObjectSource
-# from ..objectsource.genericobjectsource import GenericObjectSource
-# from ..objectsource.lidoobjectsource import LIDOObjectSource
-# from ..objectsource.teiobjectsource import TEIObjectSource
+from gamspreprocessor.objectsource import (
+    AbstractObjectSource,
+    GenericObjectSource,
+    LIDOObjectSource,
+    TEIObjectSource,
+)
 
 
 def make_object_source(

@@ -11,31 +11,11 @@ import shutil
 import warnings
 from pathlib import Path
 
-# from .genericobjectsource import GenericObjectSource
-# from .lidoobjectsource import LIDOObjectSource
-# from .teiobjectsource import TEIObjectSource
 from gamspreprocessor.objectsource import make_object_source, GenericObjectSource
 
-# from gamslib.formatdetect import detect_format
-# from gamslib.formatdetect.formatinfo import SubType
 from .bookkeeper import BookKeeper
 
 logger = logging.getLogger(__name__)
-
-
-# def guess_format(filename: str | Path, explicit_type: str = "auto") -> tuple[str, str]:
-#     """Guess the format of the file from the extension.
-
-#     Uses the formatdetector from gamslib to find out the format of the file. This means,
-#     that the type of format guesser can be configured via project.toml or
-#     environment variables.
-
-#     Returns a tuple with the content type and the (sub)format.
-#     """
-#     filepath = Path(filename) if isinstance(filename, str) else filename
-#     format_info = detect_format(filepath)
-#     subtype = format_info.subtype if explicit_type == "auto" else explicit_type
-#     return format_info.mimetype, subtype
 
 
 class ProjectSplitter:
@@ -45,12 +25,12 @@ class ProjectSplitter:
     """
 
     def __init__(
-            self,
-            output_dir: Path,
-            project_dir: Path,
-            replace_existing_object_dirs: bool = False,
+        self,
+        output_dir: Path,
+        project_dir: Path,
+        replace_existing_object_dirs: bool = False,
     ):
-        """Initialize the ProjectSplitter.  
+        """Initialize the ProjectSplitter.
 
         Arguments:
         output_dir: The directory where the object directories will be created.
@@ -58,8 +38,12 @@ class ProjectSplitter:
         replace_existing_object_dirs: If True, existing object directories will
             be replaced. Default is False.
         """
-        self.output_dir: Path = output_dir  # this is where the object directories will be created
-        self.project_dir: Path = project_dir  # this is the directory containing the original data
+        self.output_dir: Path = (
+            output_dir  # this is where the object directories will be created
+        )
+        self.project_dir: Path = (
+            project_dir  # this is the directory containing the original data
+        )
         self.replace_existing_object_dirs: bool = replace_existing_object_dirs
 
         if not self.output_dir.exists():
@@ -78,8 +62,12 @@ class ProjectSplitter:
         )
 
     def make_object_source(
-            self, source_file: Path, use_format: str = 'auto', strip_prefix: bool = True,
-            strip_extension: bool = False) -> GenericObjectSource:
+        self,
+        source_file: Path,
+        use_format: str = "auto",
+        strip_prefix: bool = True,
+        strip_extension: bool = False,
+    ) -> GenericObjectSource:
         """ObjectSource factory.
 
         Return an ObjectSource or a subclass of ObjectSource representing the source file.
@@ -88,27 +76,16 @@ class ProjectSplitter:
         Raises a FileExistsError if the directory already exists (ie. the object
         has already been split).
         """
-        return make_object_source(source_file, use_format, strip_prefix, strip_extension)
-        # use_format = use_format.lower()
-        # if use_format == "auto":
-        #     _, objecttype = guess_format(source_file)
-        # elif use_format == 'tei':
-        #     objecttype = SubType.TEIP5
-        # elif use_format == 'lido':
-        #     objecttype = SubType.LIDO
-        # else:
-        #     raise ValueError(f"Invalid format type: '{use_format}'. Must be "
-        #                      f"'auto', 'tei' or 'lido'.")
-
-        # if objecttype in (SubType.TEIP4, SubType.TEIP5):
-        #     return TEIObjectSource(source_file, strip_prefix, strip_extension)
-        # if objecttype == SubType.LIDO:
-        #     return LIDOObjectSource(source_file, strip_prefix, strip_extension)
-        # return GenericObjectSource(source_file, strip_prefix, strip_extension)
+        return make_object_source(
+            source_file, use_format, strip_prefix, strip_extension
+        )
 
     def split(
-            self, sourcefile: Path, objecttype: str = "auto", strip_prefix=True,
-            strip_extension=False
+        self,
+        sourcefile: Path,
+        objecttype: str = "auto",
+        strip_prefix=True,
+        strip_extension=False,
     ) -> list[Path]:
         """Convert sourcefile into an object directory.
 
@@ -120,7 +97,9 @@ class ProjectSplitter:
         Return a list files (Path objects) which have been copied to the object directory.
         """
         rv = []
-        obj_src = self.make_object_source(sourcefile, objecttype, strip_prefix, strip_extension)
+        obj_src = self.make_object_source(
+            sourcefile, objecttype, strip_prefix, strip_extension
+        )
         obj_src.rewrite_pid()
         obj_src.rewrite_references()
         obj_output_dir = self.output_dir / obj_src.safe_pid
@@ -130,7 +109,9 @@ class ProjectSplitter:
                 self._bookkeeper.remove_pid(obj_src.pid)
                 shutil.rmtree(obj_output_dir)
             else:
-                raise FileExistsError(f"Object directory '{obj_output_dir}' already exists.")
+                raise FileExistsError(
+                    f"Object directory '{obj_output_dir}' already exists."
+                )
         for copied_file in obj_src.save(obj_output_dir):
             self._bookkeeper.add_pid(copied_file, obj_src.pid)
             rv.append(copied_file)
@@ -145,46 +126,3 @@ class ProjectSplitter:
         "Reset the bookkeeper."
         self._bookkeeper.reset()
         self._bookkeeper.save()
-
-    # @classmethod
-    # def extract_pid(
-    #     cls, file_path: Path, object_type: str, strip_prefix: bool
-    # ) -> tuple[str, bool]:
-    #     """Extract the pid from a path.
-
-    #     If the PID was extracted from the content (eg. TEI or LIDO file), the
-    #     second return value is True. This is important, because this means that
-    #     we might have to update the value in the file.
-
-    #     If object_type is 'tei' or 'lido', we try to extract the PID from the file.
-    #     If strip_prefix is True, we remove the prefix (eg.: 'o:') from the pid.
-    #     If this fails or object_type is not known, we use the filename without extension.
-    #     """
-    #     from_content = False
-    #     pid = None
-    #     if object_type == "tei":
-    #         root = ET.parse(file_path).getroot()
-    #         element = root.find(
-    #             "./tei:teiHeader/tei:fileDesc/tei:publicationStmt/tei:idno",
-    #             namespaces={"tei": "http://www.tei-c.org/ns/1.0"},
-    #         )
-    #         if element is not None and element.text:
-    #             pid = element.text
-    #             from_content = True
-    #     elif object_type == "lido":
-    #         root = ET.parse(file_path).getroot()
-    #         element = root.find(
-    #             "./lido:lidoRecID", namespaces={"lido": "http://www.lido-schema.org"}
-    #         )
-    #         if element is not None and element.text:
-    #             pid = element.text
-    #             from_content = True
-    #     else:
-    #         pid = None
-
-    #     if pid is None:
-    #         pid = ".".join(file_path.name.split(".")[0:-1])
-    #         from_content = False
-    #     elif strip_prefix:
-    #         pid = pid.split(":")[-1]
-    #     return pid, from_content
