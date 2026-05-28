@@ -6,7 +6,7 @@ is necessary or possible.
 import shutil
 from pathlib import Path
 
-from gamspreprocessor.projectsplitter.abstractobjectsources import AbstractObjectSource
+from gamspreprocessor.objectsource.abstractobjectsources import AbstractObjectSource
 
 
 class GenericObjectSource(AbstractObjectSource):

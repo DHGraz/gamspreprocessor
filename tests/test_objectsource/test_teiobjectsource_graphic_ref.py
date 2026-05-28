@@ -3,8 +3,9 @@
 import pytest
 from lxml import etree as ET
 
-from gamspreprocessor.projectsplitter.teiobjectsource import TEIGraphicReference
+from gamspreprocessor.objectsource.teiobjectsource import TEIGraphicReference
 
+# pylint: disable=c-extension-no-member
 
 @pytest.fixture(name="tei_graphic_element")
 def make_tei_graphic_element():

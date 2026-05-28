@@ -1,6 +1,8 @@
+"Tests for the GenericObjectSource class."
+
 import os
 import pytest
-from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSource
+from gamspreprocessor.objectsource import GenericObjectSource
 
 def test_pid_with_colon(tmp_path):
     """If strip_prefix is True, the o: should be removed."""

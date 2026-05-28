@@ -1,6 +1,10 @@
-import pytest
+"Tests for the AbstractFileReference class."
 from pathlib import Path
-from gamspreprocessor.projectsplitter.abstractfilereferences import AbstractFileReference
+
+import pytest
+
+from gamspreprocessor.objectsource import AbstractFileReference
+
 
 class MockFileReference(AbstractFileReference):
     """To test the AbstractFileReference class, we need a vanilla subclass"""

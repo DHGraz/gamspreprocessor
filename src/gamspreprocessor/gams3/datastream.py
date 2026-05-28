@@ -7,6 +7,11 @@ from typing import Final
 import warnings
 import requests
 
+from gamslib.formatdetect import detect_format
+from gamslib.formatdetect.formatinfo import SubType
+
+from gamspreprocessor.objectsource import make_object_source
+
 
 # These are datastream ids which should be treated differently, as they are not regular content 
 # datastreams but rather metadata or system datastreams. (We put them in a separate subdirectory
@@ -70,8 +75,11 @@ class DataStream:
                 self._content = response.content
         return self._content
 
-    def export(self, output_dir: Path) -> Path | None:
+    def export(self, output_dir: Path, strip_prefix:bool = False) -> Path | None:
         """Export the datastream content to a file in the given output directory."""
+        # Some datastreams are not meant to be exported, either because they are empty or 
+        # because they are not regular content datastreams. In this case, we return None 
+        # to indicate that no file was created.
         if self.dsid in IGNORE_DS_IDS or self.is_empty() :
             return None
         if self.dsid in SPECIAL_DS_IDS:
@@ -81,6 +89,8 @@ class DataStream:
             ds_path = output_dir / f"{self._get_filename()}"
         with open(ds_path, "wb") as f:
             f.write(self.content)
+            f.flush()
+            self._rewrite_references(ds_path, self.mime_type, strip_prefix=strip_prefix)
         return ds_path
 
     def is_empty(self) -> bool:
@@ -120,3 +130,15 @@ class DataStream:
         # Replace any characters that are not safe for filenames with underscores
         safe_name = "".join(c if c.isalnum() or c in "-_." else "_" for c in self.dsid)
         return safe_name + extension
+
+
+    def _rewrite_references(self, ds_file: Path, mime_type: str, strip_prefix: bool = False) -> None:
+        """Rewrite any references to other datastreams if required for type.
+
+        This method is called before exporting the datastream to a file.
+        """
+        format_ = detect_format(ds_file)
+        if format_ and format_.subtype in (SubType.TEIP5, SubType.LIDO):
+            obj_src = make_object_source(ds_file, mime_type, strip_prefix=strip_prefix, strip_extension=False)
+            obj_src.rewrite_references()
+            obj_src.save(ds_file.parent)

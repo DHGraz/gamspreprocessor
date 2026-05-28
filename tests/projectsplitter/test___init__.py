@@ -1,18 +1,20 @@
-import pytest
+"Tests for the projectsplitter module."
 from pathlib import Path
-from gamspreprocessor import projectsplitter 
-from gamspreprocessor.projectsplitter.teiobjectsource import TEIObjectSource
-from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource
-from gamspreprocessor.projectsplitter.genericobjectsource import GenericObjectSource
 
-from gamslib.formatdetect.formatinfo import SubType
+import pytest
 from gamslib.formatdetect import FormatInfo
+from gamslib.formatdetect.formatinfo import SubType
+
+from gamspreprocessor import projectsplitter
+from gamspreprocessor.objectsource import GenericObjectSource, LIDOObjectSource
+from gamspreprocessor.objectsource.teiobjectsource import TEIObjectSource
 
 # @pytest.fixture
 # def mock_detect_format(mocker):
 #     return mocker.patch('gamslib.formatdetect.detect_format')
 
 def test_make_object_source_missing_file():
+    "Test make_object_source with a missing file"
     source_file = Path("/path/to/nonexistent.file") 
     with pytest.raises(FileNotFoundError):
         projectsplitter.make_object_source(source_file)

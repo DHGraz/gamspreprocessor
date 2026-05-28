@@ -3,7 +3,7 @@
 
 from frozendict import frozendict
 
-from gamspreprocessor.projectsplitter.abstractobjectsources import XMLObjectSource
+from gamspreprocessor.objectsource.abstractobjectsources import XMLObjectSource
 
 from .abstractfilereferences import AbstractXMLFileReference
 

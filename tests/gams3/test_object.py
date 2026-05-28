@@ -42,7 +42,7 @@ def test_export_creates_object_directory_and_exports_datastreams(tmp_path, monke
     exported = []
 
     class FakeDatastream:
-        def export(self, output_dir):
+        def export(self, output_dir, strip_prefix=True):
             exported.append(output_dir)
 
     def fake_get_datastreams(_self):

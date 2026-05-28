@@ -1,6 +1,11 @@
-import pytest
-from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource, LIDOResourceSet
+"Tests for the LidoObjectSource class"
+
+# pylint: disable=c-extension-no-member
 from xml.etree import ElementTree as ET
+
+import pytest
+
+from gamspreprocessor.objectsource import LIDOObjectSource, LIDOResourceSet
 
 
 def test_pid_keep_prefix(shared_datadir):

@@ -1,7 +1,10 @@
-import pytest
-from gamspreprocessor.projectsplitter.teiobjectsource import TEIObjectSource
+"Tests for TEIObjectSource."""
+
 from xml.etree import ElementTree as ET
 
+import pytest
+
+from gamspreprocessor.objectsource import TEIObjectSource
 
 
 def test_pid_keep_prefix(shared_datadir):

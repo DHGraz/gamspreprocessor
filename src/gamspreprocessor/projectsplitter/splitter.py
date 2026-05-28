@@ -11,30 +11,31 @@ import shutil
 import warnings
 from pathlib import Path
 
-from gamslib.formatdetect import detect_format
-from gamslib.formatdetect.formatinfo import SubType
+# from .genericobjectsource import GenericObjectSource
+# from .lidoobjectsource import LIDOObjectSource
+# from .teiobjectsource import TEIObjectSource
+from gamspreprocessor.objectsource import make_object_source, GenericObjectSource
 
+# from gamslib.formatdetect import detect_format
+# from gamslib.formatdetect.formatinfo import SubType
 from .bookkeeper import BookKeeper
-from .genericobjectsource import GenericObjectSource
-from .lidoobjectsource import LIDOObjectSource
-from .teiobjectsource import TEIObjectSource
 
 logger = logging.getLogger(__name__)
 
 
-def guess_format(filename: str | Path, explicit_type: str = "auto") -> tuple[str, str]:
-    """Guess the format of the file from the extension.
+# def guess_format(filename: str | Path, explicit_type: str = "auto") -> tuple[str, str]:
+#     """Guess the format of the file from the extension.
 
-    Uses the formatdetector from gamslib to find out the format of the file. This means,
-    that the type of format guesser can be configured via project.toml or
-    environment variables.
+#     Uses the formatdetector from gamslib to find out the format of the file. This means,
+#     that the type of format guesser can be configured via project.toml or
+#     environment variables.
 
-    Returns a tuple with the content type and the (sub)format.
-    """
-    filepath = Path(filename) if isinstance(filename, str) else filename
-    format_info = detect_format(filepath)
-    subtype = format_info.subtype if explicit_type == "auto" else explicit_type
-    return format_info.mimetype, subtype
+#     Returns a tuple with the content type and the (sub)format.
+#     """
+#     filepath = Path(filename) if isinstance(filename, str) else filename
+#     format_info = detect_format(filepath)
+#     subtype = format_info.subtype if explicit_type == "auto" else explicit_type
+#     return format_info.mimetype, subtype
 
 
 class ProjectSplitter:
@@ -87,22 +88,23 @@ class ProjectSplitter:
         Raises a FileExistsError if the directory already exists (ie. the object
         has already been split).
         """
-        use_format = use_format.lower()
-        if use_format == "auto":
-            _, objecttype = guess_format(source_file)
-        elif use_format == 'tei':
-            objecttype = SubType.TEIP5
-        elif use_format == 'lido':
-            objecttype = SubType.LIDO
-        else:
-            raise ValueError(f"Invalid format type: '{use_format}'. Must be "
-                             f"'auto', 'tei' or 'lido'.")
+        return make_object_source(source_file, use_format, strip_prefix, strip_extension)
+        # use_format = use_format.lower()
+        # if use_format == "auto":
+        #     _, objecttype = guess_format(source_file)
+        # elif use_format == 'tei':
+        #     objecttype = SubType.TEIP5
+        # elif use_format == 'lido':
+        #     objecttype = SubType.LIDO
+        # else:
+        #     raise ValueError(f"Invalid format type: '{use_format}'. Must be "
+        #                      f"'auto', 'tei' or 'lido'.")
 
-        if objecttype in (SubType.TEIP4, SubType.TEIP5):
-            return TEIObjectSource(source_file, strip_prefix, strip_extension)
-        if objecttype == SubType.LIDO:
-            return LIDOObjectSource(source_file, strip_prefix, strip_extension)
-        return GenericObjectSource(source_file, strip_prefix, strip_extension)
+        # if objecttype in (SubType.TEIP4, SubType.TEIP5):
+        #     return TEIObjectSource(source_file, strip_prefix, strip_extension)
+        # if objecttype == SubType.LIDO:
+        #     return LIDOObjectSource(source_file, strip_prefix, strip_extension)
+        # return GenericObjectSource(source_file, strip_prefix, strip_extension)
 
     def split(
             self, sourcefile: Path, objecttype: str = "auto", strip_prefix=True,

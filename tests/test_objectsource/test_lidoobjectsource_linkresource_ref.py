@@ -5,7 +5,7 @@ import pytest
 
 from lxml import etree as ET
 
-from gamspreprocessor.projectsplitter.lidoobjectsource import LIDOObjectSource, LIDOResourceSet
+from gamspreprocessor.objectsource import LIDOObjectSource, LIDOResourceSet
 
 
 @pytest.fixture(name="lidoresourceset_element")

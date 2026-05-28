@@ -74,7 +74,7 @@ class Gams3Object:
                 self._clean_directory(object_dir)
         object_dir.mkdir(parents=True, exist_ok=True)
         for ds in self.get_datastreams():
-            exported_file = ds.export(object_dir)
+            exported_file = ds.export(object_dir, strip_prefix=strip_prefix)
             if exported_file:
                 exported_ds_files.append(exported_file)
         return exported_ds_files
