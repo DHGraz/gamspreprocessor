@@ -1,16 +1,22 @@
 "Tests the for datastreams module of the gams3 package."
 
 from pathlib import Path
+from types import SimpleNamespace
+
+from gamslib.formatdetect.formatinfo import SubType
 
 from gamspreprocessor.gams3.datastream import DataStream
+from gamspreprocessor.gams3.object import SPECIAL_DIR_NAME
+REQUEST_TIMEOUT = 30
 
 
 def _mock_datastream_response(monkeypatch, make_fake_response, payload: bytes):
     def fake_get(_url, timeout):
-        assert timeout == 30
+        assert timeout == REQUEST_TIMEOUT
         return make_fake_response(payload, 200)
 
     monkeypatch.setattr("gamspreprocessor.gams3.datastream.requests.get", fake_get)
+
 
 def test_datastream_init():
     "Test the initialization of a DataStream."
@@ -21,7 +27,10 @@ def test_datastream_init():
         label="Metadata for test object 1",
         mime_type="text/xml",
     )
-    assert ds.url == "https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/METADATA"
+    assert (
+        ds.url
+        == "https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/METADATA"
+    )
     assert ds.dsid == "METADATA"
     assert ds.pid == "o:foo.testobject1"
     assert ds.label == "Metadata for test object 1"
@@ -32,8 +41,11 @@ def test_datastream_content(monkeypatch, lazy_shared_datadir, make_fake_response
     "Test the content property of a DataStream."
 
     def fake_get(url, timeout):
-        assert timeout == 30
-        assert url == "https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEI_SOURCE/content"
+        assert timeout == REQUEST_TIMEOUT
+        assert (
+            url
+            == "https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEI_SOURCE/content"
+        )
         xml = (lazy_shared_datadir / "tei_source.xml").read_bytes()
         return make_fake_response(xml, 200)
 
@@ -73,6 +85,133 @@ def test_datastream_content_is_cached(monkeypatch, make_fake_response):
     assert len(calls) == 1
 
 
+def test_datastream_content_returns_empty_bytes_when_cache_is_none():
+    ds = DataStream(
+        url="https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEI_SOURCE",
+        dsid="TEI_SOURCE",
+        pid="o:foo.testobject1",
+        label="TEI Source",
+        mime_type="text/xml",
+    )
+    object.__setattr__(ds, "_content", None)
+
+    assert ds.content == b""
+
+
+def test_datastream_content_returns_empty_bytes_on_http_error(monkeypatch):
+    calls = []
+
+    class FakeResponse:
+        status_code = 500
+        content = b"server error"
+
+    def fake_get(url, timeout):
+        calls.append((url, timeout))
+        assert timeout == REQUEST_TIMEOUT
+        return FakeResponse()
+
+    monkeypatch.setattr("gamspreprocessor.gams3.datastream.requests.get", fake_get)
+
+    ds = DataStream(
+        url="https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEI_SOURCE",
+        dsid="TEI_SOURCE",
+        pid="o:foo.testobject1",
+        label="TEI Source",
+        mime_type="text/xml",
+    )
+
+    assert ds.content is None
+    assert ds.content == b""
+    assert len(calls) == 1
+
+
+def test_export_rewrites_references_for_teip5(monkeypatch, tmp_path, make_fake_response):
+    captured = {}
+
+    def fake_detect_format(_path):
+        return SimpleNamespace(subtype=SubType.TEIP5)
+
+    class FakeObjectSource:
+        def __init__(self, ds_file, mode, strip_prefix, strip_extension):
+            captured["init"] = (ds_file, mode, strip_prefix, strip_extension)
+
+        def rewrite_references(self):
+            captured["rewrite"] = True
+
+        def save(self, directory):
+            captured["save"] = directory
+
+    monkeypatch.setattr("gamspreprocessor.gams3.datastream.detect_format", fake_detect_format)
+    monkeypatch.setattr("gamspreprocessor.gams3.datastream.make_object_source", FakeObjectSource)
+    monkeypatch.setattr(
+        "gamspreprocessor.gams3.datastream.requests.get",
+        lambda _url, timeout: make_fake_response(b"<TEI/>", 200),
+    )
+
+    ds_file = tmp_path / "TEI_SOURCE.xml"
+    ds_file.write_text("<TEI/>", encoding="utf-8")
+
+    ds = DataStream(
+        url="https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEI_SOURCE",
+        dsid="TEI_SOURCE",
+        pid="o:foo.testobject1",
+        label="TEI Source",
+        mime_type="text/xml",
+    )
+
+    result = ds.export(tmp_path, SPECIAL_DIR_NAME, strip_prefix=True)
+
+    assert captured["init"] == (ds_file, "auto", True, False)
+    assert captured["rewrite"] is True
+    assert captured["save"] == ds_file.parent
+    assert result == ds_file
+
+
+def test_export_ignores_non_rewriteable_formats(monkeypatch, tmp_path, make_fake_response):
+    called = []
+
+    def fake_detect_format(_path):
+        return None
+
+    monkeypatch.setattr("gamspreprocessor.gams3.datastream.detect_format", fake_detect_format)
+    monkeypatch.setattr(
+        "gamspreprocessor.gams3.datastream.requests.get",
+        lambda _url, timeout: make_fake_response(b"<root/>", 200),
+    )
+    monkeypatch.setattr(
+        "gamspreprocessor.gams3.datastream.make_object_source",
+        lambda *args, **kwargs: called.append((args, kwargs)),
+    )
+
+    ds_file = tmp_path / "TEXT.xml"
+    ds_file.write_text("<root/>", encoding="utf-8")
+
+    ds = DataStream(
+        url="https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEXT",
+        dsid="TEXT",
+        pid="o:foo.testobject1",
+        label="Text",
+        mime_type="text/xml",
+    )
+
+    result = ds.export(tmp_path, SPECIAL_DIR_NAME)
+
+    assert called == []
+    assert result == ds_file
+
+
+def test_datastream_str():
+    ds = DataStream(
+        url="https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/TEXT",
+        dsid="TEXT",
+        pid="o:foo.testobject1",
+        label="Text",
+        mime_type="text/xml",
+    )
+
+    assert str(ds) == "DataStream(dsid=TEXT)"
+
+
 def test_is_empty_detects_empty_payload(monkeypatch, make_fake_response):
     _mock_datastream_response(monkeypatch, make_fake_response, b"")
 
@@ -88,7 +227,9 @@ def test_is_empty_detects_empty_payload(monkeypatch, make_fake_response):
 
 
 def test_is_empty_detects_default_access_marker(monkeypatch, make_fake_response):
-    _mock_datastream_response(monkeypatch, make_fake_response, b"prefix [DefaulAccess] suffix")
+    _mock_datastream_response(
+        monkeypatch, make_fake_response, b"prefix [DefaulAccess] suffix"
+    )
 
     ds = DataStream(
         url="https://example.com/fedora/objects/o%3Afoo.testobject1/datastreams/METADATA",
@@ -148,13 +289,15 @@ def test_export_dc_uses_xml_filename(tmp_path: Path, monkeypatch, make_fake_resp
         mime_type="text/xml",
     )
 
-    result = ds.export(tmp_path)
+    result = ds.export(tmp_path, SPECIAL_DIR_NAME)
 
     assert result is not None
     assert result.name == "DC.xml"
 
 
-def test_export_warns_on_unknown_mime_type(recwarn, tmp_path: Path, monkeypatch, make_fake_response):
+def test_export_warns_on_unknown_mime_type(
+    recwarn, tmp_path: Path, monkeypatch, make_fake_response
+):
     _mock_datastream_response(monkeypatch, make_fake_response, b"custom")
 
     ds = DataStream(
@@ -165,7 +308,7 @@ def test_export_warns_on_unknown_mime_type(recwarn, tmp_path: Path, monkeypatch,
         mime_type="application/x-unknown-type",
     )
 
-    result = ds.export(tmp_path)
+    result = ds.export(tmp_path, SPECIAL_DIR_NAME)
 
     assert result is not None
     assert result.name == "CUSTOM"
@@ -185,7 +328,7 @@ def test_export_returns_none_for_ignored_datastream(
         mime_type="text/plain",
     )
 
-    result = ds.export(tmp_path)
+    result = ds.export(tmp_path, SPECIAL_DIR_NAME)
 
     assert result is None
 
@@ -203,10 +346,10 @@ def test_export_writes_special_datastream_to_subdirectory(
         mime_type="text/xml",
     )
 
-    result = ds.export(tmp_path)
+    result = ds.export(tmp_path, SPECIAL_DIR_NAME)
 
     assert result is not None
-    assert result.parent.name == "special_datastreams"
+    assert result.parent.name == SPECIAL_DIR_NAME
     assert result.name == "METADATA.xml"
     assert result.read_bytes() == b"<xml>metadata</xml>"
 
@@ -224,7 +367,7 @@ def test_export_writes_regular_datastream_to_object_directory(
         mime_type="text/xml",
     )
 
-    result = ds.export(tmp_path)
+    result = ds.export(tmp_path, SPECIAL_DIR_NAME)
 
     assert result is not None
     assert result.parent == tmp_path

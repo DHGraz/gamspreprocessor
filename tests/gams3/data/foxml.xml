@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="o:km.8586"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="LIDO Object"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="km"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate"
+      VALUE="2017-02-15T23:04:07.397Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate"
+      VALUE="2023-03-02T19:30:54.981Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream ID="AUDIT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object"
+      CREATED="2017-02-15T23:04:07.397Z" MIMETYPE="text/xml"
+      FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
+      <foxml:xmlContent>
+        <audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
+          <audit:record ID="AUDREC1">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>ingest</audit:action>
+            <audit:componentID/>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-15T23:04:07.397Z</audit:date>
+            <audit:justification>Cloned from template 'cirilo:LIDO.km' by user
+              'yoda'</audit:justification>
+          </audit:record>
+          <audit:record ID="AUDREC2">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>addDatastream</audit:action>
+            <audit:componentID>IMAGE.1</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-15T23:04:50.667Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC3">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>THUMBNAIL</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-15T23:04:51.183Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC4">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>DC</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-15T23:04:51.365Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC5">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>QR</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-15T23:04:53.074Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC6">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>LIDO_SOURCE</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-15T23:04:53.204Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC7">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>IMAGE.1</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-16T17:06:30.122Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC8">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>THUMBNAIL</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-16T17:06:30.816Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC9">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>DC</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-16T17:06:31.919Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC10">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>QR</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-16T17:06:32.656Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC11">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>LIDO_SOURCE</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-16T17:06:32.805Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC12">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>RELS-EXT</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-02-17T08:56:12.469Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC13">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>IMAGE.1</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-03-28T13:07:40.548Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC14">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>THUMBNAIL</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-03-28T13:07:41.010Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC15">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>DC</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-03-28T13:07:41.121Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC16">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>QR</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-03-28T13:07:41.750Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC17">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>LIDO_SOURCE</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2017-03-28T13:07:41.835Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC18">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByValue</audit:action>
+            <audit:componentID>DC</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2020-05-18T16:34:32.214Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+          <audit:record ID="AUDREC19">
+            <audit:process type="Fedora API-M"/>
+            <audit:action>modifyDatastreamByReference</audit:action>
+            <audit:componentID>QR</audit:componentID>
+            <audit:responsibility>yoda</audit:responsibility>
+            <audit:date>2023-03-02T19:30:54.981Z</audit:date>
+            <audit:justification/>
+          </audit:record>
+        </audit:auditTrail>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="RELS-INT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="RELS-INT.0" LABEL="RDF Statements about the LIDO_SOURCE datastream"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="application/rdf+xml" SIZE="77">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="TORDF" STATE="A" CONTROL_GROUP="R" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="TORDF.1"
+      LABEL="XSLT Stylesheet to create RDF-Triples from LIDO_SOURCE"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/xml">
+      <foxml:contentLocation TYPE="URL"
+        REF="http://gams.uni-graz.at/archive/objects/cirilo:Backbone/datastreams/TORDF/content"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="PID" STATE="A" CONTROL_GROUP="E" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="PID.1" LABEL="Persistent Identifier"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/html">
+      <foxml:contentLocation TYPE="URL"
+        REF="http://gams.uni-graz.at/archive/objects/o:km.8586/methods/sdef:LIDO/get"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="FO_STYLESHEET" STATE="A" CONTROL_GROUP="R" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="FO_STYLESHEET.1" LABEL="LIDO to FO Stylesheet"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/xml">
+      <foxml:contentLocation TYPE="URL"
+        REF="http://gams.uni-graz.at/archive/objects/cirilo:Backbone/datastreams/LIDOtoFO/content"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="METADATA" STATE="A" CONTROL_GROUP="E" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="METADATA.1" LABEL="Mulgara Triplestore Metadata"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/xml">
+      <foxml:contentLocation TYPE="URL"
+        REF="http://gams.uni-graz.at/archive/objects/o:km.8586/methods/sdef:Object/getMetadata"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="METHODS" STATE="A" CONTROL_GROUP="E" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="METHODS.1" LABEL="Dissemination Methods"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/xml">
+      <foxml:contentLocation TYPE="URL"
+        REF="http://gams.uni-graz.at/archive/objects/o:km.8586/methods?format=xml"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="QUERY" STATE="A" CONTROL_GROUP="M" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="QUERY.2" LABEL="Mulgara Triplestore Query"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/plain" SIZE="525">
+      <foxml:contentLocation TYPE="INTERNAL_ID" REF="o:km.8586+QUERY+QUERY.2"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="STYLESHEET" STATE="A" CONTROL_GROUP="R" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="STYLESHEET.2" LABEL="LIDO to HTML Stylesheet"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/xml">
+      <foxml:contentLocation TYPE="URL" REF="http://gams.uni-graz.at/km/km-LIDO.xsl"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="DC_MAPPING" STATE="A" CONTROL_GROUP="R" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="DC_MAPPING.2" LABEL="LIDO to DC mapping rules"
+      CREATED="2017-02-15T23:04:07.411Z" MIMETYPE="text/xml">
+      <foxml:contentLocation TYPE="URL"
+        REF="http://gams.uni-graz.at/archive/objects/cirilo:km/datastreams/LIDOtoDC_MAPPING/content"
+      />
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="SOURCE_REF" STATE="A" CONTROL_GROUP="R" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="SOURCE_REF.0" LABEL="" CREATED="2017-02-15T23:04:07.411Z"
+      MIMETYPE="text/xml">
+      <foxml:contentLocation TYPE="URL"
+        REF="http://gams.uni-graz.at/archive/get/o:km.8586/LIDO_SOURCE"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="RELS-EXT.22" LABEL="RDF Statements about this object"
+      CREATED="2017-03-28T13:07:40.237Z" MIMETYPE="text/xml" SIZE="852">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+          <rdf:Description rdf:about="info:fedora/o:km.8586">
+            <hasModel xmlns="info:fedora/fedora-system:def/model#"
+              rdf:resource="info:fedora/cm:LIDO"/>
+            <itemID xmlns="http://www.openarchives.org/OAI/2.0/">hdl:11471/908.10.8586</itemID>
+            <isMemberOf xmlns="info:fedora/fedora-system:def/relations-external#"
+              rdf:resource="info:fedora/context:km.objekte"/>
+            <isMemberOf xmlns="info:fedora/fedora-system:def/relations-external#"
+              rdf:resource="info:fedora/context:km"/>
+            <isMemberOf xmlns="info:fedora/fedora-system:def/relations-external#"
+              rdf:resource="info:fedora/context:km.kat.23"/>
+            <isMemberOf xmlns="info:fedora/fedora-system:def/relations-external#"
+              rdf:resource="info:fedora/context:km.kat.4"/>
+          </rdf:Description>
+
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="IMAGE.1" STATE="A" CONTROL_GROUP="M" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="IMAGE.1.2" LABEL="Facsimile" CREATED="2017-03-28T13:07:40.548Z"
+      MIMETYPE="image/jpeg" SIZE="1728358">
+      <foxml:contentLocation TYPE="INTERNAL_ID" REF="o:km.8586+IMAGE.1+IMAGE.1.2"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="THUMBNAIL" STATE="A" CONTROL_GROUP="M" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="THUMBNAIL.4" LABEL="Thumbnail" CREATED="2017-03-28T13:07:41.010Z"
+      MIMETYPE="image/jpeg" SIZE="1839">
+      <foxml:contentLocation TYPE="INTERNAL_ID" REF="o:km.8586+THUMBNAIL+THUMBNAIL.4"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="LIDO_SOURCE" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="LIDO_SOURCE.3" LABEL="LIDO Source"
+      CREATED="2017-03-28T13:07:41.835Z" MIMETYPE="text/xml" SIZE="15114">
+      <foxml:xmlContent>
+        <lido:lido xmlns:hdlg="http://www.hdlg.info/XML/filesystem"
+          xmlns:lido="http://www.lido-schema.org"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:t="http://www.tei-c.org/ns/1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.lido-schema.org http://gams.uni-graz.at/lido/1.0/lido.xsd">
+          <lido:lidoRecID lido:type="PID">o:km.8586</lido:lidoRecID>
+          <lido:category>
+            <lido:conceptID lido:source="CIDOC" lido:type="ID">E22</lido:conceptID>
+            <lido:term xml:lang="eng">Man-Made Object</lido:term>
+            <lido:term lido:label="info:fedora/context:km">Hans Gross Kriminalmuseum</lido:term>
+          </lido:category>
+          <lido:descriptiveMetadata xml:lang="deu">
+            <lido:objectClassificationWrap>
+              <lido:objectWorkTypeWrap>
+                <lido:objectWorkType>
+                  <lido:term lido:label="info:fedora/context:km.objekte">Objekte</lido:term>
+                </lido:objectWorkType>
+                <lido:objectWorkType>
+                  <lido:conceptID lido:label="info:fedora/context:km.kat.23"
+                    lido:source="HansGrossKategorie" lido:type="ID">23: Waffen</lido:conceptID>
+                  <lido:term>Waffen</lido:term>
+                </lido:objectWorkType>
+                <lido:objectWorkType>
+                  <lido:conceptID lido:label="info:fedora/context:km.kat.4"
+                    lido:source="HansGrossKategorie" lido:type="ID">4: Instrumente
+                    (Körperverletzung)</lido:conceptID>
+                  <lido:term>Instrumente (Körperverletzungen)</lido:term>
+                </lido:objectWorkType>
+                <lido:objectWorkType>
+                  <lido:conceptID lido:source="oth" lido:type="#OTH.1">18040600</lido:conceptID>
+                  <lido:term>Totschläger</lido:term>
+                </lido:objectWorkType>
+              </lido:objectWorkTypeWrap>
+            </lido:objectClassificationWrap>
+            <lido:objectIdentificationWrap>
+              <lido:titleWrap>
+                <lido:titleSet>
+                  <lido:appellationValue>Totschläger KM-O.659</lido:appellationValue>
+                </lido:titleSet>
+              </lido:titleWrap>
+              <lido:repositoryWrap>
+                <lido:repositorySet>
+                  <lido:repositoryName>
+                    <lido:legalBodyName>
+                      <lido:appellationValue>Andritz Depot, Hans Gross
+                        Kriminalmuseum</lido:appellationValue>
+                    </lido:legalBodyName>
+                  </lido:repositoryName>
+                  <lido:workID lido:type="idno">KM-O.659</lido:workID>
+                  <lido:workID lido:type="histIdentifier">1711</lido:workID>
+                  <lido:workID lido:type="alternative"/>
+                  <lido:repositoryLocation>
+                    <lido:namePlaceSet>
+                      <lido:appellationValue lido:label="settlement">8045
+                        Graz</lido:appellationValue>
+                    </lido:namePlaceSet>
+                    <lido:namePlaceSet>
+                      <lido:appellationValue lido:label="street">Weinzöttlstraße
+                        16</lido:appellationValue>
+                    </lido:namePlaceSet>
+                  </lido:repositoryLocation>
+                </lido:repositorySet>
+              </lido:repositoryWrap>
+              <lido:objectDescriptionWrap>
+                <lido:objectDescriptionSet>
+                  <lido:descriptiveNoteValue>
+                    <t:profileDesc>
+                      <t:textClass>
+                        <t:keywords xmlns:oth="http://gams.uni-graz.at/skos/scheme/o:oth/#"
+                          scheme="http://gams.uni-graz.at/skos/scheme/o:oth">
+                          <term xmlns="http://www.tei-c.org/ns/1.0" id="OTH.1"
+                            ref="http://gams.uni-graz.at/skos/scheme/o:oth/#18040600"
+                            type="skos:Concept">
+                            <term type="skos:prefLabel" xml:lang="eng">blackjack</term>
+                            <term type="skos:prefLabel" xml:lang="deu">Totschläger</term>
+                            <term ref="http://gams.uni-graz.at/skos/scheme/o:oth/#18040000"
+                              subtype="skos:broader" type="skos:Concept">
+                              <term type="skos:prefLabel" xml:lang="deu">Schlagwaffe</term>
+                              <term type="skos:prefLabel" xml:lang="eng">percussive weapon</term>
+                              <term ref="http://gams.uni-graz.at/skos/scheme/o:oth/#18000000"
+                                subtype="skos:broader" type="skos:Concept">
+                                <term type="skos:prefLabel" xml:lang="deu">Waffe und Munition</term>
+                                <term type="skos:prefLabel" xml:lang="eng">weapon and
+                                  ammunition</term>
+                              </term>
+                            </term>
+                          </term>
+                        </t:keywords>
+                      </t:textClass>
+                    </t:profileDesc>
+                  </lido:descriptiveNoteValue>
+                </lido:objectDescriptionSet>
+                <lido:objectDescriptionSet>
+                  <lido:descriptiveNoteValue>
+                    <t:profileDesc>
+                      <t:textClass>
+                        <t:keywords xmlns:mth="http://gams.uni-graz.at/skos/scheme/o:mth/#"
+                          scheme="http://gams.uni-graz.at/skos/scheme/o:mth">
+                          <term xmlns="http://www.tei-c.org/ns/1.0" id="MTH.2"
+                            ref="http://gams.uni-graz.at/skos/scheme/o:mth/#3060410"
+                            type="skos:Concept">
+                            <term type="skos:prefLabel" xml:lang="deu">Leder</term>
+                            <term type="skos:prefLabel" xml:lang="eng">leather</term>
+                            <term ref="http://gams.uni-graz.at/skos/scheme/o:mth/#3060400"
+                              subtype="skos:broader" type="skos:Concept">
+                              <term type="skos:prefLabel" xml:lang="eng">animal skin</term>
+                              <term type="skos:prefLabel" xml:lang="deu">Tierische Haut</term>
+                              <term ref="http://gams.uni-graz.at/skos/scheme/o:mth/#3060000"
+                                subtype="skos:broader" type="skos:Concept">
+                                <term type="skos:prefLabel" xml:lang="eng">animal material</term>
+                                <term type="skos:prefLabel" xml:lang="deu">Tierischer Stoff</term>
+                                <term ref="http://gams.uni-graz.at/skos/scheme/o:mth/#3000000"
+                                  subtype="skos:broader" type="skos:Concept">
+                                  <term type="skos:prefLabel" xml:lang="eng">organic material</term>
+                                  <term type="skos:prefLabel" xml:lang="deu">Organisches
+                                    Material</term>
+                                </term>
+                              </term>
+                            </term>
+                          </term>
+                          <term xmlns="http://www.tei-c.org/ns/1.0" id="MTH.1"
+                            ref="http://gams.uni-graz.at/skos/scheme/o:mth/#1050330"
+                            type="skos:Concept">
+                            <term type="skos:prefLabel" xml:lang="deu">Stahl</term>
+                            <term type="skos:prefLabel" xml:lang="eng">steel</term>
+                            <term ref="http://gams.uni-graz.at/skos/scheme/o:mth/#1050300"
+                              subtype="skos:broader" type="skos:Concept">
+                              <term type="skos:prefLabel" xml:lang="eng">alloy</term>
+                              <term type="skos:prefLabel" xml:lang="deu">Legierung</term>
+                              <term ref="http://gams.uni-graz.at/skos/scheme/o:mth/#1050000"
+                                subtype="skos:broader" type="skos:Concept">
+                                <term type="skos:prefLabel" xml:lang="eng">metal</term>
+                                <term type="skos:prefLabel" xml:lang="deu">Metall</term>
+                                <term ref="http://gams.uni-graz.at/skos/scheme/o:mth/#1000000"
+                                  subtype="skos:broader" type="skos:Concept">
+                                  <term type="skos:prefLabel" xml:lang="eng">inorganic
+                                    material</term>
+                                  <term type="skos:prefLabel" xml:lang="deu">Anorganisches
+                                    Material</term>
+                                </term>
+                              </term>
+                            </term>
+                          </term>
+                        </t:keywords>
+                      </t:textClass>
+                    </t:profileDesc>
+                  </lido:descriptiveNoteValue>
+                </lido:objectDescriptionSet>
+                <lido:objectDescriptionSet lido:type="condition">
+                  <lido:descriptiveNoteValue>fester haftende Verschmutzung, Metall
+                    korrodiert</lido:descriptiveNoteValue>
+                </lido:objectDescriptionSet>
+              </lido:objectDescriptionWrap>
+              <lido:objectMeasurementsWrap>
+                <lido:objectMeasurementsSet>
+                  <lido:objectMeasurements>
+                    <lido:measurementsSet>
+                      <lido:measurementType xml:lang="eng">height</lido:measurementType>
+                      <lido:measurementUnit>cm</lido:measurementUnit>
+                      <lido:measurementValue>3,5</lido:measurementValue>
+                    </lido:measurementsSet>
+                  </lido:objectMeasurements>
+                </lido:objectMeasurementsSet>
+                <lido:objectMeasurementsSet>
+                  <lido:objectMeasurements>
+                    <lido:measurementsSet>
+                      <lido:measurementType xml:lang="eng">width</lido:measurementType>
+                      <lido:measurementUnit>cm</lido:measurementUnit>
+                      <lido:measurementValue>27,0</lido:measurementValue>
+                    </lido:measurementsSet>
+                  </lido:objectMeasurements>
+                </lido:objectMeasurementsSet>
+                <lido:objectMeasurementsSet>
+                  <lido:objectMeasurements>
+                    <lido:measurementsSet>
+                      <lido:measurementType xml:lang="eng">depth</lido:measurementType>
+                      <lido:measurementUnit>cm</lido:measurementUnit>
+                      <lido:measurementValue>3,8</lido:measurementValue>
+                    </lido:measurementsSet>
+                  </lido:objectMeasurements>
+                </lido:objectMeasurementsSet>
+              </lido:objectMeasurementsWrap>
+            </lido:objectIdentificationWrap>
+            <lido:eventWrap>
+              <lido:eventSet>
+                <lido:event>
+                  <lido:eventType>
+                    <lido:conceptID lido:source="http://terminology.lido-schema.org" lido:type="ID"
+                      >lido00007</lido:conceptID>
+                    <lido:term>Herstellung</lido:term>
+                  </lido:eventType>
+                  <lido:eventMaterialsTech>
+                    <lido:materialsTech>
+                      <lido:termMaterialsTech lido:type="material">
+                        <lido:conceptID lido:source="mth" lido:type="#MTH.1"
+                          >1050330</lido:conceptID>
+                        <lido:term>Stahl</lido:term>
+                      </lido:termMaterialsTech>
+                      <lido:termMaterialsTech lido:type="material">
+                        <lido:conceptID lido:source="mth" lido:type="#MTH.2"
+                          >3060410</lido:conceptID>
+                        <lido:term>Leder</lido:term>
+                      </lido:termMaterialsTech>
+                    </lido:materialsTech>
+                  </lido:eventMaterialsTech>
+                </lido:event>
+              </lido:eventSet>
+              <lido:eventSet>
+                <lido:event>
+                  <lido:eventType>
+                    <lido:term>Digitalisierung</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                    <lido:actorInRole>
+                      <lido:actor>
+                        <lido:nameActorSet>
+                          <lido:appellationValue lido:label="photographer">Johanna
+                            Kraschitzer</lido:appellationValue>
+                        </lido:nameActorSet>
+                      </lido:actor>
+                    </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventDate>
+                    <lido:displayDate>2016</lido:displayDate>
+                  </lido:eventDate>
+                </lido:event>
+              </lido:eventSet>
+              <lido:eventSet>
+                <lido:event>
+                  <lido:eventType>
+                    <lido:conceptID lido:source="http://terminology.lido-schema.org" lido:type="ID"
+                      >lido00034</lido:conceptID>
+                    <lido:term>Restaurierung</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                    <lido:actorInRole>
+                      <lido:actor>
+                        <lido:nameActorSet>
+                          <lido:appellationValue lido:label="restorer">Barbara
+                            Schönhart</lido:appellationValue>
+                        </lido:nameActorSet>
+                      </lido:actor>
+                    </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventDate>
+                    <lido:displayDate>März 2015</lido:displayDate>
+                    <lido:date>
+                      <lido:earliestDate>2015-03</lido:earliestDate>
+                      <lido:latestDate>2015-03</lido:latestDate>
+                    </lido:date>
+                  </lido:eventDate>
+                  <lido:eventDescriptionSet>
+                    <lido:descriptiveNoteValue>Trockenreinigung, Pinsel und Latexschwamm,
+                      Metallreinigung mit Aceton</lido:descriptiveNoteValue>
+                  </lido:eventDescriptionSet>
+                </lido:event>
+              </lido:eventSet>
+              <lido:eventSet>
+                <lido:event>
+                  <lido:eventType>
+                    <lido:term>Datenerfassung</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                    <lido:actorInRole>
+                      <lido:actor>
+                        <lido:nameActorSet>
+                          <lido:appellationValue lido:label="editor">Stefan
+                            Köchel</lido:appellationValue>
+                        </lido:nameActorSet>
+                      </lido:actor>
+                    </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventActor>
+                    <lido:actorInRole>
+                      <lido:actor>
+                        <lido:nameActorSet>
+                          <lido:appellationValue lido:label="editor">Bernadette
+                            Biedermann</lido:appellationValue>
+                        </lido:nameActorSet>
+                      </lido:actor>
+                    </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventDate>
+                    <lido:displayDate>2015/2016</lido:displayDate>
+                  </lido:eventDate>
+                </lido:event>
+              </lido:eventSet>
+            </lido:eventWrap>
+            <lido:objectRelationWrap>
+              <lido:subjectWrap>
+                <lido:subjectSet>
+                  <lido:displaySubject lido:label="description">Totschläger, selbstgefertigt aus
+                    Stemmeisen und Ledergriff mit Schnur umwickelt, Jahr 1912</lido:displaySubject>
+                </lido:subjectSet>
+              </lido:subjectWrap>
+              <lido:relatedWorksWrap>
+                <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                    <lido:object>
+                      <lido:objectID lido:type="PID">o:km.848</lido:objectID>
+                      <lido:objectNote lido:type="relatedItem">KM-KK.848</lido:objectNote>
+                    </lido:object>
+                  </lido:relatedWork>
+                </lido:relatedWorkSet>
+              </lido:relatedWorksWrap>
+            </lido:objectRelationWrap>
+          </lido:descriptiveMetadata>
+          <lido:administrativeMetadata xml:lang="deu">
+            <lido:recordWrap>
+              <lido:recordID lido:type="PID">o:km.8586</lido:recordID>
+              <lido:recordType>
+                <lido:term>Einzelobjekt</lido:term>
+              </lido:recordType>
+              <lido:recordSource>
+                <lido:legalBodyName>
+                  <lido:appellationValue>Zentrum für
+                    Informationsmodellierung</lido:appellationValue>
+                </lido:legalBodyName>
+                <lido:legalBodyWeblink>http://informationsmodellierung.uni-graz.at</lido:legalBodyWeblink>
+              </lido:recordSource>
+              <lido:recordRights>
+                <lido:rightsHolder>
+                  <lido:legalBodyID lido:source="http://d-nb.info/gnd" lido:type="ID"
+                    >10053234-2</lido:legalBodyID>
+                  <lido:legalBodyName>
+                    <lido:appellationValue>Hans Gross Kriminalmuseum</lido:appellationValue>
+                  </lido:legalBodyName>
+                </lido:rightsHolder>
+                <lido:creditLine>CC BY-NC-SA 4.0</lido:creditLine>
+              </lido:recordRights>
+            </lido:recordWrap>
+            <lido:resourceWrap>
+              <lido:resourceSet lido:sortorder="1">
+                <lido:resourceID lido:type="IMAGE">IMAGE.1</lido:resourceID>
+                <lido:resourceRepresentation>
+                  <lido:linkResource lido:formatResource="image/jpeg"
+                    >http://gams.uni-graz.at/o:km.8586/IMAGE.1</lido:linkResource>
+                </lido:resourceRepresentation>
+              </lido:resourceSet>
+            </lido:resourceWrap>
+          </lido:administrativeMetadata>
+        </lido:lido>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="DC.6" LABEL="Dublin Core Record" CREATED="2020-05-18T16:34:32.214Z"
+      MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="866">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>Totschläger KM-O.659</dc:title>
+          <dc:description>Totschläger, selbstgefertigt aus Stemmeisen und Ledergriff mit Schnur umwickelt, Jahr 1912</dc:description>
+          <dc:publisher>Universitätsmuseen, Karl-Franzens-Universität Graz</dc:publisher>
+          <dc:identifier>o:km.8586</dc:identifier>
+          <dc:source>659</dc:source>
+          <dc:language>deu</dc:language>
+          <dc:relation>Hans Gross Kriminalmuseum, Virtuelle Sammlung</dc:relation>
+          <dc:relation>http://gams.uni-graz.at/km</dc:relation>
+          <dc:rights>Resource licensed under Creative Commons BY-NC-SA 4.0</dc:rights>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="QR" STATE="A" CONTROL_GROUP="M" VERSIONABLE="false">
+    <foxml:datastreamVersion ID="QR.4" LABEL="QR Code" CREATED="2023-03-02T19:30:54.981Z"
+      MIMETYPE="image/jpeg" SIZE="5851">
+      <foxml:contentLocation TYPE="INTERNAL_ID" REF="o:km.8586+QR+QR.4"/>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

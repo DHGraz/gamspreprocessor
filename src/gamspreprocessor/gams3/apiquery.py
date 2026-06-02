@@ -1,3 +1,11 @@
+"""A class for querying a Fedora 3 repository.
+
+
+This only wraps the API query for finding objects by PID pattern, which is used in 
+the export process. It is not meant to be a general-purpose API client for Fedora 3, 
+and it does not implement any other API endpoints or features.
+"""
+
 import dataclasses
 import re
 from typing import ClassVar, Generator

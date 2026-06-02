@@ -76,6 +76,15 @@ Soll von einer anderen Repository-Instanz exportiert werden, so kann diese als W
 dieser Option angegeben werden. Dabei ist zu beachten, dass nicht nur der Name des
 Servers anzugeben ist, sondern auch der Basispfad zum Repository am Server.
 
+#### `--colon-replacement`
+
+Über die Option kann festgelegt werden, wodurch in den erzuegten Objektverzeichnissen 
+die in PIDs vorkommenden Doppelpunkte ersetzt werden sollen. 
+
+Diese Option ist nur für sehr spezielle Use Cases eingeführt worden. 
+**Sie sollte im Normalfall NIE verwendet werden, da der Packager den
+Defaultwert `%3A` erwartet.**
+
 
 #### `--help`
 
