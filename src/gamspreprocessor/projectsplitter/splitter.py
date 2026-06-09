@@ -18,6 +18,21 @@ from .bookkeeper import BookKeeper
 logger = logging.getLogger(__name__)
 
 
+def guess_format(filename: str | Path, explicit_type: str = "auto") -> tuple[str, str]:
+    """Guess the format of the file from the extension.
+
+    Uses the formatdetector from gamslib to find out the format of the file. This means,
+    that the type of format guesser can be configured via project.toml or
+    environment variables.
+
+    Returns a tuple with the content type and the (sub)format.
+    """
+    filepath = Path(filename) if isinstance(filename, str) else filename
+    format_info = detect_format(filepath)
+    subtype = format_info.subtype if explicit_type == "auto" else explicit_type
+    return format_info.mimetype, subtype
+
+
 class ProjectSplitter:
     """Class to split a project into single objects.
 
@@ -25,10 +40,10 @@ class ProjectSplitter:
     """
 
     def __init__(
-        self,
-        output_dir: Path,
-        project_dir: Path,
-        replace_existing_object_dirs: bool = False,
+            self,
+            output_dir: Path,
+            project_dir: Path,
+            replace_existing_object_dirs: bool = False,
     ):
         """Initialize the ProjectSplitter.
 
@@ -126,3 +141,4 @@ class ProjectSplitter:
         "Reset the bookkeeper."
         self._bookkeeper.reset()
         self._bookkeeper.save()
+

@@ -101,7 +101,6 @@ def test_create_csv(datadir):
     for dc_dict in ds_csvdata:
         assert dc_dict["dspath"] == dc_dict["dsid"]
 
-
 def test_create_csv_with_update_flag(datadir):
     """Test the csv collect command."""
     runner = CliRunner()
