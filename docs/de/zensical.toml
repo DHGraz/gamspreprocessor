@@ -37,10 +37,12 @@ nav = [
   {
     "Tutorials" = [
           {"Empfohlene Workflows" = "tutorials/workflows.md"},
+          {"Projekt anlegen" = "tutorials/project.md"},
           {"Objekverzeichnisse erzeugen" = [
-            {"Neue Daten" = "tutorials/objdir_new.md"},
-            {"Export aus GAMS3" = "tutorials/export"},
-            {"Aus bestehenden Verzeichnissen" = "tutorials/splitproject.md"},
+            {"Intro: Objektverzeichnisse" = "tutorials/object_dirs_intro.md"},
+            {"Selbst erstellen" = "tutorials/objdir_from_scratch.md"},
+            {"Export aus GAMS3" = "tutorials/objectdir_gams3.md"},
+            {"Aus bestehenden Verzeichnissen" = "tutorials/objectdir_splitproject.md"},
             ]
           },
           {"CSV-Daten einbinden" = "tutorials/csv.md"},

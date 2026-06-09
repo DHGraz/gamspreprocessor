@@ -1,6 +1,6 @@
 [project]
 name = "gamspreprocessor"
-version = "0.4.1"
+version = "0.5.0"
 description = "A utility which helps to preprocess GAMS objects before ingestion."
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" }

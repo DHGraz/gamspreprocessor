@@ -23,13 +23,13 @@ coverage:
 lint:
 	@uv run ruff check src
 
-# buuild documentation into dist-docs folder
+# run zensical server in dev mode for the german documentation
 docs-de:
 	@uv run zensical serve --config-file docs/de/zensical.toml
 
-# serve documentation at localhost:8000
+# run zensical server in dev mode for the english documentation
 docs-en:
-	@uv run mkdocs serve -o -f docs/en/mkdocs.yml --dev-addr 0.0.0.0:8000
+	@uv run zensical serve --config-file docs/en/zensical.toml 
 
 build:
 	@uv build	
