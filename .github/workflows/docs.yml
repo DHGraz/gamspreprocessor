@@ -25,15 +25,14 @@ jobs:
 
       - name: Install Zensical
         run: |
-          pip install zensical  
+          pip install --upgrade pip
+          pip install zensical==0.0.46  
 
       - name: Build English docs
-        run: |
-          zensical build -c docs/en/zensical.yml
+        run: zensical build -c -f docs/en/zensical.yml
 
       - name: Build German docs
-        run: |
-          zensical build -c docs/de/zensical.yml
+        run: zensical build -c -f docs/de/zensical.yml
 
       # At this point "site/" should contain both "en/" and "de/" folders
 
