@@ -39,7 +39,20 @@ jobs:
           mkdir -p _pages/de _pages/en
           cp -a docs/de/site/. _pages/de/
           cp -a docs/en/site/. _pages/en/
-
+          cat > _pages/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta http-equiv="refresh" content="0; url=de/">
+              <title>gamspreprocessor</title>
+            </head>
+            <body>
+              <p>Redirecting to <a href="de/">German documentation</a>.</p>
+              <p><a href="en/">English documentation</a></p>
+            </body>
+          </html>
+          EOF      
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
