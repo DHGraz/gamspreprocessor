@@ -28,9 +28,8 @@ jobs:
           pip install --upgrade pip
           pip install zensical==0.0.46  mkdocstrings-python==2.0.5 
 
-      # Enable when English config exists
-      # - name: Build English docs
-      #   run: zensical build -c -f docs/en/zensical.toml
+      - name: Build English docs
+        run: zensical build -c -f docs/en/zensical.toml
 
       - name: Build German docs
         run: zensical build -c -f docs/de/zensical.toml
@@ -39,7 +38,7 @@ jobs:
         run: |
           mkdir -p _pages/de _pages/en
           cp -a docs/de/site/. _pages/de/
-          if [ -d docs/en/site ]; then cp -a docs/en/site/. _pages/en/; fi
+          cp -a docs/en/site/. _pages/en/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
