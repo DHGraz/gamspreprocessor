@@ -53,7 +53,9 @@ Folgende Subcommands stehen zur Verfügung:
    * [project](#der-unterbefehl-project) - Initialisieren eines neuen Projekts
    * [csv](#der-unterbefehl-csv) - Erstellung und Verwaltung von CSV-Dateien 
      (`object.csv` und `datastreams.csv`) in den einzelnen Objektordnern
+<!--     
    * [validate](#validate) - Validieren von Objektverzeichnissen  
+-->
    * [transform](#der-unterbefehl-transform) - Ausführen einer Transformation 
      z.B. mit XSLT
    * [multitransform](#der-unterbefehl-multitransform) - Wie `transform`, aber 

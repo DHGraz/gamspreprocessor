@@ -10,4 +10,4 @@ preprocess project init
 in einem Schritt mit einer basalen Projektstruktur anzulegen.
 
 Details dazu finden sich in der Beschreibung des 
-[Unterbefehls](../subcommands/project.toml)
+[Unterbefehls](../subcommands/project.md)

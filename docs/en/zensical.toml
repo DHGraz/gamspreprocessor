@@ -28,61 +28,10 @@ site_author = "Gunter Vasold"
 # Read more: https://zensical.org/docs/setup/basics/#copyright
 copyright = ""
 
-#docs_dir = "docs/"
-#site_dir = "site/de/"
-
-
 
 
 nav = [
   "index.md",
-  "installation.md",
-  {"Projektkonfiguration" = "configuration.md"},
-  {
-  "Befehlsreferenz" = [
-        "reference/preprocess.md",
-        {
-          "Unterbefehle" = [
-              {"project" = "reference/subcommands/project.md"},
-              {"csv" =  "reference/subcommands/csv.md"},
-              {"transform" = "reference/subcommands/transform.md"},
-              {"multitransform" = "reference/subcommands/multitransform.md"},
-              {"splitproject" = "reference/subcommands/splitproject.md"},
-              {"gams3export" = "reference/subcommands/gams3export.md"}
-          ]
-        },
-        {
-          "Dateien" = [
-              {"gamsproject.toml" = "reference/files/gamsproject.toml.md"},
-              {"DC.xml" = "reference/files/dc.xml.md"},
-              {"object.csv" = "reference/files/object.csv.md"},
-              {"datastreams.csv" = "reference/files/datastreams.csv.md"}
-          ]
-        }
-    ]
-  },
-  {
-    "Tutorials" = [
-          #"tutorials/index.md",
-          {"Empfohlene Workflows" = "tutorials/workflows.md"},
-          {"Projekt anlegen" = "tutorials/project.md"},
-          {"Objekverzeichnisse erzeugen" = [
-            {"Intro: Objektverzeichnisse" = "tutorials/object_dirs_intro.md"},
-            {"Selbst erstellen" = "tutorials/objdir_from_scratch.md"},
-            {"Export aus GAMS3" = "tutorials/objectdir_gams3.md"},
-            {"Aus bestehenden Verzeichnissen" = "tutorials/objectdir_splitproject.md"},
-            ]
-          },
-          {"CSV-Daten einbinden" = "tutorials/csv.md"},
-          {"Daten transformieren" = "tutorials/transform.md"},
-          {"multitransform" = "tutorials/multitransform.md"}
-    ] 
-  },
-  {
-    "How to" = [
-        {"Overview" = "how-to/index.md"}
-    ]
-  },
 ]
 
 
@@ -103,7 +52,7 @@ nav = [
 # Read more:
 # - https://zensical.org/docs/setup/language/
 #
-language = "de"
+language = "en"
 
 [project.extra]
 alternate = [
