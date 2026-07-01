@@ -15,10 +15,26 @@ dependencies = [
 readme = "README.md"
 # due to a problem with saxonche, 3.13 currently does not work!
 requires-python = ">= 3.11"
+keywords = ["GAMS"]
 
 [project.scripts]
 preprocess = "gamspreprocessor.cli.main:cli"
 
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Utilities",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/DHGraz/gamslib"
+Documentation = "https://dhgraz.github.io/gamslib/"
+Issue = "https://github.com/DHGraz/gamslib/issues"
+Changelog = "https://github.com/DHGraz/gamslib/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling"]
@@ -41,6 +57,15 @@ dev = [
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+
+[tool.hatch.build]
+exclude = [
+    ".uv-cache/**",
+    ".venv/**",
+    "build/**",
+    "dist/**",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gamspreprocessor"]
