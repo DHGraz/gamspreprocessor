@@ -1,22 +1,37 @@
 # Gamspreprocessor
 
-Gamspreprocessor (`preprocess`) provides a set of tools useful in preparation
+`gamspreprocessor` (or short: `preprocess`) provides a set of tools useful in preparation
 of GAMS object folders (which are required for packaging).
 
 ## Installation
 
-gamspreprocess is available on pypi.org and can be installed via pip:
+gamspreprocessor is available on pypi.org and can be installed via pip:
 
 ```
-pip install gamslib
+pip install gamspreprocessor
 ```
 
-Installation via `uvx` or `uv tool` will be available soon and will be the suggest way to
-use/install gamspreprocessor.
+A propably better way to install this tool is to use the `uv tool` command, which requires,
+that you install `uv` first (see https://docs.astral.sh/uv/getting-started/installation/).
+
+Use this command to install `gamspreprocessor` on your computer:
+
+```bash
+uv tool install gamspreprocessor
+```
+
+Afterwards, the `gamspreprocessor` command should be availabe on your machine.
+
+If you do not want to install it permanently, you can use the `uvx` command provided by
+`uv`:
+
+```
+uvx gamspreprocessor --help
+```
 
 ## Usage
 
-The package provides a single command `preprocess` with a set of subcommands:
+The package provides a single command `gamsproprocessor` (or short: `preprocess`) with a set of subcommands:
 
   - `csv`             Helpers for managing GAMS object CSV files.
   - `gams3export`     Export one or more objects from a GAMS 3 repository to...
