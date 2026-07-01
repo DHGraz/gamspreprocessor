@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0] - 2026-07-01
 
 ### Changed
- 
+
+  * The official command is now 'gamspreprocessor'
+    The old command name 'preprocess' still works   
   * Add gams3export subcommand
   * Reorganize documentation
   * Make documentation available on Github Pages
