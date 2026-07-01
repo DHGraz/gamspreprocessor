@@ -36,10 +36,10 @@ Gibt den Hilfetext für diesen Unterbefehl aus.
 
 ### update
 
-`preprocess project update` aktualisiert das Format der Datei `project.toml`. 
+`gamspreprocessor project update` aktualisiert das Format der Datei `project.toml`. 
 
 ```
-preprocess project update [OPTIONS] CONFIG_FILE
+gamspreprocessor project update [OPTIONS] CONFIG_FILE
 ```
 
 Dieser Befehl sollte immer nach dem Upgrade auf eine neue Version das gamspreprocessors ausgeführt werden. Er sorgt dafür, dass das Format der bestehenden Konfigurationsdatei mit dem möglicherweise erweiterten neuen Format in der neuen Version abgeglichen wird.

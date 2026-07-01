@@ -40,7 +40,7 @@ nav = [
   {"Projektkonfiguration" = "configuration.md"},
   {
   "Befehlsreferenz" = [
-        "reference/preprocess.md",
+        "reference/gamspreprocessor.md",
         {
           "Unterbefehle" = [
               {"project" = "reference/subcommands/project.md"},

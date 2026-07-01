@@ -7,7 +7,7 @@ sichergestellt werden, dass die Objektverzeichnisse korrekt angelegt wurden.
 ## Verwendung 
 
 ```
-preprocess validate [OPTIONS] <VERZEICHNIS>
+gamspreprocessor validate [OPTIONS] <VERZEICHNIS>
 ```
 
 `VERZEICHNIS` ist hier der Pfad zu einem validierenden Objektverzeichnis oder einem 

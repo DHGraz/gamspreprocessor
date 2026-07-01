@@ -1,7 +1,7 @@
 ## project.toml
 
 Die Datei `project.toml` enthält die Konfigurationseinstellungen für die `gams-xxx` 
-Programme, speziell für das Preprocessing Werkzeug.
+Programme, speziell für das gamspreprocessoring Werkzeug.
 
 Im Prinzip ist es es egal, wo diese Datei liegt, wir empfehlen aber das 
 Wurzelverzeichnis des Projektordners. Idealerweise sollte es nur eine
@@ -15,7 +15,7 @@ ein `.env` File adaptiert werden.
 Der Befehl 
 
 ```
-preprocess project init <project-root>
+gamspreprocessor project init <project-root>
 ```
 
 erzeugt im Verzeichnis `<project-root>' unter anderem eine `project.toml`
@@ -27,7 +27,7 @@ nötig werden, gibt es einen weiteren Befehl, mit dem eine existierende
 Konfiguration angepasst werden kann:
 
 ```
-preprocess project update
+gamspreprocessor project update
 ```
 
 ### Aufbau

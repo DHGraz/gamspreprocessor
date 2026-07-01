@@ -4,11 +4,11 @@
 ## Einzelne Objekte exportieren
 
 Soll ein Projekt von Gams3 nach GAMS 5 migriert werden, sollte der Weg auch über Objektverzeichnisse
-führen. Der Preprocess stellt dazu den Befehl 'gams3export` bereit. Dieses Tool
+führen. Der gamspreprocessor stellt dazu den Befehl 'gams3export` bereit. Dieses Tool
 funktioniert so, dass man ein einzelnen Objekt über seinen PID angibt:
 
 ```
-preprocess gams3export o:foo.bar.1
+gamspreprocessor gams3export o:foo.bar.1
 ```
 
 Dadurch werden alle Datenströme des Objekts `o:foo.bar.1` in ein neues Verzeichnis `objects/o%3Afoo.bar.1` gespeichert.
@@ -16,7 +16,7 @@ Dadurch werden alle Datenströme des Objekts `o:foo.bar.1` in ein neues Verzeich
 Will man das Präfix (hier: `o:`) verwerfen, kann man die Option `--strip-prefix` setzen:
 
 ```
-preprocess gams3export --strip-prefix o:foo.bar.1
+gamspreprocessor gams3export --strip-prefix o:foo.bar.1
 ```
 
 Das Objekt wir dann ins Verzeichnis `objects/foo.bar.1` geschrieben.
@@ -32,7 +32,7 @@ Projekts. Das geht einfach, indem man statt einer vollen Objekt-ID (PID) ein Mus
 angibt. Es werden dann alle Objekte exportiert, für die dieses Muster passt.
 
 ```
-preprocess gams3export '*:foo*'
+gamspreprocessor gams3export '*:foo*'
 ```
 
 Exportiert alle Objekte in deren PID die Zeichnkette `:foo` vorkommt. Wichtig dabei sind
@@ -43,7 +43,7 @@ Alle Optionen funktionieren für den Export einzelner einzelner Objekte oder meh
 Details zu den Optionen bekommt man entweder so:
 
 ```
-preprocess gams3export --help
+gamspreprocessor gams3export --help
 ```
 
 oder man liest in der [Befehlsreferenz](../reference/subcommands/gams3export.md) nach.

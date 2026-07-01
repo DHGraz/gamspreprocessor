@@ -13,7 +13,7 @@ von `object.csv` und `datastreams.csv`.
 In der einfachsten Form kann der Subbefehl so verwendet werden:
 
 ```bash
-prepocess gams3export 'o:foo.1'
+gamsprepocessor gams3export 'o:foo.1'
 ```
 
 Dieser Aufruf legt im Verzeichnis `objects` ein Verzeichnis `o%3Afoo.1` an. `%3A`
@@ -34,13 +34,13 @@ Es können auch mehrere Objekte(z.B. alle Objekte eines Projekts)
 mit einem Aufruf exportiert werden, indem ein PID-Muster angegeben wird:
 
 ```bash
-preprocess gams3export '*foo*'
+gamspreprocessor gams3export '*foo*'
 ```
 
 ## Verwendung
 
 ```
-preprocess gams3export [OPTIONS] PID-PATTERN
+gamspreprocessor gams3export [OPTIONS] PID-PATTERN
 ```
 
 ### Optionen 

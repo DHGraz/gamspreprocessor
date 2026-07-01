@@ -27,7 +27,7 @@ Jedes Objektverzeichnis muss aber folgende Voraussetzungen erfüllen:
   - Jedes Objektverzeichnis MUSS zwei CSV Dateien mit zusätzlichen Metadaten enthalten:
     -  `object.csv` enthält zusätzliche Metadaten zum Objekt
     -  `datatstreams.csv` enthält zusätzliche Metadaten zu jeder zu ingestierenden Datei.
-    Diese beiden Datein können mit dem Unterbefehl [preprocess csv](subcommands/csv.md) weitgehend automatisch erzeugt und verwaltet werden.
+    Diese beiden Datein können mit dem Unterbefehl [gamspreprocessor csv](subcommands/csv.md) weitgehend automatisch erzeugt und verwaltet werden.
   -  Eine beliebige Menge von Dateien ("Datenströmen"), wobei nur jene Dateien ins SIP-Package aufgenommen werden, für die ein
      Eintrag ind `datastreams.csv` existiert. 
 
@@ -110,7 +110,7 @@ Die Generierung von Objektverzeichnissen kann auf beliege Art erfolgen.
 Manche Projekte verwenden selbst geschriebene Scripte umd die benötigten Objekte 
 z.B. aus Google Spreadsheets, XML Dateien usw. zu erzeugen.
 
-Der `preprocessor`stellt den Unterbefehl `splitproject` bereit, der Daten, wie sie 
+Der `gamspreprocessor` stellt den Unterbefehl `splitproject` bereit, der Daten, wie sie 
 typischerweise in alten GAMS Projekten angelegt wurden,
 in einzelne Objektordner aufdröselt.
 

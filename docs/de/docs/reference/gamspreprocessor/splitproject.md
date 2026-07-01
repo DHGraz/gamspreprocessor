@@ -8,7 +8,7 @@ Sie benötigen diesen Unterbefehl also nur, wenn Sie alte Projekte direkt von de
 ## Verwendung 
 
 ```
-preprocess splitproject [OPTIONS] COMMAND [ARGS]...
+gamspreprocessor splitproject [OPTIONS] COMMAND [ARGS]...
 ```
 
 ## Unterbefehle
@@ -22,7 +22,7 @@ preprocess splitproject [OPTIONS] COMMAND [ARGS]...
 Dieser Unterbefehl teilt Projektdateien in einzelne Objektordner auf.
 
 ```
-preprocess splitproject split [OPTIONS] [SOURCEFILES]...
+gamspreprocessor splitproject split [OPTIONS] [SOURCEFILES]...
 ```
 
 Alte Projekte bewahrten meist alle zu ingestierenden Objekte in einem einzigen gemeinsamen Ordner auf. 
@@ -72,10 +72,10 @@ Zeigt den Hilfetext für diesen Unterbefehl an.
 
 ### showunhandled
 
-`preprocess split showunhandled` listet alle Dateien auf, die noch nicht einem Objekt zugeordnet sind, d.h. die noch nicht in einen Projektordner kopert worden sind. Dieser Befehl dient der Kontroll, ob alle vorhandenen Dateien umgewandelt worden sind.
+`gamspreprocessor split showunhandled` listet alle Dateien auf, die noch nicht einem Objekt zugeordnet sind, d.h. die noch nicht in einen Projektordner kopert worden sind. Dieser Befehl dient der Kontroll, ob alle vorhandenen Dateien umgewandelt worden sind.
 
 ```
-preprocess splitproject showunhandled [OPTIONS] OUTPUT_DIR
+gamspreprocessor splitproject showunhandled [OPTIONS] OUTPUT_DIR
 ```
 
 Listet alle Dateien im Projektordner auf, die noch nicht mit einem split Befehl bearbeitet wurden.

@@ -1,17 +1,16 @@
 # Installation
 
-`gamspreprocess` steht als Package auf pypi.org zur Verfügung. 
-Nach der Installation (z.B. via `uv` oder `pip`) steht das `preprocess`
+`gamspreprocessor` steht als Package auf pypi.org zur Verfügung. 
+Nach der Installation (z.B. via `uv` oder `pip`) steht das `gamspreprocessor`
 Programm zur Verfügung.
 
 ## Normale Verwendung
 
-Soll `preprocess` zur normalen Verwendung installiert werden, empfehlen wird diesen Weg:
+Soll `gamspreprocessor` zur normalen Verwendung installiert werden, empfehlen wir diesen Weg:
 
 ### Voraussetzung: Installation von `uv`. 
 
-`uv` ist ein alternativer Paketmanager, der das Leben mit Python erheblich erleichtert. Allerdings muss uv
-zuerst installiert werden. 
+`uv` ist ein alternativer Paketmanager, der das Leben mit Python erheblich erleichtert. Allerdings muss uv zuerst installiert werden. 
 
 #### Installation unter Windows
 
@@ -33,20 +32,39 @@ Grundsätzlich kann `uv`auch mit pip installiert werden, steht aber dann je nach
 pip install uv
 ```
 
-### Temporäre Installation von ```gamspreprocess```
+### Temporäre Installation
 
-Ist `uv` installiert, kann `gamspreprocessor so ausprobiert werden:
+Ist `uv` installiert, kann `gamspreprocessor` so ausprobiert werden:
 
 ```
-uvx gamspreprocessor preprocess
+uvx gamspreprocessor 
 ```
 
-### Dauerhafte Installation von `gamspreprocessor`
+### Dauerhafte Installation
 ```
 uv tool install gamspreprocessor
 ```
 
-Danach steht das Programm `preprocess` direkt zur Verfügung
+Danach steht das Programm `gamspreprocessor` direkt zur Verfügung.
+
+#### Upgrade
+
+Ein via `uv tool install` installiertes `gamspreprocessor` kann mit diesem Befehl 
+auf die aktuellste Version gebracht werden:
+
+```
+uv tool upgrade gamspreprocessor
+```
+
+#### gamspreprocessor deinstallieren
+
+Wurde `gamspreprocessor` via `uv tool install` kann es mit diesem Befehl wieder 
+deinstalliert werden:
+
+```
+uv tool uninstall gamspreprocessor
+```
+
 
 ### Installation ohne uv
 
@@ -57,7 +75,7 @@ normal mit `pip` installiert werden:
 pip install gamspreprocessor
 ```
 
-Danach muss aber immer zuerst das virtuelle Environment aktiviert werden, in dem `ganspreprocessor` installiert worden ist.
+Danach muss aber immer zuerst das virtuelle Environment aktiviert werden, in dem `gansgamspreprocessor` installiert worden ist.
 
 
 ## Installation für Development
@@ -65,7 +83,7 @@ Danach muss aber immer zuerst das virtuelle Environment aktiviert werden, in dem
 Soll weiter an gamspreprocessor gearbeitet werden, lässt sich eine dafür geeignete Umgebung mit wenigen Schritten
 herstellen:
 
-1. `git clone https://zimlab.uni-graz.at/gams5/production/preprocessing/gamspreprocessor.git`
+1. `git clone https://zimlab.uni-graz.at/gams5/production/gamspreprocessoring/gamspreprocessor.git`
 2. cd gamspreprocessor
 3. uv sync
 

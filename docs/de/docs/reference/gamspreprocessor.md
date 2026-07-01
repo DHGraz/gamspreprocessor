@@ -1,7 +1,7 @@
 # preprocess
 
-`preprocess` ist das zentrale Programm beim Erstellen von Objektverzeichnissen.
-Dabei wird für jedes Projekt ein eigenes Verzeichnis (["Projektordner"](object_dirs.md)) angelegt.
+`gamspreprocessor`  (oder kurz: `preprocess`) ist das zentrale Programm beim Erstellen von Objektverzeichnissen.
+Dabei wird für jedes Projekt ein eigenes Verzeichnis (["Projektverzeichnis"](object_dirs.md)) angelegt.
 
 
 Es steht nach der Installation des Pakets `gamspreprocessor` zur Verfügung. 
@@ -9,15 +9,15 @@ Falls das Programm nicht gefunden wird, überprüfen Sie, ob das
 korrekte virtuelle Environment aktiviert ist -- also das Environment in dem 
 Sie `gamspreprocessor` installiert haben.
 
-`preprocess` muss (fast) immer mit einem Unterbefehl aufgerufen werden, die
+`gamspreprocessor` muss (fast) immer mit einem Unterbefehl aufgerufen werden, die
 jeweils eigene Kommandozeilenoptionen und -argumente unterstützen. 
 
-Sowohl `preprocess` selbst, als auch alle Unterbefehle unterstützen die
+Sowohl `gamspreprocessor` selbst, als auch alle Unterbefehle unterstützen die
 Option `--help`, die zur Ausgabe der Syntax und weiterer verfügbarer Optionen 
 führt.
 
 
-`preprocess` selbst kennt einige wenige globale Optionen. 
+`gamspreprocessor` selbst kennt einige wenige globale Optionen. 
 
 ## Globale Optionen
 
@@ -33,18 +33,18 @@ Globale Optionen sind **vor** dem jewiligen Unterbefehl anzugeben und stehen glo
   * `--filelog-level`: Legt die Gesprächigkeit für die Logdatei fest.
     Erlaubte Werte sind: `DEBUG`, `INFO`, `WARNING`, `ERROR` oder 
     `CRITICAL`.
-  * `--version`: Gibt die Version von `preprocess` aus.
-  * `--help`: Gibt Hilfe für `preprocess` aus.  
+  * `--version`: Gibt die Version von `gamspreprocessor` aus.
+  * `--help`: Gibt Hilfe für `gamspreprocessor` aus.  
 
-Mit `preprocess --help` können Sie sich diese Optionen ausgeben lassen.
+Mit `gamspreprocessor --help` können Sie sich diese Optionen ausgeben lassen.
 
 ## Unterbefehle
 
-Das Programm `preprocess` kennt eine Reihen von Subcommands, die jeweils 
+Das Programm `gamspreprocessor` kennt eine Reihen von Subcommands, die jeweils 
 in einem eigenen Dokument beschrieben werden. Deshalb werden die 
 einzelnen Unterbefehle hier nur kurz beschrieben und und auf das ausführlichere 
 Dokument verlinkt. Sie können sich aber auch mit
-`preprocess <subcommand> --help` die Hilfe zu den einzelnen Unterbefehlen
+`gamspreprocessor <subcommand> --help` die Hilfe zu den einzelnen Unterbefehlen
 anzeigen lassen.
  
 
@@ -67,50 +67,59 @@ Folgende Subcommands stehen zur Verfügung:
 
 ### Der Unterbefehl project
 
-[`preprocess project`](preprocess/project.md) stellt weitere Unterbefehle für die Erzeugung und Aktualisierung
-eines GAMS-Projekts bereit. Dies ist der empfohlende Weg ein neues Projekt anzulegen.
+[`gamspreprocessor project`](gamspreprocessor/project.md) stellt weitere Unterbefehle
+für die Erzeugung und Aktualisierung eines GAMS-Projekts bereit. Dies ist der 
+empfohlende Weg ein neues Projekt anzulegen.
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden Sie 
-[hier](preprocess/project.md) oder via `preprocess project --help`.
+[hier](gamspreprocessor/project.md) oder via `gamspreprocessor project --help`.
 
 ### Der Unterbefehl csv
 
-[`preprocess csv`](preprocess/csv.md) stellt einige Unterbefehle bereit, mit denen die CSV Dateien
-mit den Objekt-Metadaten erzeugt und verwaltet werden könne.
+[`gamspreprocessor csv`](gamspreprocessor/csv.md) stellt einige Unterbefehle bereit,
+mit denen die CSV Dateien mit den Objekt-Metadaten erzeugt und verwaltet 
+werden können.
 
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
-Sie [hier](preprocess/csv.md) oder via `preprocess csv --help`.
+Sie [hier](gamspreprocessor/csv.md) oder via `gamspreprocessor csv --help`.
 
+<!--
 ## Der Unterbefehl validate
 
-`preprocess validate`(preprocess/validate.md) kann bzw. sollte verwendet werden, um ein oder
-mehrere Objektverzeichnisse auf ihre Korrektheit zu überprüfen. 
+`gamspreprocessor validate`(gamspreprocess/validate.md) kann bzw. sollte verwendet
+werden, um ein oder mehrere Objektverzeichnisse auf ihre Korrektheit zu überprüfen. 
 
-Deails und weitere Möglichkeiten zu diesem Unterbefehl find Sie [hier](preprocess/validate.md) 
-oder via `preprocess validate --help`.
+Deails und weitere Möglichkeiten zu diesem Unterbefehl find Sie 
+[hier](gamspreprocessor/validate.md) oder via `gamspreprocessor validate --help`.
+-->
 
 ### Der Unterbefehl transform
 
-[`preprocess transform`](preprocess/transform.md) führt Transformationen von Daten aus. Aktuell
-gibt es nur die Möglichkeit XSLT-Transformationen auszuhühren (via Saxon).
+[`gamspreprocessor transform`](gamspreprocessor/transform.md) führt Transformationen
+von Daten aus. Aktuell gibt es nur die Möglichkeit XSLT-Transformationen 
+auszuführen (via Saxon).
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
-Sie [hier](preprocess/transform.md) oder via `preprocess transform --help`.
+Sie [hier](gamspreprocessor/transform.md) oder via 
+`gamspreprocessor transform --help`.
 
 ### Der Unterbefehl multitransform
 
-[`preprocess multitransform`](preprocess/multitransform.md) funktioniert gleich wie `preprocess transform`,
+[`gamspreprocessor multitransform`](gamspreprocessor/multitransform.md) 
+funktioniert gleich wie `gamspreprocessor transform`,
 führt die Transformation aber auf viele Objekte aus. Das ist beispielsweise
 praktisch, um via XSLT auf einen Schlag für alle Objekte Metadaten aus 
 dem TEI Header in das zwingend vorgegebene DC.xml zu überführen.
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
-Sie [hier](preprocess/multitransform.md) oder via `preprocess multitransform --help`.
+Sie [hier](gamspreprocessor/multitransform.md) oder via 
+`gamspreprocessor multitransform --help`.
 
 ### Der Unterbefehl splitproject
 
-[`preprocess splitproject`](preprocess/splitproject.md) ist ein Mittel, um ein Projekt, wie es 
+[`gamspreprocessor splitproject`](gamspreprocessor/splitproject.md) ist ein 
+Mittel, um ein Projekt, wie es 
 typischerweise in GAMS 3 vor dem Ingest angelegt wurde in eine
 Struktur zu überführen, aus der Bags für den Ingest in GAMS 5 s
 erzeugt werden können. Es zerlegt also das Projekt in 
@@ -118,5 +127,5 @@ Objektverzeichnisse, kopiert referenzierte Ressourcen und benennt
 diese ggf. um.
 
 Details und weitere Möglichkeiten zu diesem Unterbefehl finden 
-Sie [hier](preprocess/splitproject.md) oder via 
-`preprocess splitproject --help`.
+Sie [hier](gamspreprocessor/splitproject.md) oder via 
+`gamspreprocessor splitproject --help`.

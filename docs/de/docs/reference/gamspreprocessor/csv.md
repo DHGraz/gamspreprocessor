@@ -15,37 +15,37 @@ liegen) zwei CSV-Dateien:
   
 Diese beiden Dateien landen nicht im Bag, werden aber für die Erzeugung der Bag-Metadaten
 gebraucht. Da die händische Erzeugung und Pflege dieser CSV-Dateien sehr mühsam ist,
-stellt der `csv` Unterbefehl von `preprocess` nützliche Funktionen dafür bereit.
+stellt der `csv` Unterbefehl von `gamspreprocessor` nützliche Funktionen dafür bereit.
 
 Ein prototypischer Ablauf sieht so aus:
 
   1. Erstellung der Objektordner (z.B. via `updatecsv split`). Wichtig dabei ist,
      dass in jedem Objektordner eine Datei `DC.xml` vorhanden ist. Diese kann
      z.B. via XSLT aus einem TEI erzeugt werden (siehe 
-     `preprocess multitransform`).
+     `gamspreprocessor multitransform`).
   1. Ist diese Voraussetzung erfüllt, und zusätzlich die Projekt-Konfigurationsdatei
-     `project.toml` erzeugt (siehe `preprocess init`), können mit dem Befehl
-     `preprocess csv create OBJECT_ROOT` für alle Objektordner unterhalb von `OBJECT_ROOT`
+     `project.toml` erzeugt (siehe `gamspreprocessor init`), können mit dem Befehl
+     `gamspreprocessor csv create OBJECT_ROOT` für alle Objektordner unterhalb von `OBJECT_ROOT`
      diese beiden CSV Dateien erzeugt werden.
   1. Gibt es mehrere oder sogar viele Projektordner, wäre die separate Bearbeitung der 
      einzelnen CSV-Dateien sehr mühsam. Deshalb wird empfohlen, mit dem Befehl
-     `preprocess csv collect` alle CSV-Daten aus den einzelnen  Objektordnern
+     `gamspreprocessor csv collect` alle CSV-Daten aus den einzelnen  Objektordnern
      einzusammeln und zusammen in eine Excel-Datei `all_objects.csv` zu speichern.
      Diese Datei kann dann sehr effizient bearbeitet werden, indem beispielsweise
      die Einträge nach bestimmten Spalten sortiert werden und/oder fehlende Werte
      in viele Zeilen gleichzeitig hineinkopiert werden. 
   1. Ist die Bearbeitung von `all_objects.csv` abgeschlossen, werden die dort
-     vorgenommenen Änderungen mit dem Befehl `preprocess csv update` wieder in
+     vorgenommenen Änderungen mit dem Befehl `gamspreprocessor csv update` wieder in
      die einzelnen CSV-Datei zurückgespielt. `all_objects.csv` sollte danach
      aus Konsistenzgründen gelöscht werden, da die Datei jederzeit neu
-     via `preprocess csv collect` erzeugt werden kann.
+     via `gamspreprocessor csv collect` erzeugt werden kann.
 
 
 
 ## Verwendung 
 
 ```
-preprocess csv [OPTIONS] COMMAND [ARGS]
+gamspreprocessor csv [OPTIONS] COMMAND [ARGS]
 ```
 
 ## Unterbefehle
@@ -61,7 +61,7 @@ preprocess csv [OPTIONS] COMMAND [ARGS]
 Dieser Unterbefehl generiert CSV Dateien mit Metadaten für ein oder mehrere Objektverzeichnisse.
 
 ```
-preprocess csv create [OPTIONS] AUSGANGSVERZEICHNIS
+gamspreprocessor csv create [OPTIONS] AUSGANGSVERZEICHNIS
 ```
 
 Geht rekursiv durch alle Verzeichnisse unterhalb von `AUSGANGSVERZEICHNIS`, prüft, ob es sich um ein
@@ -81,7 +81,7 @@ Diese Option setzt den Pfad zur Projektkonfigurationsdatei (`project.toml`):
 Beispiel:
 
 ```
-preprocess csv create -c foo/bar/project.toml projects/myproject
+gamspreprocessor csv create -c foo/bar/project.toml projects/myproject
 ```
 
 Die Option braucht nur gesetzt zu werden, wenn sich die Konfigurationsdatei an einem außergewöhnlichen Ort befindet.
@@ -128,7 +128,7 @@ Gibt den Hilfetext für `csv create` aus.
 
 ### collect
 
-`preprocess csv collect` dient dazu, Daten aus den CSV-Dateien in den Objektordnern
+`gamspreprocessor csv collect` dient dazu, Daten aus den CSV-Dateien in den Objektordnern
 einzusammeln und zusammen in eine Excel-Datei (`all_objects.xlsx`) zu speichern. 
 Diese Excel-Datei sollte die Bearbeitung der Metadaten erheblich erleichtern und 
 beschleunigen. Der Befehl `proprocess csv update` kann dann dazu verwendet werden, 
@@ -136,13 +136,13 @@ alle CSV Datei in den Objektordnern durch die Daten aus dem Excel-File neu zu ge
 
 Diese beiden Vorgänge können beliebig oft wiederholt werden. Da `all_objects.csv`  
 jederzeit aus den Objekt-CSV-Dateien neu generiert werden kann, besteht keine Notwendigkeit,
-die `all_objects.csv` Datei aufzubewahren, sobald ihre Inhalte via `preprocess csv update` 
+die `all_objects.csv` Datei aufzubewahren, sobald ihre Inhalte via `gamspreprocessor csv update` 
 in die Objekt-CSV-Dateien zurückgespielt worden sind.
 
 Beispiel:
 
 ```
-preprocess csv collect projects/myproject
+gamspreprocessor csv collect projects/myproject
 ```
 
 
@@ -167,14 +167,14 @@ Gibt den Hilfetext für diesen Unterbefehl aus.
 
 ### update
 
-`preprocess csv update` schreibt die in `all_objects.xslx` geänderten Daten wieder zurück in die 
+`gamspreprocessor csv update` schreibt die in `all_objects.xslx` geänderten Daten wieder zurück in die 
 `object.csv` und `datastreams.csv` der einzelnen Objektordner. Voraussetzung ist, dass
-die Excel-Datei zuvor mit `preprocess csv collect` erzeugt worden ist. 
+die Excel-Datei zuvor mit `gamspreprocessor csv collect` erzeugt worden ist. 
 `csv update` ist also das Gegenstück zu `csv collect`: `csv collect` sammelt die Daten aus den
 Objektverzeichnissen ein, `csv update` schreibt sie wieder dorthin zurück.
 
 ```
-preprocess csv update [OPTIONS] PROJECTROOT
+gamspreprocessor csv update [OPTIONS] PROJECTROOT
 ```
 
 `PROJECTROOT` ist das Verzeichnis in dem die Objektordner liegen.
@@ -182,7 +182,7 @@ preprocess csv update [OPTIONS] PROJECTROOT
 Beispiel:
 
 ```
-preprocess csv update projects/myproject/objects
+gamspreprocessor csv update projects/myproject/objects
 ```
 
 #### Optionen
@@ -196,7 +196,7 @@ nur gesetzt werden, falls die Excel Datei nicht im aktuellen Arbeitsverzeichnis 
 
 Ist diese Option gesetzt, liest das Programm die gesammelten Daten nicht aus der Datei
 `all_objects.xlsx`, sondern aus den beiden CSV-Dateien `all_objects.csv` und `all_datastreams.csv`.
-Das macht nur Sinn, wenn zuvor bei `preprocess csv collect` die Option `--to-csv`verwendet wurde.
+Das macht nur Sinn, wenn zuvor bei `gamspreprocessor csv collect` die Option `--to-csv`verwendet wurde.
 
 Falls diese Dateien nicht im aktuellen Arbeitsverzeichnis liegen, kann der Pfad zur korrekten
 Verzeichnis mit der Option `--input-dir` gesetzt werden.
@@ -213,7 +213,7 @@ Dieser Befehl wandelt die beiden verpflichtend anzugebenen CSV Datein in eine Ex
 die Excel Datei direkt erzeugt.*
 
 ```
-preprocess csv csv2xlsx [OPTIONS] <PFAD ZU OBJECT_CSV> <PFAD ZU DATASTREAMS_CSV>
+gamspreprocessor csv csv2xlsx [OPTIONS] <PFAD ZU OBJECT_CSV> <PFAD ZU DATASTREAMS_CSV>
 ```
 
 Dieser Befehl erzeugt eine Datei `all_objects.xlsx` im aktuellen Arbeitsverzeichnis.
@@ -233,7 +233,7 @@ Gibt den Hilfetext für diesen Unterbefehl aus.
 
 ### xlsx2csv
 
-`preprocess csv xlsx2csv` wandelt eine xslx-Metadaten-Datei in zwei CSV Dateien um. 
+`gamspreprocessor csv xlsx2csv` wandelt eine xslx-Metadaten-Datei in zwei CSV Dateien um. 
 Da die Excel Datei zwei Blätter (Tabellen) enthält (je eine für Objekte und Datenströme), werden zwei 
 CSV-Dateien erzeugt.
 
@@ -241,7 +241,7 @@ CSV-Dateien erzeugt.
 `update` Unterbefehle direkt auf der Excel Datei operieren können.*
 
 ```
-preprocess csv xlsx2csv [OPTIONS] XLSX_FILE
+gamspreprocessor csv xlsx2csv [OPTIONS] XLSX_FILE
 ```
 
 wandelt `XLSX_FILE` in zwei Dateien `all_objects.csv` und `all_datastreams.csv` um. Diese werden im selben Verzeichnis

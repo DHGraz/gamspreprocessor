@@ -6,10 +6,10 @@ Falls Sie nur eine einzelne Datei umwandeln wollen, verwenden Sie statt dessen
 den Befehl [transform](transform.md).
 
 
-`preprocess multitransform` funktioniert ähnlich wie `preprocess transform`, jedoch kann 
+`gamspreprocessor multitransform` funktioniert ähnlich wie `gamspreprocessor transform`, jedoch kann 
 mit `multitransform` eine Tranformation auf mehrere Dateien und Objekte angewendet werden.
 
-`preprocess multitransform` kann beispielsweise dafür verwendet werden, um mit einem Befehl für hunderte oder tausende 
+`gamspreprocessor multitransform` kann beispielsweise dafür verwendet werden, um mit einem Befehl für hunderte oder tausende 
 Objektverzeichnisse aus dem in TEI-Files vorhandenen Metadaten `DC.xml` Dateien zu erzeugen.
 
 Aktuell kann `multitransform` nur XSLT. Weitere Transformationen können aber bei Bedarf hinzugefügt werden.
@@ -17,7 +17,7 @@ Aktuell kann `multitransform` nur XSLT. Weitere Transformationen können aber be
 ## Verwendung 
 
 ```
-preprocess multitransform [OPTIONS] COMMAND [ARGS]...
+gamspreprocessor multitransform [OPTIONS] COMMAND [ARGS]...
 ```
 
 ## Unterbefehle
@@ -27,7 +27,7 @@ preprocess multitransform [OPTIONS] COMMAND [ARGS]...
 
 ### xslt
 
-`preprocess multitransform xslt` wendet eine XSL Transformation auf 
+`gamspreprocessor multitransform xslt` wendet eine XSL Transformation auf 
 XML Dateien in mehreren Verzeichnissen an.
 Funktioniert bei Bedarf auch rekursiv, das heißt, die Transformation kann auch auf Unterverzeichnisse angewendet werden.
 
@@ -47,7 +47,7 @@ dürfen.
 
 
 ```
-preprocess multitransform xslt [OPTIONS] [START_DIR]...
+gamspreprocessor multitransform xslt [OPTIONS] [START_DIR]...
 ```
 
 #### Optionen: 
@@ -109,12 +109,12 @@ Zeigt den Hilfetext für diesen Unterbefehl an.
 
 ### xslt-processor
 
-`preprocess multitransform xslt-processor` Zeigt die Version des verwendeten XSLT Prozessors an.
+`gamspreprocessor multitransform xslt-processor` Zeigt die Version des verwendeten XSLT Prozessors an.
 
 Beispiel:
 
 ```
-preprocess multitransform xslt-processor 
+gamspreprocessor multitransform xslt-processor 
 ```
 
 

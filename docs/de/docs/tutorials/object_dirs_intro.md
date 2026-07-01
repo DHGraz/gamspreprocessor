@@ -1,6 +1,6 @@
 # Basics: Objektverzeichnisse
 
-Im Preprocessing von GAMS Daten sind **Objekverzeichnisse** zentral.
+Im gamspreprocessoring von GAMS Daten sind **Objekverzeichnisse** zentral.
 
 Die Grundidee ist, dass jedes Objekt in einem eigenen Verzeichnis angelegt wird:
 
@@ -31,11 +31,11 @@ im Detail in eigenen Tutorials beschrieben. Daher hier nur ein Überblick:
   * Durch eigene Scripte. Hier stehen natürlich alle Möglichkeiten offen, etwa ein 
     Excel-artiges  Sheet als Ausgangspunkt zu verwenden.
   * Objekte aus GAMS Version 3 in Objektverzeichnisse exportieren. Für diesen Zweck stellt
-    der Preprocessor einen eigenen Unterbefehl zur Verfügung: 
-    [`preprocess gams3export`](objectdir_gams3.md).
+    der gamspreprocessor einen eigenen Unterbefehl zur Verfügung: 
+    [`gamspreprocessor gams3export`](objectdir_gams3.md).
   * Objektverzeichnisse aus Daten erzeugen, wie sie typischerweise für den Ingest
-    in GAMS 3 angelegt wurden. Der Preprocessor stellt dafür einen Unterbefehl
-    [`preprocess splitproject`](objectdir_splitproject.md) bereit.    
+    in GAMS 3 angelegt wurden. Der gamspreprocessor stellt dafür einen Unterbefehl
+    [`gamspreprocessor splitproject`](objectdir_splitproject.md) bereit.    
 
 
 ## Datenströme

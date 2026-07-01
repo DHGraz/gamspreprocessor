@@ -5,7 +5,7 @@ via Cirilo genutzt wurden, können diese mit dem Unterbefehl `splitproject` in
 Objektverzeichnisse konvertiert werden:
 
 ```
-preprocess splitproject split /projects/foo/TEI_*.xml
+gamspreprocessor splitproject split /projects/foo/TEI_*.xml
 ```
 
 Analysiert alle auf das angegebene Muster passende Dateien und erzeugt passende Objektverzeichnisse.

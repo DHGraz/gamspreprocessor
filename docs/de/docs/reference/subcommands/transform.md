@@ -8,7 +8,7 @@ Shellscript oder verwenden statt dessen den Unterbefehl [multitransform](./multi
 ## Verwendung 
 
 ```
-preprocess transform [OPTIONS] COMMAND [ARGS]...
+gamspreprocessor transform [OPTIONS] COMMAND [ARGS]...
 ```
 
 ## Unterbefehle
@@ -19,12 +19,12 @@ preprocess transform [OPTIONS] COMMAND [ARGS]...
 
 ### xslt
 
-`preprocess transform xslt -x <XSLT-DATEI> <EINGABEDATEI> <AUSGABEDATEI>` 
+`gamspreprocessor transform xslt -x <XSLT-DATEI> <EINGABEDATEI> <AUSGABEDATEI>` 
 wendet die XSL Transformation `XSLT-DATEI` auf die Ausgangsdatei `EINGABEDATEI` an und schreibt das Ergebnis in die Datei
 `AUSGABEDATEI`.
 
 ```
-preprocess transform xslt [OPTIONS] XML_FILE OUTPUT_FILE
+gamspreprocessor transform xslt [OPTIONS] XML_FILE OUTPUT_FILE
 ```
 
 #### Optionen:
@@ -43,7 +43,7 @@ Zeigt den Hilfetext für diesen Unterbefehl an.
 Über diesen Unterbefehl lässt sich die genaue Version des verwendeten XSLT Prozessors herausfinden.
 
 ```
-preprocess transform xslt-processor
+gamspreprocessor transform xslt-processor
 ```
 
 zeigt die Version des installierten XSLT Prozessors

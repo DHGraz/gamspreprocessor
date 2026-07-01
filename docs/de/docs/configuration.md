@@ -1,12 +1,12 @@
 # Konfiguration eines GAMS Projects
 
-Verschiedene GAMS Werkezuge wie `preprocess` oder `package` benötigen eine
+Verschiedene GAMS Werkezuge wie `gamspreprocessor` oder `package` benötigen eine
 (gemeinsame) Konfigurationsdatei mit dem Namen `gamsproject.toml`.
 
 Ein Skelett dieser Konfigurationsdatei kann mit 
 
 ```bash
-preprocess project init 
+gamspreprocessor project init 
 ```
 
 erzeugt werden. 

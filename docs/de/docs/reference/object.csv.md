@@ -27,7 +27,7 @@ Die Datei besteht aus folgenden Spalten:
 
 `recid` ist der Identifikator des digitalen Objekts. Also etwas wie `hsa.letters.123`.
 
-Bei der Generierung des CSV (`preprocess csv create`) wird der Ordnername des Objekts als Defaultwert
+Bei der Generierung des CSV (`gamspreprocessor csv create`) wird der Ordnername des Objekts als Defaultwert
 eingetragen.
 
 ### title
