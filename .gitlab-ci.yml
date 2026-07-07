@@ -73,7 +73,7 @@ auto-tag:
     - TAG="v${VERSION}"
     - echo "Detected version ${TAG}"
     - |
-      ALL_TAG${git ls-remote --tags origin)
+      ALL_TAGS=$(git ls-remote --tags origin)
       echo All tags: ${ALL_TAGS}
       if echo "${ALL_TAGS}" | grep -q "refs/tags/${TAG}$"; then
         echo "Tag ${TAG} already exists, nothing to do"
