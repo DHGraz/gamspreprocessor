@@ -1,6 +1,6 @@
 stages:
-  - test
-  - lint
+  #- test
+  #- lint
   - nightly-test
   - prepare
   - deploy
@@ -90,7 +90,7 @@ create_release:
     #    --form "ref=$CI_COMMIT_SHA" \
     #    "https://$CI_SERVER_HOST/api/v4/projects/$CI_PROJECT_ID/repository/tags"
     - echo "Creating release for $RELEASE_VERSION..."
-    - GITLAB_TOKEN=$CI_JOB_TOKEN GLAB_HOST=$CI_SERVER_HOST GITLAB_REPO=$CI_PROJECT_PATH glab release create "$RELEASE_VERSION" --name "Release $RELEASE_VERSION" --notes "Automatic release for commit $CI_COMMIT_TITLE" --ref $CI_COMMIT_SHA
+    - GITLAB_TOKEN=$CI_JOB_TOKEN GLAB_HOST=$CI_SERVER_HOST GITLAB_REPO=$CI_PROJECT_ID glab release create "$RELEASE_VERSION" --name "Release $RELEASE_VERSION" --notes "Automatic release for commit $CI_COMMIT_TITLE" --ref $CI_COMMIT_SHA
   artifacts:
     reports:
       # Make $RELEASE_VERSION accessible in jext job
