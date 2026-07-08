@@ -78,12 +78,15 @@ create_release:
     - if: $CI_COMMIT_BRANCH == "main"
   #before_script:
   #  - apk add --no-cache awk
-  script:
-    # 1. extract version
+
+script:
     - VERSION_RAW=$(awk -F ' = ' '/^\[project\]/{in_proj=1; next} /^\[/{in_proj=0} in_proj && /^version/{gsub(/"/, "", $2); print $2; exit}' pyproject.toml)
     - RELEASE_VERSION="v${VERSION_RAW}"
     - echo "RELEASE_VERSION=$RELEASE_VERSION" >> release.env
     - echo "Creating release for $RELEASE_VERSION..."
+  
+    # Needed by glab to identifiy server and authentciate explicitely
+    - GITLAB_TOKEN=$CI_JOB_TOKEN GLAB_HOST=$CI_SERVER_HOST glab release create "$RELEASE_VERSION" --name "Release $RELEASE_VERSION" --notes "Automatic release for commit $CI_COMMIT_TITLE" --ref $CI_COMMIT_SHA
     
     # 2. create GitLab release erstellen. Gitlab stops if theis goes wrong
     - glab release create "$RELEASE_VERSION" --name "Release $RELEASE_VERSION" --notes "Automatic release for commit $CI_COMMIT_TITLE" --ref $CI_COMMIT_SHA
