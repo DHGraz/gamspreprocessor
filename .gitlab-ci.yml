@@ -83,12 +83,12 @@ create_release:
     - VERSION_RAW=$(awk -F ' = ' '/^\[project\]/{in_proj=1; next} /^\[/{in_proj=0} in_proj && /^version/{gsub(/"/, "", $2); print $2; exit}' pyproject.toml)
     - RELEASE_VERSION="v${VERSION_RAW}"
     - echo "RELEASE_VERSION=$RELEASE_VERSION" >> release.env
-    - |
-      curl --request POST \
-        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        --form "tag_name=$RELEASE_VERSION" \
-        --form "ref=$CI_COMMIT_SHA" \
-        "https://$CI_SERVER_HOST/api/v4/projects/$CI_PROJECT_ID/repository/tags"
+    #- |
+    #  curl --request POST \
+    #    --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+    #    --form "tag_name=$RELEASE_VERSION" \
+    #    --form "ref=$CI_COMMIT_SHA" \
+    #    "https://$CI_SERVER_HOST/api/v4/projects/$CI_PROJECT_ID/repository/tags"
     - echo "Creating release for $RELEASE_VERSION..."
     - GITLAB_TOKEN=$CI_JOB_TOKEN GLAB_HOST=$CI_SERVER_HOST GITLAB_REPO=$CI_PROJECT_PATH glab release create "$RELEASE_VERSION" --name "Release $RELEASE_VERSION" --notes "Automatic release for commit $CI_COMMIT_TITLE" --ref $CI_COMMIT_SHA
   artifacts:
