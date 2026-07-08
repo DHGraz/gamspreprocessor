@@ -79,8 +79,7 @@ create_release:
   #before_script:
   #  - apk add --no-cache awk
 
-
-script:
+  script:
     - VERSION_RAW=$(awk -F ' = ' '/^\[project\]/{in_proj=1; next} /^\[/{in_proj=0} in_proj && /^version/{gsub(/"/, "", $2); print $2; exit}' pyproject.toml)
     - RELEASE_VERSION="v${VERSION_RAW}"
     - echo "RELEASE_VERSION=$RELEASE_VERSION" >> release.env
