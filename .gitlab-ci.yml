@@ -86,11 +86,8 @@ create_release:
     - |
       curl --request POST \
         --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        "https://$CI_SERVER_HOST/api/v4/projects/$CI_PROJECT_ID/repository/tags?tag_name=$RELEASE_VERSION&amp;ref=$CI_COMMIT_SHA"
-    - echo "Creating tag for $RELEASE_VERSION"
+        "https://$CI_SERVER_HOST/api/v4/projects/$CI_PROJECT_ID/repository/tags?tag_name=$RELEASE_VERSION&ref=$CI_COMMIT_SHA" 
     - echo "Creating release for $RELEASE_VERSION..."
-    
-    # Wir übergeben GITLAB_REPO im Format "besitzer/projekt-name" via vordefinierter Variable
     - GITLAB_TOKEN=$CI_JOB_TOKEN GLAB_HOST=$CI_SERVER_HOST GITLAB_REPO=$CI_PROJECT_PATH glab release create "$RELEASE_VERSION" --name "Release $RELEASE_VERSION" --notes "Automatic release for commit $CI_COMMIT_TITLE" --ref $CI_COMMIT_SHA
   artifacts:
     reports:
