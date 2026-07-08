@@ -4,7 +4,7 @@ stages:
   - nightly-test
   - prepare
   - deploy
-  - publish
+  
 
 variables:
   UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
@@ -16,6 +16,18 @@ cache:
   paths:
     - .uv-cache
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: never
+    
 # run on any push
 pytest:
   stage: test
@@ -60,7 +72,7 @@ nightly-pytest:
 
 
 create_release:
-  stage: release
+  stage: deploy
   image: registry.gitlab.com/gitlab-org/cli:latest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
