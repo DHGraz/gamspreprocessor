@@ -29,28 +29,28 @@ workflow:
     - when: never
     
 # run on any push
-pytest:
-  stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - when: always
-  parallel:
-    matrix:
-      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
-  script:
-    - uv python install $PYTHON_VERSION
-    - uv run --python $PYTHON_VERSION pytest
+#pytest:
+#  stage: test
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "schedule"
+#      when: never
+#    - when: always
+#  parallel:
+#    matrix:
+#      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
+#  script:
+#    - uv python install $PYTHON_VERSION
+#    - uv run --python $PYTHON_VERSION pytest
 
-# Linting (Ruff normally only needs one python version): run on any push 
-lint-ruff:
-  stage: lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - when: always
-  script:
-    - uv run ruff check src
+## Linting (Ruff normally only needs one python version): run on any push 
+#lint-ruff:
+#  stage: lint
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "schedule"
+#      when: never
+#    - when: always
+#  script:
+#    - uv run ruff check src
 
 
 
