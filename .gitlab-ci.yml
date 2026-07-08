@@ -90,7 +90,14 @@ create_release:
     #    --form "ref=$CI_COMMIT_SHA" \
     #    "https://$CI_SERVER_HOST/api/v4/projects/$CI_PROJECT_ID/repository/tags"
     - echo "Creating release for $RELEASE_VERSION..."
-    - GITLAB_TOKEN=$CI_JOB_TOKEN GLAB_HOST=$CI_SERVER_HOST glab release create "$RELEASE_VERSION" --repo "$CI_PROJECT_PATH" --name "Release $RELEASE_VERSION" --notes "Automatic release for commit $CI_COMMIT_TITLE" --ref $CI_COMMIT_SHA
+    - |
+      curl --fail --request POST \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --form "tag_name=$RELEASE_VERSION" \
+        --form "ref=$CI_COMMIT_SHA" \
+        --form "name=Release $RELEASE_VERSION" \
+        --form "description=Automatic release for commit $CI_COMMIT_TITLE" \
+        "https://$CI_SERVER_HOST/api/v4/projects/$CI_PROJECT_ID/releases"
   artifacts:
     reports:
       # Make $RELEASE_VERSION accessible in jext job
