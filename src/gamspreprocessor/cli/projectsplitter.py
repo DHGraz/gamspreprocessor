@@ -88,6 +88,10 @@ def split_project(  # noqa: PLR0913
             src_files = f.read().splitlines()
     else:
         src_files = sourcefiles
+        if not src_files:
+            raise click.ClickException(
+                "No processable source files found."
+            )
     try:
         splitter = projectsplitter_api.create_project_splitter(
             Path(output_dir),
