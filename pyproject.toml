@@ -1,6 +1,6 @@
 [project]
 name = "gamspreprocessor"
-version = "0.5.0"
+version = "0.5.1"
 description = "A utility which helps to preprocess GAMS objects before ingestion."
 authors = [
     { name = "Gunter Vasold", email = "gunter.vasold@uni-graz.at" }
@@ -10,10 +10,10 @@ requires-python = ">= 3.11"
 keywords = ["GAMS"]
 
 dependencies = [
-    "click>=8.1.7",
-    "uritools>=4.0.3",
-    "saxonche>=12.5.0",
-    "frozendict>=2.4.6",
+    "click>=8.4.2",
+    "uritools>=6.1.2",
+    "saxonche>=13.0.0",
+    "frozendict>=2.4.7",
     "gamslib>=0.8.6",
 ]
 
@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 [project.scripts]
@@ -45,14 +46,13 @@ build-backend = "hatchling.build"
 [dependency-groups]
 
 dev = [
-    "pytest>=8.3.2",
-    "pylint>=3.2.6",
-    "pytest-datadir>=1.5.0",
-    "grip>=4.6.2",
-    "pyright>=1.1.390",
-    "pytest-cov>=6.0.0",
-    "ruff>=0.15.13",
-    "zensical>=0.0.46",
+    "pytest>=9.1.1",
+    "pylint>=4.0.6",
+    "pytest-datadir>=1.8.0",
+    "pyright>=1.1.411",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.21",
+    "zensical>=0.0.50",
     "mkdocstrings-python>=2.0.5",
 ]
 

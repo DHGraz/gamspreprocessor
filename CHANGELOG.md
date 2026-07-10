@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.5.1] - 2026-07-10
+
+## Changed
+
+  * Refactor to make the API more clear
+  * Add the API section to the German documentation 
+
 ## [0.5.0] - 2026-07-01
 
 ### Changed
