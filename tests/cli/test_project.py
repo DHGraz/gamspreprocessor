@@ -13,29 +13,6 @@ def test_init_project(tmp_path):
     assert "Please edit this file" in result.output
     assert (tmp_path / "gamsproject.toml").is_file()
 
-    def test_update_project_needed(tmp_path, mocker): # pragma: no cover
-        "Test for updating a project that needs updating."
-        # Create project.toml in tmp_path
-        project_toml = tmp_path / "project.toml"
-        project_toml.touch()
-
-        # Mock configuration_needs_update to return True
-        mocker.patch(
-            "gamspreprocessor.cli.project.configuration_needs_update", return_value=True
-        )
-        # Mock update_configuration
-        mock_update = mocker.patch("gamspreprocessor.cli.project.update_configuration")
-        # Mock Path.cwd to return tmp_path
-        mocker.patch("gamspreprocessor.cli.project.Path.cwd", return_value=tmp_path)
-
-        runner = CliRunner()
-        result = runner.invoke(cli, ["project", "update", str(project_toml)])
-
-        assert result.exit_code == 0
-        assert "Updated" in result.output
-        assert "Please edit this file" in result.output
-        mock_update.assert_called_once_with(tmp_path)
-
 
 def test_project_cli_help():
     """Test that 'project --help' displays help information."""
@@ -72,7 +49,8 @@ def test_init_and_update_flow(tmp_path, monkeypatch):
 
     # Update an up to date project
     monkeypatch.setattr(
-        "gamspreprocessor.cli.project.configuration_needs_update", lambda x: False
+        "gamspreprocessor.cli.project.project_api.project_configuration_needs_update",
+        lambda x: False,
     )
     result = runner.invoke(cli, ["project", "update", str(tmp_path / "gamsproject.toml")])
     assert result.exit_code == 0
@@ -80,7 +58,12 @@ def test_init_and_update_flow(tmp_path, monkeypatch):
 
     # Update a project that needs updating
     monkeypatch.setattr(
-        "gamspreprocessor.cli.project.configuration_needs_update", lambda x: True
+        "gamspreprocessor.cli.project.project_api.project_configuration_needs_update",
+        lambda x: True,
+    )
+    monkeypatch.setattr(
+        "gamspreprocessor.cli.project.project_api.update_project_configuration",
+        lambda x: None,
     )
     result = runner.invoke(cli, ["project", "update", str(tmp_path / "gamsproject.toml")])
     assert result.exit_code == 0

@@ -80,10 +80,19 @@ nav = [
   },
   {
     "How to" = [
-        {"Overview" = "how-to/index.md"}
+        {"Überblick" = "how-to/index.md"}
     ]
   },
-
+  {
+    "API Referenz" = [
+      {"Überblick" = "api/index.md"},
+      {"project" = "api/project.md"},
+      {"objectcsv" = "api/objectcsv.md"},
+      {"transformers" = "api/transformers.md"},
+      {"gams3" = "api/gams3.md"},
+      {"splitproject" = "api/splitproject.md"}
+    ]
+  }
 ]
 
 

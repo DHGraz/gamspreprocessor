@@ -2,12 +2,10 @@
 
 import logging
 from pathlib import Path
-from typing import Tuple
 
 import click
 
-from ..projectsplitter.bookkeeper import BookKeeper
-from ..projectsplitter.splitter import ProjectSplitter
+from gamspreprocessor import projectsplitter as projectsplitter_api
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +67,7 @@ def split_project(  # noqa: PLR0913
     replace: bool,
     file_list: str,
     strip_prefix: bool,
-    sourcefiles: Tuple[str],
+    sourcefiles: tuple[str, ...],
 ):
     """Split project files into objects directories.
 
@@ -81,8 +79,6 @@ def split_project(  # noqa: PLR0913
     specify the files. eg. 'somedir/*.xml' will split all xml files in
     the somedir directory.
     """
-    file_counter = 0
-    object_counter = 0
     if file_list and sourcefiles:
         raise click.ClickException(
             "You cannot use both '--file-list' and 'sourcefiles'."
@@ -92,24 +88,30 @@ def split_project(  # noqa: PLR0913
             src_files = f.read().splitlines()
     else:
         src_files = sourcefiles
-    if len(src_files) == 0:
-        raise click.ClickException("No processable source files found.")
-    splitter = ProjectSplitter(Path(output_dir), Path(src_files[0]).parent, replace)
-    if reset:
-        splitter.reset()
-    # it's enough to update once per run
-    splitter.update_bookkeeper()
-    for sourcefile in src_files:
-        try:
-            copied_files = splitter.split(Path(sourcefile), object_format, strip_prefix)
+    try:
+        splitter = projectsplitter_api.create_project_splitter(
+            Path(output_dir),
+            Path(src_files[0]).parent,
+            replace=replace,
+            reset=reset,
+        )
+        file_counter = 0
+        object_counter = 0
+        for sourcefile in src_files:
+            try:
+                copied_files = projectsplitter_api.split_project_file(
+                    splitter, sourcefile, object_format, strip_prefix
+                )
+            except FileExistsError as exp:
+                raise click.ClickException(
+                    f"Object directory for {sourcefile} already exists. "
+                    "Use '--replace' to overwrite the object directory or delete the directory by hand."
+                ) from exp
             file_counter += len(copied_files)
             object_counter += 1
             click.echo(f"Split {sourcefile} into object directories.")
-        except FileExistsError as exp:
-            raise click.ClickException(
-                f"Object directory for {sourcefile} already exists. "
-                "Use '--replace' to overwrite the object directory or delete the directory by hand."
-            ) from exp
+    except ValueError as exp:
+        raise click.ClickException(str(exp)) from exp
     click.echo(
         f"Created {object_counter} object dirs, containing {file_counter} files."
     )
@@ -126,11 +128,10 @@ def showunhandled(output_dir: str = "./objects"):
     This command lists all files from the project directory, which have not been
     processed by a split command yet.
     """
-    objects_dir = Path(output_dir)
-    if not (objects_dir / BookKeeper.FILENAME).exists():
-        raise click.ClickException("No bookkeeper file found. Did you run split?")
-    bookkeeper = BookKeeper(objects_dir / BookKeeper.FILENAME)
-    unhandled_files = bookkeeper.get_unhandled()
+    try:
+        unhandled_files = projectsplitter_api.list_unhandled_files(Path(output_dir))
+    except FileNotFoundError as exp:
+        raise click.ClickException(str(exp)) from exp
     if len(unhandled_files) == 0:
         click.echo("No unhandled files found.")
     elif len(unhandled_files) == 1:

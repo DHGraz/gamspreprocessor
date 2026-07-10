@@ -61,9 +61,7 @@ def export_objects(  # noqa: PLR0913 # pylint: disable=too-many-positional-argum
 
 
 __all__ = [
-    "DataStream",
     "ExportError",
     "Gams3Object",
-    "Gams3Query",
     "export_objects",
 ]

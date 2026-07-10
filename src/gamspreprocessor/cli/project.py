@@ -4,11 +4,8 @@ import logging
 from pathlib import Path
 
 import click
-from gamslib.projectconfiguration.utils import (
-    configuration_needs_update,
-    initialize_project_dir,
-    update_configuration,
-)
+
+from gamspreprocessor import project as project_api
 
 logger = logging.getLogger()
 
@@ -26,7 +23,7 @@ def cli():
 @click.argument("project-root", type=click.Path(exists=True))
 def init_project(project_root: str):
     """Create a basic project structure and project.toml."""
-    initialize_project_dir(Path(project_root))
+    project_api.initialize_project(Path(project_root))
     click.echo(
         f"Created {project_root}/project.toml. "
         "Please edit this file to configure your project."
@@ -42,8 +39,8 @@ def update_project(config_file: str):
     often as you like, it will not overwrite any of your settings.
     It will only add new settings or remove deprecated ones.
     """
-    if configuration_needs_update(Path(config_file)):
-        update_configuration(Path(config_file))
+    if project_api.project_configuration_needs_update(Path(config_file)):
+        project_api.update_project_configuration(Path(config_file))
         click.echo(
             f"Updated {config_file}."
             "Please edit this file to finish configuring your project."

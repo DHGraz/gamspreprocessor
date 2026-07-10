@@ -21,3 +21,5 @@ all_objects.xlsx
 .DS_Store
 validation_errors.log
 site/
+all_datastreams.csv
+all_objects.csv
