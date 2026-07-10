@@ -93,7 +93,7 @@ auto-tag-and-publish:
   script:
     - apk add --no-cache python3 curl
     - curl -LsSf https://astral.sh/uv/install.sh | sh
-    
+    - source $HOME/.local/bin/env
     - VERSION_RAW=$(awk -F ' = ' '/^\[project\]/{in_project=1; next} /^\[/{in_project=0} in_project && /^version = / {gsub(/"/, "", $2); print $2; exit}' pyproject.toml)
     - TAG="v${VERSION_RAW}"
     - echo "Detected tag='$TAG'"
