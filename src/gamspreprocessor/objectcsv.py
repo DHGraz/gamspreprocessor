@@ -134,10 +134,10 @@ def xlsx_to_csv(
 
 
 __all__ = [
-    "create_csv_files",
     "collect_csv_data",
-    "update_csv_files",
+    "create_csv_files",
     "csv_to_xlsx",
-    "xlsx_to_csv",
     "resolve_project_toml",
+    "update_csv_files",
+    "xlsx_to_csv",
 ]

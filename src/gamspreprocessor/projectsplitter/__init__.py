@@ -55,7 +55,7 @@ def make_object_source(
     return obj_src
 
 
-def split_project_files(
+def split_project_files(  # noqa: PLR0913
     output_dir: Path | str,
     sourcefiles: Sequence[Path | str],
     object_format: str = "auto",
