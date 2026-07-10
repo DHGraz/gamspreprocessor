@@ -40,23 +40,23 @@ nav = [
   {"Projektkonfiguration" = "configuration.md"},
   {
   "Befehlsreferenz" = [
-        "reference/gamspreprocessor.md",
+        "command-reference/gamspreprocessor.md",
         {
           "Unterbefehle" = [
-              {"project" = "reference/subcommands/project.md"},
-              {"csv" =  "reference/subcommands/csv.md"},
-              {"transform" = "reference/subcommands/transform.md"},
-              {"multitransform" = "reference/subcommands/multitransform.md"},
-              {"splitproject" = "reference/subcommands/splitproject.md"},
-              {"gams3export" = "reference/subcommands/gams3export.md"}
+              {"project" = "command-reference/subcommands/project.md"},
+              {"csv" =  "command-reference/subcommands/csv.md"},
+              {"transform" = "command-reference/subcommands/transform.md"},
+              {"multitransform" = "command-reference/subcommands/multitransform.md"},
+              {"splitproject" = "command-reference/subcommands/splitproject.md"},
+              {"gams3export" = "command-reference/subcommands/gams3export.md"}
           ]
         },
         {
           "Dateien" = [
-              {"gamsproject.toml" = "reference/files/gamsproject.toml.md"},
-              {"DC.xml" = "reference/files/dc.xml.md"},
-              {"object.csv" = "reference/files/object.csv.md"},
-              {"datastreams.csv" = "reference/files/datastreams.csv.md"}
+              {"gamsproject.toml" = "command-reference/files/gamsproject.toml.md"},
+              {"DC.xml" = "command-reference/files/dc.xml.md"},
+              {"object.csv" = "command-reference/files/object.csv.md"},
+              {"datastreams.csv" = "command-reference/files/datastreams.csv.md"}
           ]
         }
     ]
@@ -83,6 +83,7 @@ nav = [
         {"Overview" = "how-to/index.md"}
     ]
   },
+
 ]
 
 

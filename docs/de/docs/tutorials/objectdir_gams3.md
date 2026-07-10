@@ -46,4 +46,4 @@ Details zu den Optionen bekommt man entweder so:
 gamspreprocessor gams3export --help
 ```
 
-oder man liest in der [Befehlsreferenz](../reference/subcommands/gams3export.md) nach.
+oder man liest in der [Befehlsreferenz](../command-reference/subcommands/gams3export.md) nach.

@@ -12,4 +12,4 @@ gamspreprocessor project init
 ```
 
 Ein komplette Übersicht über die enthaltenen Sub-Befehle findet sich in der
-[Referenz](reference/gamspreprocessor/)
+[Referenz](command-reference/gamspreprocessor/)

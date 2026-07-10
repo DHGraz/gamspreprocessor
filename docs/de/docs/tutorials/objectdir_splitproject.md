@@ -13,4 +13,4 @@ Analysiert alle auf das angegebene Muster passende Dateien und erzeugt passende 
 
 TODO: better example and explain what is done.
 
-Details dazu finden sich in der [Referenz](../reference/subcommands/splitproject.md) zu diesem Befehl.
+Details dazu finden sich in der [Referenz](../command-reference/subcommands/splitproject.md) zu diesem Befehl.
