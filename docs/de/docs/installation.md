@@ -18,7 +18,7 @@ Soll `gamspreprocessor` zur normalen Verwendung installiert werden, empfehlen wi
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-#### Installation unter macOS und Linux
+#### Installation von uv unter macOS und Linux
 
 ```
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -75,7 +75,7 @@ normal mit `pip` installiert werden:
 pip install gamspreprocessor
 ```
 
-Danach muss aber immer zuerst das virtuelle Environment aktiviert werden, in dem `gansgamspreprocessor` installiert worden ist.
+Danach muss aber immer zuerst das virtuelle Environment aktiviert werden, in dem `gamspreprocessor` installiert worden ist.
 
 
 ## Installation für Development
