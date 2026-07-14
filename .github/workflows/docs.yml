@@ -34,7 +34,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install zensical==0.0.46  mkdocstrings-python==2.0.5 
+          pip install .
+          pip install zensical==0.0.50  mkdocstrings-python==2.0.5 
 
       - name: Build English docs
         run: zensical build -c -f docs/en/zensical.toml
