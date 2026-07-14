@@ -35,8 +35,8 @@ copyright = ""
 
 
 nav = [
-  "index.md",
-  "installation.md",
+  {"Überblick" = "index.md"},
+  {"Installation" = "installation.md"},
   {"Projektkonfiguration" = "configuration.md"},
   {
   "Befehlsreferenz" = [

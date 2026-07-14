@@ -12,5 +12,5 @@ The important functions API wise are:
   - [update_csv_files](#gamspreprocessor.objectcsv.update_csv_files) - Update 
         per-object CSV files from a combined XLSX or CSV export
 
-
 ::: gamspreprocessor.objectcsv
+
